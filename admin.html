@@ -1,0 +1,3087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentPark Admin</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="Brand_assets/favicon-32x32.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: '#0D2740',
+            'navy-light': '#1A3A5C',
+            gold: '#CBA14B',
+            'gold-tint': '#F5EDD8',
+            'navy-tint': '#D6DEE5',
+            'deep-ink': '#0D1027',
+            'warm-gray': '#F5F5F5',
+          },
+          fontFamily: {
+            sans: ['Inter', 'Helvetica Neue', 'Arial', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+
+    .heading-tight { letter-spacing: -0.03em; }
+    .body-relaxed { line-height: 1.7; }
+    .spring-ease { transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+    .brand-focus:focus-visible {
+      outline: 2px solid #CBA14B;
+      outline-offset: 2px;
+    }
+
+    .shadow-elevated {
+      box-shadow:
+        0 1px 2px rgba(13, 39, 64, 0.04),
+        0 4px 8px rgba(13, 39, 64, 0.06),
+        0 12px 24px rgba(13, 39, 64, 0.06);
+    }
+    .shadow-floating {
+      box-shadow:
+        0 2px 4px rgba(13, 39, 64, 0.04),
+        0 8px 16px rgba(13, 39, 64, 0.08),
+        0 24px 48px rgba(13, 39, 64, 0.1);
+    }
+
+    .grain-overlay::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.03;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 256px 256px;
+      z-index: 1;
+    }
+
+    /* Sidebar nav active */
+    .nav-item.active {
+      background: rgba(203, 161, 75, 0.12);
+      color: #CBA14B;
+    }
+    .nav-item.active .nav-icon { color: #CBA14B; }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(13, 39, 64, 0.15); border-radius: 3px; }
+
+    /* Input styles */
+    .admin-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #D6DEE5;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #0D2740;
+      background: white;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      outline: none;
+    }
+    .admin-input:focus {
+      border-color: #CBA14B;
+      box-shadow: 0 0 0 3px rgba(203, 161, 75, 0.12);
+    }
+    .admin-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #D6DEE5;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #0D2740;
+      background: white;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      outline: none;
+      resize: vertical;
+      min-height: 48px;
+      overflow: hidden;
+      field-sizing: content;
+    }
+    .admin-textarea:focus {
+      border-color: #CBA14B;
+      box-shadow: 0 0 0 3px rgba(203, 161, 75, 0.12);
+    }
+
+    /* Tab system */
+    .tab-btn.active-tab {
+      background: #0D2740;
+      color: white;
+    }
+    .admin-lang-btn.active-admin-lang {
+      background: #CBA14B;
+      color: #0D1027;
+      font-weight: 600;
+    }
+
+    /* Toast */
+    #toast {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    #toast.hidden {
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+    }
+
+    /* Login screen */
+    #login-screen {
+      transition: opacity 0.3s ease;
+    }
+
+    /* Stat card shimmer on hover */
+    .stat-card:hover {
+      transform: translateY(-2px);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Image drop zone */
+    .drop-zone {
+      border: 2px dashed #D6DEE5;
+      border-radius: 12px;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: #CBA14B;
+      background: rgba(203, 161, 75, 0.04);
+    }
+
+    /* Toggle switch */
+    .toggle-track {
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background: #D6DEE5;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .toggle-track.on { background: #CBA14B; }
+    .toggle-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: white;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    }
+    .toggle-track.on .toggle-thumb { transform: translateX(20px); }
+
+    /* Rich text editor */
+    .rich-editor {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #D6DEE5;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #0D2740;
+      background: white;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      outline: none;
+      resize: vertical;
+      min-height: 48px;
+      overflow-y: visible;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .rich-editor:focus {
+      border-color: #CBA14B;
+      box-shadow: 0 0 0 3px rgba(203, 161, 75, 0.12);
+    }
+    .rich-editor:empty::before {
+      content: attr(data-placeholder);
+      color: #9CA3AF;
+      pointer-events: none;
+    }
+    .color-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 6px;
+      background: #F8FAFB;
+      border: 1px solid #D6DEE5;
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+      flex-wrap: wrap;
+    }
+    .color-toolbar + .rich-editor {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+    .color-swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      border: 1.5px solid rgba(13, 39, 64, 0.15);
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      flex-shrink: 0;
+    }
+    .color-swatch:hover {
+      transform: scale(1.2);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .color-swatch.active-color {
+      border-color: #0D2740;
+      box-shadow: 0 0 0 2px rgba(13, 39, 64, 0.2);
+    }
+    .color-toolbar .toolbar-sep {
+      width: 1px;
+      height: 16px;
+      background: #D6DEE5;
+      margin: 0 2px;
+      flex-shrink: 0;
+    }
+    .color-toolbar label.custom-color-wrap {
+      position: relative;
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1.5px solid rgba(13, 39, 64, 0.15);
+      flex-shrink: 0;
+    }
+    .color-toolbar label.custom-color-wrap input[type="color"] {
+      position: absolute;
+      inset: -4px;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none;
+      cursor: pointer;
+    }
+    .color-toolbar .toolbar-btn {
+      padding: 2px 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #0D2740;
+      background: white;
+      border: 1px solid #D6DEE5;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    /* Prevent toolbar clicks from stealing selection focus */
+    .color-toolbar * {
+      user-select: none;
+    }
+    .color-toolbar .toolbar-btn:hover {
+      background: #F0F2F5;
+    }
+  </style>
+</head>
+<body class="font-sans bg-warm-gray antialiased min-h-screen">
+
+  <!-- ============================================================ -->
+  <!-- LOGIN SCREEN -->
+  <!-- ============================================================ -->
+  <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center relative grain-overlay overflow-hidden">
+    <!-- Background -->
+    <div class="absolute inset-0 bg-gradient-to-br from-deep-ink via-navy to-navy-light"></div>
+    <div class="absolute top-0 right-0 w-3/4 h-3/4 bg-[radial-gradient(ellipse_at_top_right,rgba(203,161,75,0.12),transparent_60%)]"></div>
+    <div class="absolute bottom-0 left-0 w-1/2 h-1/2 bg-[radial-gradient(ellipse_at_bottom_left,rgba(13,39,64,0.8),transparent_60%)]"></div>
+
+    <div class="relative z-10 w-full max-w-md px-6">
+      <!-- Logo -->
+      <div class="flex justify-center mb-10">
+        <img src="Brand_assets/AgentPark_logo.png" alt="AgentPark" class="h-12 w-auto">
+      </div>
+
+      <div class="bg-white/[0.06] border border-white/10 rounded-2xl p-8 shadow-floating backdrop-blur-sm">
+        <h1 class="text-2xl font-bold text-white heading-tight mb-1" data-i18n="admin-panel">Admin Panel</h1>
+        <p class="text-sm text-navy-tint/80 mb-8 body-relaxed" data-i18n="sign-in-desc">Sign in to manage your website.</p>
+
+        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
+          <div>
+            <label class="block text-xs font-medium text-gold-tint/70 tracking-wide uppercase mb-2" data-i18n="username">Username</label>
+            <input id="login-user" type="text" placeholder="admin" class="admin-input bg-white/10 border-white/15 text-white placeholder-white/30" style="color:white;background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);" autocomplete="username">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gold-tint/70 tracking-wide uppercase mb-2" data-i18n="password">Password</label>
+            <input id="login-pass" type="password" placeholder="••••••••" class="admin-input bg-white/10 border-white/15 text-white placeholder-white/30" style="color:white;background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);" autocomplete="current-password">
+          </div>
+          <p id="login-error" class="text-red-400 text-sm hidden" data-i18n="login-error">Incorrect username or password.</p>
+          <button type="submit" class="w-full px-6 py-3 bg-gold text-deep-ink font-semibold text-sm rounded-lg hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-floating mt-2" data-i18n="sign-in">
+            Sign In
+          </button>
+        </form>
+
+        <p class="text-xs text-white/30 text-center mt-6" data-i18n="login-hint">Default: admin / agentpark2025</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- ADMIN SHELL (hidden until logged in) -->
+  <!-- ============================================================ -->
+  <div id="admin-shell" class="hidden min-h-screen flex">
+
+    <!-- MOBILE SIDEBAR BACKDROP -->
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="admin-sidebar" class="w-64 min-h-screen bg-navy flex flex-col flex-shrink-0 relative grain-overlay overflow-hidden fixed md:relative z-50 -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(203,161,75,0.08),transparent_60%)] pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col h-full">
+        <!-- Logo -->
+        <div class="px-6 py-6 border-b border-white/8">
+          <img src="Brand_assets/AgentPark_logo.png" alt="AgentPark" class="h-8 w-auto">
+          <p class="text-[10px] text-white/30 mt-2 tracking-widest uppercase" data-i18n="sidebar-admin-panel">Admin Panel</p>
+        </div>
+
+        <!-- Nav -->
+        <nav class="flex-1 px-3 py-6 space-y-1">
+          <button onclick="showSection('dashboard')" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/8 transition-colors duration-150 brand-focus text-left" data-section="dashboard">
+            <svg class="nav-icon w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span data-i18n="nav-dashboard">Dashboard</span>
+          </button>
+          <button onclick="showSection('content')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/8 transition-colors duration-150 brand-focus text-left" data-section="content">
+            <svg class="nav-icon w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            <span data-i18n="nav-content">Content</span>
+          </button>
+          <button onclick="showSection('images')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/8 transition-colors duration-150 brand-focus text-left" data-section="images">
+            <svg class="nav-icon w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span data-i18n="nav-images">Images</span>
+          </button>
+          <button onclick="showSection('analytics')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/8 transition-colors duration-150 brand-focus text-left" data-section="analytics">
+            <svg class="nav-icon w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            <span data-i18n="nav-analytics">Analytics</span>
+          </button>
+          <button onclick="showSection('events')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/8 transition-colors duration-150 brand-focus text-left" data-section="events">
+            <svg class="nav-icon w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span data-i18n="nav-events">Events</span>
+          </button>
+          <button onclick="showSection('settings')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/8 transition-colors duration-150 brand-focus text-left" data-section="settings">
+            <svg class="nav-icon w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span data-i18n="nav-settings">Settings</span>
+          </button>
+        </nav>
+
+        <!-- Footer -->
+        <div class="px-6 py-5 border-t border-white/8">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center">
+              <span class="text-xs font-bold text-gold">A</span>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-white">Admin</p>
+              <p class="text-[10px] text-white/40">agentpark.am</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <a href="/" target="_blank" class="flex-1 text-center text-xs py-2 px-3 rounded-lg bg-white/8 text-white/60 hover:text-white hover:bg-white/12 transition-colors duration-150 brand-focus" data-i18n="view-site">
+              View Site
+            </a>
+            <button onclick="handleLogout()" class="flex-1 text-center text-xs py-2 px-3 rounded-lg bg-white/8 text-white/60 hover:text-red-400 hover:bg-red-500/10 transition-colors duration-150 brand-focus" data-i18n="log-out">
+              Log Out
+            </button>
+            <div class="mt-3 flex items-center gap-1 justify-center">
+              <button onclick="adminSetLang('en')" data-alang="en" class="admin-lang-switch active-alang px-2 py-0.5 text-[10px] font-semibold rounded border border-white/20 text-white/60 hover:text-white">EN</button>
+              <button onclick="adminSetLang('am')" data-alang="am" class="admin-lang-switch px-2 py-0.5 text-[10px] font-semibold rounded border border-white/20 text-white/60 hover:text-white">ՀՅ</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 overflow-auto w-full md:w-auto">
+
+      <!-- Top bar -->
+      <header class="sticky top-0 z-30 bg-white/90 border-b border-navy-tint/40 backdrop-blur-sm px-4 md:px-8 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button onclick="toggleSidebar()" class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-navy/8 transition-colors duration-150">
+            <svg class="w-6 h-6 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div>
+            <h1 id="page-title" class="text-lg font-bold text-navy heading-tight">Dashboard</h1>
+            <p id="page-sub" class="text-xs text-navy/50 mt-0.5">Welcome back, Admin</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="save-badge" class="hidden text-xs font-medium text-gold bg-gold/10 px-3 py-1 rounded-full border border-gold/20" data-i18n="unsaved-changes">Unsaved changes</span>
+          <button id="save-btn" onclick="saveAll()" class="hidden px-5 py-2 bg-navy text-white text-sm font-semibold rounded-lg hover:bg-navy-light active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-elevated" data-i18n="save-changes">
+            Save Changes
+          </button>
+        </div>
+      </header>
+
+      <!-- ==================== DASHBOARD ==================== -->
+      <section id="section-dashboard" class="p-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+          <!-- Stat cards -->
+          <div class="stat-card bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
+            <div class="flex items-start justify-between mb-4">
+              <div class="w-10 h-10 rounded-xl bg-navy/8 flex items-center justify-center">
+                <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </div>
+              <span id="dash-pv-change" class="text-xs font-medium text-navy/40 bg-navy/5 px-2 py-0.5 rounded-full">—</span>
+            </div>
+            <p id="dash-page-views" class="text-2xl font-bold text-navy heading-tight">—</p>
+            <p class="text-xs text-navy/50 mt-1" data-i18n="stat-page-views">Page Views (30d)</p>
+          </div>
+          <div class="stat-card bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
+            <div class="flex items-start justify-between mb-4">
+              <div class="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <span id="dash-uv-change" class="text-xs font-medium text-navy/40 bg-navy/5 px-2 py-0.5 rounded-full">—</span>
+            </div>
+            <p id="dash-unique-visitors" class="text-2xl font-bold text-navy heading-tight">—</p>
+            <p class="text-xs text-navy/50 mt-1" data-i18n="stat-unique-visitors">Unique Visitors</p>
+          </div>
+          <div class="stat-card bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
+            <div class="flex items-start justify-between mb-4">
+              <div class="w-10 h-10 rounded-xl bg-navy/8 flex items-center justify-center">
+                <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              </div>
+              <span id="dash-cs-change" class="text-xs font-medium text-navy/40 bg-navy/5 px-2 py-0.5 rounded-full">—</span>
+            </div>
+            <p id="dash-contact-submissions" class="text-2xl font-bold text-navy heading-tight">—</p>
+            <p class="text-xs text-navy/50 mt-1" data-i18n="stat-contact-submissions">Contact Submissions</p>
+          </div>
+          <div class="stat-card bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
+            <div class="flex items-start justify-between mb-4">
+              <div class="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <span class="text-xs font-medium text-navy/50 bg-navy/5 px-2 py-0.5 rounded-full" data-i18n="stat-avg-label">avg</span>
+            </div>
+            <p id="dash-avg-duration" class="text-2xl font-bold text-navy heading-tight">—</p>
+            <p class="text-xs text-navy/50 mt-1" data-i18n="stat-avg-duration">Avg. Session Duration</p>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
+            <h3 class="text-sm font-semibold text-navy mb-5" data-i18n="quick-actions">Quick Actions</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <button onclick="showSection('content')" class="flex items-center gap-3 p-4 rounded-xl border border-navy-tint/40 hover:border-gold/40 hover:bg-gold/4 transition-colors duration-150 brand-focus text-left group">
+                <div class="w-9 h-9 rounded-lg bg-navy/5 group-hover:bg-gold/10 flex items-center justify-center transition-colors duration-150">
+                  <svg class="w-4 h-4 text-navy/60 group-hover:text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-navy" data-i18n="qa-edit-content">Edit Content</p>
+                  <p class="text-xs text-navy/50" data-i18n="qa-edit-content-desc">Update page copy</p>
+                </div>
+              </button>
+              <button onclick="showSection('images')" class="flex items-center gap-3 p-4 rounded-xl border border-navy-tint/40 hover:border-gold/40 hover:bg-gold/4 transition-colors duration-150 brand-focus text-left group">
+                <div class="w-9 h-9 rounded-lg bg-navy/5 group-hover:bg-gold/10 flex items-center justify-center transition-colors duration-150">
+                  <svg class="w-4 h-4 text-navy/60 group-hover:text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-navy" data-i18n="qa-manage-images">Manage Images</p>
+                  <p class="text-xs text-navy/50" data-i18n="qa-manage-images-desc">Upload & swap images</p>
+                </div>
+              </button>
+              <button onclick="showSection('analytics')" class="flex items-center gap-3 p-4 rounded-xl border border-navy-tint/40 hover:border-gold/40 hover:bg-gold/4 transition-colors duration-150 brand-focus text-left group">
+                <div class="w-9 h-9 rounded-lg bg-navy/5 group-hover:bg-gold/10 flex items-center justify-center transition-colors duration-150">
+                  <svg class="w-4 h-4 text-navy/60 group-hover:text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-navy" data-i18n="qa-view-analytics">View Analytics</p>
+                  <p class="text-xs text-navy/50" data-i18n="qa-view-analytics-desc">Stats & traffic</p>
+                </div>
+              </button>
+              <button onclick="showSection('settings')" class="flex items-center gap-3 p-4 rounded-xl border border-navy-tint/40 hover:border-gold/40 hover:bg-gold/4 transition-colors duration-150 brand-focus text-left group">
+                <div class="w-9 h-9 rounded-lg bg-navy/5 group-hover:bg-gold/10 flex items-center justify-center transition-colors duration-150">
+                  <svg class="w-4 h-4 text-navy/60 group-hover:text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-navy" data-i18n="qa-settings">Settings</p>
+                  <p class="text-xs text-navy/50" data-i18n="qa-settings-desc">Brand & contact</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-navy rounded-2xl p-6 shadow-elevated relative overflow-hidden grain-overlay">
+            <div class="absolute top-0 right-0 w-40 h-40 bg-[radial-gradient(ellipse_at_top_right,rgba(203,161,75,0.15),transparent_70%)] pointer-events-none"></div>
+            <div class="relative z-10">
+              <p class="text-xs font-medium text-gold tracking-widest uppercase mb-4" data-i18n="site-status">Site Status</p>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-white/60" data-i18n="status-main-site">Main Site</span>
+                  <span class="flex items-center gap-1.5 text-xs text-green-400"><span class="w-1.5 h-1.5 rounded-full bg-green-400 inline-block"></span><span data-i18n="status-live">Live</span></span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-white/60" data-i18n="status-server">Server</span>
+                  <span class="flex items-center gap-1.5 text-xs text-green-400"><span class="w-1.5 h-1.5 rounded-full bg-green-400 inline-block"></span><span data-i18n="status-running">Running</span></span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-white/60" data-i18n="status-last-updated">Last Updated</span>
+                  <span class="text-xs text-white/60">Mar 4, 2026</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-white/60" data-i18n="status-version">Version</span>
+                  <span class="text-xs text-white/60">1.0.0</span>
+                </div>
+              </div>
+              <a href="/" target="_blank" class="mt-6 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gold text-deep-ink text-xs font-semibold rounded-lg hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus" data-i18n="open-website">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                Open Website
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== CONTENT ==================== -->
+      <section id="section-content" class="p-8 hidden">
+        <div class="max-w-3xl space-y-6">
+
+          <!-- Language selector -->
+          <div class="flex items-center gap-3 mb-1">
+            <span class="text-xs font-semibold text-navy/50 uppercase tracking-wide" data-i18n="editing-language">Editing Language:</span>
+            <div class="flex rounded-lg border border-navy-tint/50 overflow-hidden text-xs font-semibold">
+              <button onclick="setAdminLang('en')" data-admin-lang="en" class="admin-lang-btn active-admin-lang px-4 py-2 text-navy/70 hover:bg-navy/5 transition-colors duration-150" data-i18n="lang-english">English</button>
+              <div class="w-px bg-navy-tint/50"></div>
+              <button onclick="setAdminLang('am')" data-admin-lang="am" class="admin-lang-btn px-4 py-2 text-navy/70 hover:bg-navy/5 transition-colors duration-150" data-i18n="lang-armenian">Հայերեն (Armenian)</button>
+            </div>
+          </div>
+
+          <!-- Tab buttons -->
+          <div class="flex gap-2 flex-wrap">
+            <button onclick="showContentTab('hero')" class="tab-btn active-tab px-4 py-2 text-sm font-medium rounded-lg bg-navy/8 text-navy/70 hover:bg-navy/12 transition-colors duration-150 brand-focus" data-tab="hero" data-i18n="tab-hero">Hero</button>
+            <button onclick="showContentTab('about')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-navy/8 text-navy/70 hover:bg-navy/12 transition-colors duration-150 brand-focus" data-tab="about" data-i18n="tab-about">About</button>
+            <button onclick="showContentTab('community')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-navy/8 text-navy/70 hover:bg-navy/12 transition-colors duration-150 brand-focus" data-tab="community" data-i18n="tab-community">Community & Events</button>
+            <button onclick="showContentTab('nav')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-navy/8 text-navy/70 hover:bg-navy/12 transition-colors duration-150 brand-focus" data-tab="nav" data-i18n="tab-navigation">Navigation</button>
+            <button onclick="showContentTab('armenian')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-navy/8 text-navy/70 hover:bg-navy/12 transition-colors duration-150 brand-focus" data-tab="armenian" data-i18n="tab-armenian">🇦🇲 Armenian</button>
+          </div>
+
+          <!-- Hero tab -->
+          <div id="content-tab-hero" class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30 space-y-5">
+            <h3 class="text-sm font-semibold text-navy" data-i18n="hero-section">Hero Section</h3>
+            <div>
+              <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-location-badge">Location Badge</label>
+              <input id="hero-badge" type="text" class="admin-input" value="Yerevan, Armenia" oninput="markDirty()">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-headline-line1">Headline (line 1)</label>
+              <input id="hero-h1a" type="text" class="admin-input" value="Armenia's Next Frontier in" oninput="markDirty()">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-headline-highlighted">Headline (highlighted)</label>
+              <input id="hero-h1b" type="text" class="admin-input" value="Artificial Intelligence" oninput="markDirty()">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-subheading">Subheading</label>
+              <textarea id="hero-sub" class="admin-textarea" oninput="markDirty()">AgentPark is the beating heart of Armenia's AI ecosystem — a future-focused hub that brings together innovation, entrepreneurship, and education to launch AI-native ventures into global markets.</textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-primary-cta">Primary CTA Label</label>
+                <input id="hero-cta1" type="text" class="admin-input" value="Discover AgentPark" oninput="markDirty()">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-secondary-cta">Secondary CTA Label</label>
+                <input id="hero-cta2" type="text" class="admin-input" value="Partner with Us" oninput="markDirty()">
+              </div>
+            </div>
+          </div>
+
+          <!-- About tab -->
+          <div id="content-tab-about" class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30 space-y-5 hidden">
+            <h3 class="text-sm font-semibold text-navy" data-i18n="about-section">About Section</h3>
+            <div>
+              <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-section-label">Section Label</label>
+              <input id="about-label" type="text" class="admin-input" value="About AgentPark" oninput="markDirty()">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-heading">Heading</label>
+              <textarea id="about-h2" class="admin-textarea" oninput="markDirty()">Where Startups Scale, Communities Connect, and Ideas Become Impact</textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-paragraph-1">Paragraph 1</label>
+              <textarea id="about-p1" class="admin-textarea" oninput="markDirty()">The Yerevan AgentPark is set to become the beating heart of Armenia's growing AI ecosystem — a future-focused hub that brings together innovation, entrepreneurship, and education.</textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-paragraph-2">Paragraph 2</label>
+              <textarea id="about-p2" class="admin-textarea" oninput="markDirty()">The AgentPark team is composed of experienced professionals who have been actively involved in the development of Armenia's technological ecosystem, including work on the creation of high-tech clusters within the USAID CAPS program.</textarea>
+            </div>
+          </div>
+
+          <!-- Community tab -->
+          <div id="content-tab-community" class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30 space-y-5 hidden">
+            <h3 class="text-sm font-semibold text-navy" data-i18n="community-section">Community Section</h3>
+            <div>
+              <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-section-label-comm">Section Label</label>
+              <input id="comm-label" type="text" class="admin-input" value="Community & Events" oninput="markDirty()">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-heading-comm">Heading</label>
+              <textarea id="comm-h2" class="admin-textarea" oninput="markDirty()">Global Events, Local Impact</textarea>
+            </div>
+
+            <div class="border-t border-navy-tint/30 pt-4">
+              <p class="text-xs font-semibold text-navy/50 uppercase tracking-wide mb-4" data-i18n="feature-1">Feature 1</p>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-title">Title</label>
+                  <input id="comm-f1-title" type="text" class="admin-input" value="Community Space" oninput="markDirty()">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-description">Description</label>
+                  <textarea id="comm-f1-desc" class="admin-textarea" oninput="markDirty()">Inviting local residents and students to participate in AI-related events and educational programs, bridging the gap between professionals and young enthusiasts.</textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-navy-tint/30 pt-4">
+              <p class="text-xs font-semibold text-navy/50 uppercase tracking-wide mb-4" data-i18n="feature-2">Feature 2</p>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-title-f2">Title</label>
+                  <input id="comm-f2-title" type="text" class="admin-input" value="International Conferences & Hackathons" oninput="markDirty()">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-description-f2">Description</label>
+                  <textarea id="comm-f2-desc" class="admin-textarea" oninput="markDirty()">Regular events bringing together leading minds from Armenia and abroad, sparking new ideas, partnerships, and research.</textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-navy-tint/30 pt-4">
+              <p class="text-xs font-semibold text-navy/50 uppercase tracking-wide mb-4" data-i18n="feature-3">Feature 3</p>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-title-f3">Title</label>
+                  <input id="comm-f3-title" type="text" class="admin-input" value="Mentorship & Learning" oninput="markDirty()">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-description-f3">Description</label>
+                  <textarea id="comm-f3-desc" class="admin-textarea" oninput="markDirty()">Fostering a culture of mentorship and mutual learning between seasoned professionals and the next generation of AI talent.</textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Events Subsection -->
+            <div class="border-t border-navy-tint/30 pt-4">
+              <p class="text-xs font-semibold text-navy/50 uppercase tracking-wide mb-4" data-i18n="events-subsection">Events Subsection</p>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-events-heading">Events Heading</label>
+                  <input id="events-h2" type="text" class="admin-input" value="Events at AgentPark" oninput="markDirty()">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-upcoming-label">Upcoming Label</label>
+                    <input id="events-upcoming-label" type="text" class="admin-input" value="Upcoming Events" oninput="markDirty()">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-past-label">Past Label</label>
+                    <input id="events-past-label" type="text" class="admin-input" value="Past Events" oninput="markDirty()">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="saveCommunityContent()" class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gold text-deep-ink font-semibold text-sm rounded-lg hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus" data-i18n="save-community-section">
+              Save Community & Events Section
+            </button>
+            <div id="comm-save-msg" class="hidden text-center text-sm text-green-600 font-medium" data-i18n="changes-saved-index">Changes saved to index.html</div>
+          </div>
+
+          <!-- Nav tab -->
+          <div id="content-tab-nav" class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30 space-y-5 hidden">
+            <h3 class="text-sm font-semibold text-navy" data-i18n="navigation-labels">Navigation Labels</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-link-1">Link 1</label>
+                <input id="nav-1" type="text" class="admin-input" value="About" oninput="markDirty()">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-link-2">Link 2</label>
+                <input id="nav-2" type="text" class="admin-input" value="NVIDIA AI Factory" oninput="markDirty()">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-link-3">Link 3</label>
+                <input id="nav-3" type="text" class="admin-input" value="What We Do" oninput="markDirty()">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-link-4">Link 4</label>
+                <input id="nav-4" type="text" class="admin-input" value="Community" oninput="markDirty()">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-cta-button">CTA Button</label>
+                <input id="nav-cta" type="text" class="admin-input" value="Get in Touch" oninput="markDirty()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Armenian Content Tab (dynamic) -->
+          <div id="content-tab-armenian" class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30 space-y-5 hidden">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="text-lg">🇦🇲</span>
+              <div>
+                <h3 class="text-sm font-semibold text-navy">Հայերեն (Armenian) — բոլոր բաժինները</h3>
+                <p class="text-xs text-navy/50" data-i18n="am-tab-desc">Edit all Armenian translations. Changes apply when visitors switch to Armenian.</p>
+              </div>
+            </div>
+            <div id="am-fields-container">
+              <div class="text-center py-8 text-navy/40 text-sm" data-i18n="loading-am-fields">Loading Armenian fields...</div>
+            </div>
+            <button onclick="saveAllArmenian()" class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gold text-deep-ink font-semibold text-sm rounded-lg hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus">
+              Պահպանել հայերեն բովանդակությունը / Save Armenian
+            </button>
+            <div id="am-save-msg" class="hidden text-center text-sm text-green-600 font-medium">Armenian content saved ✓</div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== IMAGES ==================== -->
+      <section id="section-images" class="p-8 hidden">
+        <div class="max-w-5xl space-y-6">
+
+          <!-- Upload Zone -->
+          <div class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
+            <h3 class="text-sm font-semibold text-navy mb-1" data-i18n="upload-image">Upload Image</h3>
+            <p class="text-xs text-navy/50 mb-5 body-relaxed" data-i18n="upload-image-desc">Upload images to the server. Supported: JPG, PNG, SVG, WebP.</p>
+            <div class="drop-zone p-10 text-center cursor-pointer" id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+              <div class="w-12 h-12 rounded-xl bg-navy/5 flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-navy/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+              </div>
+              <p class="text-sm font-medium text-navy/70" data-i18n="drop-files">Drop files here or <span class="text-gold">click to browse</span></p>
+              <p class="text-xs text-navy/40 mt-1" data-i18n="saved-to-uploads">Saved to /uploads/ on the server</p>
+              <input type="file" id="file-input" class="hidden" accept="image/*" multiple onchange="handleFileSelect(event)">
+            </div>
+            <div id="upload-progress" class="hidden mt-4 text-sm text-navy/60 text-center"></div>
+          </div>
+
+          <!-- Image Library -->
+          <div class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
+            <div class="flex items-center justify-between mb-5">
+              <h3 class="text-sm font-semibold text-navy" data-i18n="image-library">Image Library</h3>
+              <button onclick="loadImageLibrary()" class="text-xs text-gold hover:underline brand-focus" data-i18n="refresh">Refresh</button>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" id="image-library-grid">
+              <div class="col-span-full text-center py-6 text-navy/40 text-xs">Loading...</div>
+            </div>
+          </div>
+
+          <!-- Section Image Manager -->
+          <div class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
+            <h3 class="text-sm font-semibold text-navy mb-1" data-i18n="website-section-images">Website Section Images</h3>
+            <p class="text-xs text-navy/50 mb-6 body-relaxed" data-i18n="website-section-images-desc">Click a slot to change which image appears in each section of the website.</p>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="section-image-slots">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Image Picker Modal -->
+      <div id="img-picker-modal" class="hidden fixed inset-0 z-[200] items-center justify-center p-4">
+        <div class="absolute inset-0 bg-deep-ink/70 backdrop-blur-sm" onclick="closeImgPicker()"></div>
+        <div class="relative z-10 w-full max-w-2xl bg-white rounded-2xl shadow-[0_32px_64px_rgba(13,39,64,0.28)] overflow-hidden flex flex-col" style="max-height:80vh">
+          <div class="bg-navy px-6 py-4 flex items-center justify-between flex-shrink-0">
+            <div>
+              <h3 class="text-base font-bold text-white" data-i18n="choose-image">Choose Image</h3>
+              <p id="picker-slot-label" class="text-navy-tint/60 text-xs mt-0.5"></p>
+            </div>
+            <button onclick="closeImgPicker()" class="text-white/50 hover:text-white brand-focus rounded p-1">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <!-- URL input -->
+          <div class="px-6 py-4 border-b border-navy-tint/30 flex-shrink-0">
+            <label class="block text-xs font-semibold text-navy/50 uppercase tracking-wide mb-2" data-i18n="paste-image-url">Or paste an image URL</label>
+            <div class="flex gap-2">
+              <input id="picker-url-input" type="url" placeholder="https://example.com/image.jpg" data-i18n-placeholder="ph-picker-url" class="admin-input flex-1">
+              <button onclick="applyPickerUrl()" class="px-4 py-2 bg-gold text-deep-ink text-sm font-semibold rounded-lg hover:brightness-110 brand-focus flex-shrink-0" data-i18n="use-url">Use URL</button>
+            </div>
+          </div>
+          <!-- Grid -->
+          <div class="overflow-y-auto flex-1 p-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="picker-grid">
+              <div class="col-span-full text-center py-6 text-navy/40 text-xs">Loading images...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== ANALYTICS ==================== -->
+      <section id="section-analytics" class="p-8 hidden">
+        <div class="max-w-5xl space-y-6">
+
+          <!-- Summary row -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white rounded-2xl p-5 shadow-elevated border border-navy-tint/30">
+              <p class="text-xs text-navy/50 mb-1" data-i18n="analytics-this-month">This Month</p>
+              <p id="analytics-pv-count" class="text-xl font-bold text-navy heading-tight">—</p>
+              <p class="text-xs text-navy/40" data-i18n="analytics-page-views">page views</p>
+            </div>
+            <div class="bg-white rounded-2xl p-5 shadow-elevated border border-navy-tint/30">
+              <p class="text-xs text-navy/50 mb-1" data-i18n="analytics-visitors">Visitors</p>
+              <p id="analytics-uv-count" class="text-xl font-bold text-navy heading-tight">—</p>
+              <p class="text-xs text-navy/40" data-i18n="analytics-unique-sessions">unique sessions</p>
+            </div>
+            <div class="bg-white rounded-2xl p-5 shadow-elevated border border-navy-tint/30">
+              <p class="text-xs text-navy/50 mb-1" data-i18n="analytics-bounce-rate">Bounce Rate</p>
+              <p id="analytics-bounce" class="text-xl font-bold text-navy heading-tight">—</p>
+              <p class="text-xs text-green-500" data-i18n="analytics-bounce-change">↓ 4% vs last month</p>
+            </div>
+            <div class="bg-white rounded-2xl p-5 shadow-elevated border border-navy-tint/30">
+              <p class="text-xs text-navy/50 mb-1" data-i18n="analytics-avg-duration">Avg. Duration</p>
+              <p id="analytics-duration" class="text-xl font-bold text-navy heading-tight">—</p>
+              <p class="text-xs text-green-500" data-i18n="analytics-duration-change">↑ 12s vs last month</p>
+            </div>
+          </div>
+
+          <!-- Traffic chart (visual bar chart) -->
+          <div class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-sm font-semibold text-navy" data-i18n="daily-traffic">Daily Traffic — March 2026</h3>
+              <span class="text-xs text-navy/40 bg-warm-gray px-3 py-1 rounded-full" data-i18n="last-14-days">Last 14 days</span>
+            </div>
+            <div id="traffic-chart-bars" class="flex items-end gap-2 h-32">
+              <!-- Bars populated dynamically -->
+              <div class="text-center py-10 text-navy/40 text-xs w-full">Loading chart...</div>
+<span class="text-[9px] text-navy/30">19</span></div>
+              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 20"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:60%"></div><span class="text-[9px] text-navy/30">20</span></div>
+              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 21"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:35%"></div><span class="text-[9px] text-navy/30">21</span></div>
+              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 22"><div class="w-full bg-gold/60 rounded-t-sm hover:bg-gold transition-colors duration-150 cursor-default" style="height:80%"></div><span class="text-[9px] text-navy/30">22</span></div>
+              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 23"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:55%"></div><span class="text-[9px] text-navy/30">23</span></div>
+              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 24"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:50%"></div><span class="text-[9px] text-navy/30">24</span></div>
+              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 25"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:70%"></div><span class="text-[9px] text-navy/30">25</span></div>
+              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 26"><div class="w-full bg-gold/60 rounded-t-sm hover:bg-gold transition-colors duration-150 cursor-default" style="height:100%"></div><span class="text-[9px] text-navy/30">26</span></div>
+              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 27"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:65%"></div><span class="text-[9px] text-navy/30">27</span></div>
+              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 28"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:58%"></div><span class="text-[9px] text-navy/30">28</span></div>
+              <div class="flex flex-col items-center gap-1 flex-1" title="Mar 1"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:42%"></div><span class="text-[9px] text-navy/30">Mar 1</span></div>
+              <div class="flex flex-col items-center gap-1 flex-1" title="Mar 2"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:75%"></div><span class="text-[9px] text-navy/30">2</span></div>
+              <div class="flex flex-col items-center gap-1 flex-1" title="Mar 3"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:68%"></div><span class="text-[9px] text-navy/30">3</span></div>
+              <div class="flex flex-col items-center gap-1 flex-1" title="Mar 4"><div class="w-full bg-gold rounded-t-sm hover:brightness-110 transition-colors duration-150 cursor-default" style="height:82%"></div><span class="text-[9px] text-navy/30 font-semibold">4</span></div>
+            </div>
+          </div>
+
+          <!-- Top pages + Geo -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
+              <h3 class="text-sm font-semibold text-navy mb-5" data-i18n="top-pages">Top Pages</h3>
+              <div id="top-pages-list" class="space-y-3">
+                <div class="text-center py-4 text-navy/40 text-xs">Loading...</div>
+              </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
+              <h3 class="text-sm font-semibold text-navy mb-5" data-i18n="top-countries">Top Countries</h3>
+              <div id="top-countries-list" class="space-y-3">
+                <div class="text-center py-4 text-navy/40 text-xs">Loading...</div>
+              </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== SETTINGS ==================== -->
+      <section id="section-settings" class="p-8 hidden">
+        <div class="max-w-3xl space-y-6">
+
+          <!-- Brand Colors -->
+          <div class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30 space-y-5">
+            <h3 class="text-sm font-semibold text-navy" data-i18n="brand-colors">Brand Colors</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-primary-navy">Primary (Navy)</label>
+                <div class="flex items-center gap-3">
+                  <input type="color" id="color-navy" value="#0D2740" class="w-10 h-10 rounded-lg border border-navy-tint/40 cursor-pointer p-0.5" oninput="markDirty()">
+                  <input type="text" id="color-navy-hex" value="#0D2740" class="admin-input flex-1" oninput="syncColor('navy')" style="font-family:monospace">
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-accent-gold">Accent (Gold)</label>
+                <div class="flex items-center gap-3">
+                  <input type="color" id="color-gold" value="#CBA14B" class="w-10 h-10 rounded-lg border border-navy-tint/40 cursor-pointer p-0.5" oninput="markDirty()">
+                  <input type="text" id="color-gold-hex" value="#CBA14B" class="admin-input flex-1" oninput="syncColor('gold')" style="font-family:monospace">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Info -->
+          <div class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30 space-y-5">
+            <h3 class="text-sm font-semibold text-navy" data-i18n="contact-information">Contact Information</h3>
+            <div>
+              <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-email-address">Email Address</label>
+              <input id="contact-email" type="email" class="admin-input" value="info@agentpark.am" oninput="markDirty()">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-phone">Phone</label>
+              <input id="contact-phone" type="tel" class="admin-input" value="+374 11 000 000" oninput="markDirty()">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-address">Address</label>
+              <input id="contact-address" type="text" class="admin-input" value="Yerevan, Armenia" oninput="markDirty()">
+            </div>
+          </div>
+
+          <!-- SEO -->
+          <div class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30 space-y-5">
+            <h3 class="text-sm font-semibold text-navy" data-i18n="seo-meta">SEO & Meta</h3>
+            <div>
+              <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-page-title">Page Title</label>
+              <input id="seo-title" type="text" class="admin-input" value="AgentPark — AI Innovation Hub & Accelerator | Yerevan, Armenia" oninput="markDirty()">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-meta-description">Meta Description</label>
+              <textarea id="seo-desc" class="admin-textarea" oninput="markDirty()">AgentPark is Armenia's premier AI innovation hub and accelerator — connecting, growing, and launching AI-native ventures into global markets from Yerevan.</textarea>
+            </div>
+          </div>
+
+          <!-- Toggles -->
+          <div class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30 space-y-4">
+            <h3 class="text-sm font-semibold text-navy" data-i18n="site-options">Site Options</h3>
+            <div class="flex items-center justify-between py-2 border-b border-navy-tint/20">
+              <div>
+                <p class="text-sm font-medium text-navy" data-i18n="maintenance-mode">Maintenance Mode</p>
+                <p class="text-xs text-navy/50" data-i18n="maintenance-mode-desc">Show a coming soon page to visitors</p>
+              </div>
+              <div class="toggle-track" onclick="toggleSwitch(this)" id="toggle-maintenance">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between py-2 border-b border-navy-tint/20">
+              <div>
+                <p class="text-sm font-medium text-navy" data-i18n="cookie-banner">Cookie Banner</p>
+                <p class="text-xs text-navy/50" data-i18n="cookie-banner-desc">Show GDPR cookie consent banner</p>
+              </div>
+              <div class="toggle-track on" onclick="toggleSwitch(this)" id="toggle-cookies">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between py-2">
+              <div>
+                <p class="text-sm font-medium text-navy" data-i18n="analytics-tracking">Analytics Tracking</p>
+                <p class="text-xs text-navy/50" data-i18n="analytics-tracking-desc">Enable visitor analytics collection</p>
+              </div>
+              <div class="toggle-track on" onclick="toggleSwitch(this)" id="toggle-analytics">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Danger zone -->
+          <div class="bg-white rounded-2xl p-6 shadow-elevated border border-red-100">
+            <h3 class="text-sm font-semibold text-red-600 mb-4" data-i18n="danger-zone">Danger Zone</h3>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-navy" data-i18n="reset-all-settings">Reset All Settings</p>
+                <p class="text-xs text-navy/50" data-i18n="reset-all-settings-desc">Restore all fields to their default values</p>
+              </div>
+              <button onclick="confirmReset()" class="px-4 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus" data-i18n="reset-btn">
+                Reset
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== EVENTS ==================== -->
+      <section id="section-events" class="p-8 hidden">
+        <div class="max-w-4xl space-y-6">
+
+          <!-- Add Event Form -->
+          <div class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
+            <h3 id="ev-form-title" class="text-sm font-semibold text-navy mb-5" data-i18n="add-new-event">Add New Event</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-event-title">Event Title * <span class="text-navy/30 normal-case">(English)</span></label>
+                <input id="ev-title" type="text" class="admin-input" placeholder="e.g. AI Hackathon Yerevan 2026" data-i18n-placeholder="ph-ev-title">
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">Title <span class="text-navy/30 normal-case">(Armenian / Հայerenen)</span></label>
+                <input id="ev-title-am" type="text" class="admin-input" placeholder="e.g. AI Հdelays Երevան 2026">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">Start Date</label>
+                <input id="ev-date" type="date" class="admin-input">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">End Date <span class="text-navy/30 normal-case">(for multi-day events)</span></label>
+                <input id="ev-end-date" type="date" class="admin-input">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-location">Location</label>
+                <input id="ev-location" type="text" class="admin-input" placeholder="e.g. AgentPark, Yerevan" data-i18n-placeholder="ph-ev-location">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-capacity">Capacity</label>
+                <input id="ev-capacity" type="number" class="admin-input" placeholder="e.g. 100" data-i18n-placeholder="ph-ev-capacity">
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">Cover Image <span class="text-navy/30 normal-case">(shown on event cards)</span></label>
+                <div class="flex gap-2">
+                  <input id="ev-cover-image" type="text" class="admin-input flex-1" placeholder="https://example.com/event-cover.jpg">
+                  <label class="px-4 py-2.5 bg-navy/8 text-navy/70 text-xs font-medium rounded-lg hover:bg-navy/15 transition-colors duration-150 cursor-pointer flex items-center gap-1.5 flex-shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Upload
+                    <input type="file" accept="image/*" class="hidden" onchange="uploadEventImage(this, 'ev-cover-image')">
+                  </label>
+                </div>
+                <div id="ev-cover-upload-progress" class="hidden mt-1">
+                  <div class="h-1 bg-navy/10 rounded-full overflow-hidden"><div class="h-full bg-gold rounded-full transition-all duration-300" style="width:0%"></div></div>
+                  <span class="text-[10px] text-navy/40">Uploading...</span>
+                </div>
+                <div id="ev-cover-preview" class="mt-2 hidden">
+                  <img id="ev-cover-preview-img" class="w-full max-h-40 object-cover rounded-lg border border-navy-tint/30" alt="Cover preview">
+                </div>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">Description <span class="text-navy/30 normal-case">(English)</span></label>
+                <textarea id="ev-desc" class="admin-textarea" placeholder="Describe the event..." data-i18n-placeholder="ph-ev-desc"></textarea>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">Description <span class="text-navy/30 normal-case">(Armenian / Հայerenen)</span></label>
+                <textarea id="ev-desc-am" class="admin-textarea" placeholder="Նկարdelays միdelays..."></textarea>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">Post-Event Summary <span class="text-navy/30 normal-case">(English, for past events)</span></label>
+                <textarea id="ev-summary" class="admin-textarea" placeholder="Write a summary after the event has taken place..." data-i18n-placeholder="ph-ev-summary"></textarea>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">Post-Event Summary <span class="text-navy/30 normal-case">(Armenian / Հայerenen)</span></label>
+                <textarea id="ev-summary-am" class="admin-textarea" placeholder="Գdelays միdelays ամdelays..."></textarea>
+              </div>
+              <!-- Organizers -->
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">Organizers <span class="text-navy/30 normal-case">(one per line: Name | Logo URL)</span></label>
+                <div id="ev-organizers-list" class="space-y-2 mb-2"></div>
+                <div class="flex items-center gap-2">
+                  <input id="ev-org-name" type="text" class="admin-input flex-1" placeholder="Organization name">
+                  <input id="ev-org-logo" type="text" class="admin-input flex-1" placeholder="Logo URL (optional)">
+                  <label class="px-2 py-1.5 bg-navy/8 text-navy/70 text-[11px] font-medium rounded-lg hover:bg-navy/15 transition-colors duration-150 cursor-pointer flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <input type="file" accept="image/*" class="hidden" onchange="uploadOrgLogo(this)">
+                  </label>
+                  <button onclick="addOrganizerRow()" class="px-3 py-1.5 bg-gold/20 text-gold text-xs font-semibold rounded-lg hover:bg-gold/30 transition-colors duration-150">+ Add</button>
+                </div>
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-ev-images">Event Images <span class="text-navy/30 normal-case">(one per line: URL | Caption)</span></label>
+                <textarea id="ev-images" class="admin-textarea" placeholder="https://example.com/photo1.jpg | Opening keynote&#10;https://example.com/photo2.jpg | Panel discussion&#10;https://example.com/photo3.jpg" data-i18n-placeholder="ph-ev-images"></textarea>
+                <div class="flex items-center gap-2 mt-1.5">
+                  <label class="px-3 py-1.5 bg-navy/8 text-navy/70 text-[11px] font-medium rounded-lg hover:bg-navy/15 transition-colors duration-150 cursor-pointer flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Upload images
+                    <input type="file" accept="image/*" multiple class="hidden" onchange="uploadEventImages(this)">
+                  </label>
+                  <div id="ev-images-upload-progress" class="hidden flex-1">
+                    <div class="h-1 bg-navy/10 rounded-full overflow-hidden"><div class="h-full bg-gold rounded-full transition-all duration-300" style="width:0%"></div></div>
+                    <span class="text-[10px] text-navy/40">Uploading...</span>
+                  </div>
+                </div>
+                <p class="text-[10px] text-navy/30 mt-1" data-i18n="ev-images-hint">One image per line. Format: <code class="bg-navy/5 px-1 rounded">URL | Caption</code> — caption is optional.</p>
+                <div id="ev-images-preview" class="flex flex-wrap gap-2 mt-2"></div>
+              </div>
+              <!-- Video -->
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">Event Video <span class="text-navy/30 normal-case">(YouTube, Vimeo, or direct URL)</span></label>
+                <div class="flex items-center gap-2">
+                  <input id="ev-video-url" type="text" class="admin-input flex-1" placeholder="https://www.youtube.com/watch?v=... or upload video">
+                  <label class="px-3 py-1.5 bg-navy/8 text-navy/70 text-[11px] font-medium rounded-lg hover:bg-navy/15 transition-colors duration-150 cursor-pointer flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    Upload
+                    <input type="file" accept="video/*" class="hidden" onchange="uploadEventVideo(this)">
+                  </label>
+                </div>
+                <div id="ev-video-preview" class="mt-2 hidden"></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 mt-5">
+              <button id="ev-add-btn" onclick="addEvent()" class="px-6 py-2.5 bg-navy text-white text-sm font-semibold rounded-lg hover:bg-navy-light active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-elevated" data-i18n="add-event-btn">
+                Add Event
+              </button>
+              <button id="ev-update-btn" onclick="updateEvent()" class="hidden px-6 py-2.5 bg-gold text-deep-ink text-sm font-semibold rounded-lg hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-elevated" data-i18n="save-changes-event">
+                Save Changes
+              </button>
+              <button id="ev-cancel-btn" onclick="cancelEditEvent()" class="hidden px-4 py-2.5 bg-navy/8 text-navy/70 text-sm font-medium rounded-lg hover:bg-navy/15 transition-colors duration-150 brand-focus" data-i18n="cancel-btn">
+                Cancel
+              </button>
+              <span id="ev-adding" class="text-xs text-navy/50 hidden" data-i18n="saving">Saving...</span>
+            </div>
+          </div>
+
+          <!-- Events List -->
+          <div class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
+            <div class="flex items-center justify-between mb-5">
+              <h3 class="text-sm font-semibold text-navy" data-i18n="all-events">All Events</h3>
+              <button onclick="loadEvents()" class="text-xs text-gold hover:text-gold/70 transition-opacity duration-150" data-i18n="refresh-events">Refresh</button>
+            </div>
+            <div id="events-list">
+              <div class="text-center py-10 text-navy/40 text-sm">Loading events...</div>
+            </div>
+          </div>
+
+          <!-- Registrations Panel -->
+          <div id="registrations-panel" class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30 hidden">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <h3 class="text-sm font-semibold text-navy" data-i18n="registrations">Registrations</h3>
+                <p id="reg-event-title" class="text-xs text-navy/50 mt-0.5"></p>
+              </div>
+              <button onclick="document.getElementById('registrations-panel').classList.add('hidden')" class="text-xs text-navy/40 hover:text-navy transition-colors duration-150" data-i18n="close-btn">Close</button>
+            </div>
+            <div id="registrations-list">
+              <div class="text-center py-8 text-navy/40 text-sm">No registrations yet.</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 bg-navy text-white text-sm font-medium rounded-xl shadow-floating hidden">
+    <svg class="w-4 h-4 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+    <span id="toast-msg">Changes saved</span>
+  </div>
+
+  <script>
+    // ============================================================
+    // AUTH
+    // ============================================================
+    const CREDS = { user: 'admin', pass: 'agentpark2025' };
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('login-user').value.trim();
+      const p = document.getElementById('login-pass').value;
+      if (u === CREDS.user && p === CREDS.pass) {
+        document.getElementById('login-screen').style.opacity = '0';
+        setTimeout(() => {
+          document.getElementById('login-screen').classList.add('hidden');
+          document.getElementById('admin-shell').classList.remove('hidden');
+          document.getElementById('admin-shell').classList.add('flex');
+        }, 300);
+        initRichEditors();
+        loadSaved();
+        initAutoExpand();
+      } else {
+        const err = document.getElementById('login-error');
+        err.classList.remove('hidden');
+        setTimeout(() => err.classList.add('hidden'), 3000);
+      }
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('admin-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      const isOpen = !sidebar.classList.contains('-translate-x-full');
+      sidebar.classList.toggle('-translate-x-full', isOpen);
+      backdrop.classList.toggle('hidden', isOpen);
+      document.body.classList.toggle('overflow-hidden', !isOpen);
+    }
+
+    function handleLogout() {
+      document.getElementById('admin-shell').classList.add('hidden');
+      document.getElementById('admin-shell').classList.remove('flex');
+      const ls = document.getElementById('login-screen');
+      ls.classList.remove('hidden');
+      ls.style.opacity = '1';
+      document.getElementById('login-pass').value = '';
+    }
+
+    // ============================================================
+    // SECTION NAVIGATION
+    // ============================================================
+    const sections = ['dashboard', 'content', 'images', 'analytics', 'events', 'settings'];
+    const titleKeys = {
+      dashboard: ['title-dashboard', 'sub-dashboard'],
+      content:   ['title-content', 'sub-content'],
+      images:    ['title-images', 'sub-images'],
+      analytics: ['title-analytics', 'sub-analytics'],
+      events:    ['title-events', 'sub-events'],
+      settings:  ['title-settings', 'sub-settings'],
+    };
+
+    function showSection(name) {
+      // Close sidebar on mobile
+      if (window.innerWidth < 768) {
+        const sidebar = document.getElementById('admin-sidebar');
+        sidebar.classList.add('-translate-x-full');
+        document.getElementById('sidebar-backdrop').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }
+      sections.forEach(s => {
+        document.getElementById('section-' + s).classList.add('hidden');
+        document.querySelectorAll('.nav-item').forEach(btn => {
+          if (btn.dataset.section === s) btn.classList.remove('active');
+        });
+      });
+      document.getElementById('section-' + name).classList.remove('hidden');
+      document.querySelectorAll('.nav-item').forEach(btn => {
+        if (btn.dataset.section === name) btn.classList.add('active');
+      });
+      const lang = localStorage.getItem('agentpark-lang') || 'en';
+      const t = ADMIN_TRANS[lang] || ADMIN_TRANS.en;
+      document.getElementById('page-title').textContent = t[titleKeys[name][0]] || ADMIN_TRANS.en[titleKeys[name][0]];
+      document.getElementById('page-sub').textContent = t[titleKeys[name][1]] || ADMIN_TRANS.en[titleKeys[name][1]];
+
+      // Load events when switching to events section
+      if (name === 'dashboard') loadDashboardStats();
+      if (name === 'analytics') loadAnalyticsData();
+      if (name === 'events') loadEvents();
+      // Init images section
+      if (name === 'images') initImagesSection();
+      // Load Armenian fields when switching to Armenian tab
+      if (name === 'armenian') loadArmenianFields();
+
+      // Show/hide save button
+      const saveable = ['content', 'settings'];
+      document.getElementById('save-btn').classList.toggle('hidden', !saveable.includes(name));
+      document.getElementById('save-badge').classList.add('hidden');
+      isDirty = false;
+    }
+
+    // ============================================================
+    // CONTENT TABS
+    // ============================================================
+    const contentTabs = ['hero', 'about', 'community', 'nav', 'armenian'];
+
+    function showContentTab(name) {
+      contentTabs.forEach(t => {
+        document.getElementById('content-tab-' + t).classList.add('hidden');
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          if (btn.dataset.tab === t) btn.classList.remove('active-tab');
+        });
+      });
+      document.getElementById('content-tab-' + name).classList.remove('hidden');
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.dataset.tab === name) btn.classList.add('active-tab');
+      });
+    }
+
+    // ============================================================
+    // AUTO-EXPAND TEXT FIELDS
+    // ============================================================
+    function autoResize(el) {
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
+    }
+
+    function initAutoExpand() {
+      // Auto-expand all textareas
+      document.querySelectorAll('.admin-textarea').forEach(ta => {
+        if (ta.dataset.autoInit) return;
+        ta.dataset.autoInit = '1';
+        ta.addEventListener('input', () => autoResize(ta));
+        // Initial resize after a tick (content may not be laid out yet)
+        setTimeout(() => autoResize(ta), 0);
+      });
+
+      // Convert single-line inputs to auto-expanding textareas when content is long
+      document.querySelectorAll('.admin-input').forEach(inp => {
+        if (inp.type !== 'text' || inp.dataset.autoInit) return;
+        inp.dataset.autoInit = '1';
+        // Make inputs show full text on focus via a temporary textarea overlay
+        inp.addEventListener('focus', function() {
+          if (this.scrollWidth <= this.clientWidth) return; // fits already
+          const ta = document.createElement('textarea');
+          ta.className = 'admin-textarea';
+          ta.style.minHeight = '36px';
+          ta.value = this.value;
+          ta.setAttribute('rows', '1');
+          const attrs = ['id', 'data-am-key', 'data-am-raw', 'data-i18n', 'data-i18n-placeholder'];
+          attrs.forEach(a => { if (this.hasAttribute(a)) ta.setAttribute(a, this.getAttribute(a)); });
+          ta.oninput = this.oninput;
+          this.parentNode.replaceChild(ta, this);
+          ta.dataset.autoInit = '1';
+          ta.addEventListener('input', () => autoResize(ta));
+          autoResize(ta);
+          ta.focus();
+        });
+      });
+    }
+
+    // Re-run after Armenian fields load
+    const _origLoadArmenianFields = typeof loadArmenianFields === 'function' ? loadArmenianFields : null;
+
+    // ============================================================
+    // RICH TEXT COLOR EDITOR
+    // ============================================================
+    const RICH_COLORS = [
+      { name: 'Navy', hex: '#0D2740' },
+      { name: 'Gold', hex: '#CBA14B' },
+      { name: 'Red', hex: '#DC2626' },
+      { name: 'Blue', hex: '#2563EB' },
+      { name: 'Green', hex: '#16A34A' },
+      { name: 'Purple', hex: '#9333EA' },
+      { name: 'Orange', hex: '#EA580C' },
+      { name: 'Pink', hex: '#DB2777' },
+      { name: 'Teal', hex: '#0D9488' },
+      { name: 'Black', hex: '#000000' },
+    ];
+
+    // IDs of fields that should get the rich color editor
+    const RICH_EDITOR_IDS = [
+      'hero-sub', 'about-h2', 'about-p1', 'about-p2',
+      'comm-h2', 'comm-f1-desc', 'comm-f2-desc', 'comm-f3-desc',
+      'seo-desc'
+    ];
+
+    function buildColorToolbar(editorId) {
+      const bar = document.createElement('div');
+      bar.className = 'color-toolbar';
+      bar.setAttribute('data-for', editorId);
+      // Prevent mousedown from stealing focus/selection from the editor
+      bar.addEventListener('mousedown', function(e) { e.preventDefault(); });
+
+      // Color swatches
+      RICH_COLORS.forEach(c => {
+        const s = document.createElement('button');
+        s.type = 'button';
+        s.className = 'color-swatch';
+        s.style.background = c.hex;
+        s.title = c.name + ' (' + c.hex + ')';
+        s.onclick = function(e) { e.preventDefault(); applyColor(editorId, c.hex); };
+        bar.appendChild(s);
+      });
+
+      // Separator
+      const sep = document.createElement('span');
+      sep.className = 'toolbar-sep';
+      bar.appendChild(sep);
+
+      // Custom color picker
+      const wrap = document.createElement('label');
+      wrap.className = 'custom-color-wrap';
+      wrap.title = 'Custom color';
+      const picker = document.createElement('input');
+      picker.type = 'color';
+      picker.value = '#CBA14B';
+      picker.oninput = function() { applyColor(editorId, picker.value); };
+      wrap.appendChild(picker);
+      bar.appendChild(wrap);
+
+      // Separator
+      const sep2 = document.createElement('span');
+      sep2.className = 'toolbar-sep';
+      bar.appendChild(sep2);
+
+      // Remove color button
+      const clearBtn = document.createElement('button');
+      clearBtn.type = 'button';
+      clearBtn.className = 'toolbar-btn';
+      clearBtn.textContent = 'Remove color';
+      clearBtn.title = 'Remove color from selected text';
+      clearBtn.onclick = function(e) { e.preventDefault(); removeColor(editorId); };
+      bar.appendChild(clearBtn);
+
+      return bar;
+    }
+
+    function _saveSelection(editor) {
+      const sel = window.getSelection();
+      if (!sel.rangeCount) return null;
+      const range = sel.getRangeAt(0);
+      if (!editor.contains(range.commonAncestorContainer)) return null;
+      return range;
+    }
+
+    function _restoreSelection(range) {
+      if (!range) return;
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    function applyColor(editorId, hex) {
+      const editor = document.getElementById(editorId);
+      if (!editor) return;
+
+      const sel = window.getSelection();
+      if (!sel.rangeCount || sel.isCollapsed) {
+        editor.focus();
+        return;
+      }
+      const range = sel.getRangeAt(0);
+      if (!editor.contains(range.commonAncestorContainer)) return;
+
+      // Wrap selected text in a colored span
+      const span = document.createElement('span');
+      span.style.color = hex;
+      try {
+        range.surroundContents(span);
+      } catch(e) {
+        // If selection crosses element boundaries, use execCommand as fallback
+        document.execCommand('foreColor', false, hex);
+        // Convert <font> tags to <span style="color:...">
+        editor.querySelectorAll('font[color]').forEach(font => {
+          const s = document.createElement('span');
+          s.style.color = font.getAttribute('color');
+          s.innerHTML = font.innerHTML;
+          font.replaceWith(s);
+        });
+      }
+      sel.removeAllRanges();
+      markDirty();
+      // Auto-save Armenian fields if this is an Armenian rich editor
+      if (editorId.startsWith('am-rich-')) autoSaveArmenian();
+    }
+
+    function removeColor(editorId) {
+      const editor = document.getElementById(editorId);
+      if (!editor) return;
+
+      const sel = window.getSelection();
+      if (!sel.rangeCount || sel.isCollapsed) {
+        editor.focus();
+        return;
+      }
+      const range = sel.getRangeAt(0);
+      if (!editor.contains(range.commonAncestorContainer)) return;
+
+      // Remove color spans within selection
+      const fragment = range.cloneContents();
+      const container = document.createElement('div');
+      container.appendChild(fragment);
+      // Strip all span/font color wrappers
+      container.querySelectorAll('span[style*="color"], font[color]').forEach(el => {
+        el.replaceWith(...el.childNodes);
+      });
+      range.deleteContents();
+      range.insertNode(container.firstChild || document.createTextNode(''));
+
+      sel.removeAllRanges();
+      markDirty();
+      if (editorId.startsWith('am-rich-')) autoSaveArmenian();
+    }
+
+    // Auto-save Armenian content to localStorage without full UI feedback
+    function autoSaveArmenian() {
+      const strip = (html) => html ? html.replace(/<[^>]+>/g, '').trim() : '';
+      const data = {};
+      document.querySelectorAll('[data-am-key]').forEach(el => {
+        const key = el.getAttribute('data-am-key');
+        if (el.getAttribute('data-am-rich') === '1') {
+          const richEl = el.querySelector('[data-rich="true"]');
+          if (richEl) data[key] = sanitizeRichHTML(richEl.innerHTML);
+          return;
+        }
+        const val = (el.value || '').trim();
+        const rawOriginal = el.getAttribute('data-am-raw') || '';
+        if (rawOriginal && strip(rawOriginal) === val) {
+          data[key] = rawOriginal;
+        } else if (val) {
+          data[key] = val;
+        }
+      });
+      if (Object.keys(data).length) {
+        localStorage.setItem('agentpark-am-overrides', JSON.stringify(data));
+      }
+    }
+
+    function initRichEditors() {
+      RICH_EDITOR_IDS.forEach(id => {
+        const textarea = document.getElementById(id);
+        if (!textarea || textarea.getAttribute('data-rich-init')) return;
+
+        // Create contenteditable div
+        const editor = document.createElement('div');
+        editor.id = id;
+        editor.className = 'rich-editor';
+        editor.setAttribute('contenteditable', 'true');
+        editor.setAttribute('data-rich', 'true');
+        editor.innerHTML = textarea.value || textarea.textContent || '';
+        editor.oninput = function() { markDirty(); };
+
+        // Build toolbar
+        const toolbar = buildColorToolbar(id);
+
+        // Replace textarea
+        textarea.parentNode.insertBefore(toolbar, textarea);
+        textarea.parentNode.insertBefore(editor, textarea);
+        textarea.remove();
+      });
+    }
+
+    // Sanitize rich editor HTML: keep only color spans, strip all other HTML artifacts
+    function sanitizeRichHTML(html) {
+      if (!html) return '';
+      // Replace <div>, <p> block tags with newlines, then remove closing tags
+      let s = html.replace(/<\/(div|p|br)>/gi, '');
+      s = s.replace(/<(div|p)[^>]*>/gi, '\n');
+      s = s.replace(/<br\s*\/?>/gi, '\n');
+      // Keep <span style="color:..."> and <span class="text-..."> — strip all other tags
+      const colorSpans = [];
+      s = s.replace(/<span\s+(?:style\s*=\s*"color:\s*[^"]*"|class\s*=\s*"text-[^"]*")\s*>([\s\S]*?)<\/span>/gi, (m) => {
+        colorSpans.push(m);
+        return '\x00CS' + (colorSpans.length - 1) + '\x00';
+      });
+      // Strip remaining HTML tags
+      s = s.replace(/<[^>]+>/g, '');
+      // Restore color spans
+      s = s.replace(/\x00CS(\d+)\x00/g, (_, i) => colorSpans[parseInt(i)]);
+      // Clean up excessive newlines and trim
+      s = s.replace(/\n{3,}/g, '\n\n').trim();
+      // Convert newlines back to nothing for single-line display (most fields are single-line)
+      // Actually keep them as-is since some fields like about-p1 are multi-line
+      return s;
+    }
+
+    // Get value from a field — handles both regular inputs and rich editors
+    function getFieldValue(id) {
+      const el = document.getElementById(id);
+      if (!el) return '';
+      if (el.getAttribute('data-rich') === 'true') return sanitizeRichHTML(el.innerHTML);
+      return el.value;
+    }
+
+    function setFieldValue(id, val) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (el.getAttribute('data-rich') === 'true') {
+        el.innerHTML = val;
+      } else {
+        el.value = val;
+      }
+    }
+
+    // ============================================================
+    // DIRTY / SAVE
+    // ============================================================
+    let isDirty = false;
+
+    function markDirty() {
+      isDirty = true;
+      document.getElementById('save-badge').classList.remove('hidden');
+      document.getElementById('save-btn').classList.remove('hidden');
+    }
+
+    function saveAll(fromArmenian) {
+      if (currentAdminLang === 'am' && !fromArmenian) {
+        saveAllArmenian();
+        return;
+      }
+      const data = {};
+      ['hero-badge','hero-h1a','hero-h1b','hero-sub','hero-cta1','hero-cta2',
+       'about-label','about-h2','about-p1','about-p2',
+       'comm-label','comm-h2',
+       'comm-f1-title','comm-f1-desc','comm-f2-title','comm-f2-desc','comm-f3-title','comm-f3-desc',
+       'events-h2','events-upcoming-label','events-past-label',
+       'nav-1','nav-2','nav-3','nav-4','nav-cta',
+       'contact-email','contact-phone','contact-address',
+       'seo-title','seo-desc','color-navy-hex','color-gold-hex'].forEach(id => {
+        const val = getFieldValue(id);
+        if (val !== '') data[id] = val;
+      });
+      localStorage.setItem('agentpark-admin', JSON.stringify(data));
+      isDirty = false;
+      document.getElementById('save-badge').classList.add('hidden');
+      showToast('Changes saved to local storage');
+    }
+
+    function loadSaved() {
+      const raw = localStorage.getItem('agentpark-admin');
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      let needsResave = false;
+      Object.entries(data).forEach(([id, val]) => {
+        // Sanitize any previously saved HTML artifacts
+        const clean = sanitizeRichHTML(val);
+        if (clean !== val) { data[id] = clean; needsResave = true; }
+        setFieldValue(id, clean);
+      });
+      // Re-save sanitized data so front-end picks up clean values
+      if (needsResave) localStorage.setItem('agentpark-admin', JSON.stringify(data));
+    }
+
+    // Admin language toggle — switches content tabs between English and Armenian
+    let currentAdminLang = 'en';
+    function setAdminLang(lang) {
+      currentAdminLang = lang;
+      document.querySelectorAll('.admin-lang-btn').forEach(b => {
+        b.classList.toggle('active-admin-lang', b.dataset.adminLang === lang);
+      });
+
+      const enTabs = ['hero', 'about', 'community', 'nav'];
+      const enTabBtns = document.querySelectorAll('.tab-btn');
+      const amTabBtn = document.querySelector('.tab-btn[data-tab="armenian"]');
+
+      if (lang === 'am') {
+        // Hide English tab buttons, show only Armenian tab
+        enTabBtns.forEach(btn => {
+          if (enTabs.includes(btn.dataset.tab)) btn.style.display = 'none';
+        });
+        if (amTabBtn) amTabBtn.style.display = 'none';
+        // Show Armenian content tab, hide English tabs
+        showContentTab('armenian');
+        loadArmenianFields();
+      } else {
+        // Show English tab buttons and Armenian tab button
+        enTabBtns.forEach(btn => btn.style.display = '');
+        if (amTabBtn) amTabBtn.style.display = '';
+        // Switch to hero tab
+        showContentTab('hero');
+      }
+    }
+
+    // Section label mapping for grouping keys
+    const AM_SECTIONS = {
+      'nav': 'Navigation',
+      'hero': 'Hero',
+      'about': 'About',
+      'nvidia': 'NVIDIA AI Factory',
+      'pillars': 'Pillars / What We Do',
+      'p1': 'Pillar 1', 'p2': 'Pillar 2', 'p3': 'Pillar 3', 'p4': 'Pillar 4',
+      'comm': 'Community',
+      'events': 'Events',
+      'mission': 'Mission',
+      'contact': 'Contact',
+      'footer': 'Footer',
+      'ev': 'Event UI',
+      'modal': 'Registration Modal',
+    };
+
+    function getSectionForKey(key) {
+      // Match longest prefix first
+      const prefixes = Object.keys(AM_SECTIONS).sort((a, b) => b.length - a.length);
+      for (const p of prefixes) {
+        if (key === p || key.startsWith(p + '-')) return p;
+      }
+      return 'other';
+    }
+
+    let _amTransData = {}; // all Armenian translation keys
+    let _amFieldsLoaded = false;
+
+    async function loadArmenianFields() {
+      // If fields are already loaded, auto-save current edits and skip rebuild
+      if (_amFieldsLoaded) {
+        autoSaveArmenian();
+        return;
+      }
+      const container = document.getElementById('am-fields-container');
+      container.innerHTML = '<div class="text-center py-8 text-navy/40 text-sm">Loading...</div>';
+
+      // Parse TRANS.am from index.html
+      function parseTransAm(text) {
+        const obj = {};
+        const block = text.match(/TRANS\.am\s*=\s*\{([\s\S]*?)\n\s*\};/);
+        if (!block) return obj;
+        const re = /'([^']+)'\s*:\s*'((?:[^'\\\\]|\\\\.)*)'/g;
+        let m;
+        while ((m = re.exec(block[1])) !== null) {
+          obj[m[1]] = m[2].replace(/\\\\'/g, "'").replace(/\\\\n/g, '\n');
+        }
+        return obj;
+      }
+
+      let base = {};
+      try {
+        const res = await fetch('/index.html');
+        const html = await res.text();
+        base = parseTransAm(html);
+      } catch(e) { console.log('Fetch error', e); }
+
+      // Merge localStorage overrides
+      let overrides = {};
+      try { overrides = JSON.parse(localStorage.getItem('agentpark-am-overrides') || '{}'); } catch {}
+      _amTransData = { ...base, ...overrides };
+
+      if (!Object.keys(_amTransData).length) {
+        container.innerHTML = '<div class="text-center py-8 text-red-500 text-sm">Could not load Armenian translations from index.html</div>';
+        return;
+      }
+
+      // Group keys by section
+      const groups = {};
+      Object.keys(_amTransData).forEach(key => {
+        const section = getSectionForKey(key);
+        if (!groups[section]) groups[section] = [];
+        groups[section].push(key);
+      });
+
+      // Render fields grouped by section — preserve raw HTML values
+      const strip = (html) => html ? html.replace(/<[^>]+>/g, '').trim() : '';
+      const esc = (s) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      let fieldsHtml = '';
+      const sectionOrder = ['nav','hero','about','nvidia','pillars','p1','p2','p3','p4','comm','events','mission','contact','footer','ev','modal','other'];
+
+      sectionOrder.forEach(sec => {
+        if (!groups[sec]) return;
+        const label = AM_SECTIONS[sec] || 'Other';
+        fieldsHtml += '<div class="border-t border-navy-tint/30 pt-4 mt-4">';
+        fieldsHtml += '<p class="text-xs font-semibold text-navy/50 uppercase tracking-wide mb-3">' + label + '</p>';
+        fieldsHtml += '<div class="space-y-3">';
+        groups[sec].forEach(key => {
+          const raw = _amTransData[key] || '';
+          const hasHtml = /<[^>]+>/.test(raw);
+          const displayVal = strip(raw);
+          const editorId = 'am-rich-' + key.replace(/[^a-zA-Z0-9-]/g, '_');
+          fieldsHtml += '<div>';
+          fieldsHtml += '<label class="block text-xs font-medium text-navy/50 mb-1 tracking-wide">' + key;
+          if (hasHtml) fieldsHtml += ' <span class="text-gold text-[10px]">(has styling)</span>';
+          fieldsHtml += '</label>';
+          // All fields get rich editor with color toolbar
+          fieldsHtml += '<div data-am-key="' + key + '" data-am-raw="' + esc(raw) + '" data-am-rich="1" id="' + editorId + '-wrap">';
+          fieldsHtml += '<div class="color-toolbar" data-for="' + editorId + '" onmousedown="event.preventDefault()">';
+          RICH_COLORS.forEach(function(c) {
+            fieldsHtml += '<button type="button" class="color-swatch" style="background:' + c.hex + '" title="' + c.name + '" onclick="applyColor(\'' + editorId + '\',\'' + c.hex + '\')"></button>';
+          });
+          fieldsHtml += '<span class="toolbar-sep"></span>';
+          fieldsHtml += '<label class="custom-color-wrap" title="Custom color"><input type="color" value="#CBA14B" oninput="applyColor(\'' + editorId + '\',this.value)"></label>';
+          fieldsHtml += '<span class="toolbar-sep"></span>';
+          fieldsHtml += '<button type="button" class="toolbar-btn" onclick="removeColor(\'' + editorId + '\')">Remove color</button>';
+          fieldsHtml += '</div>';
+          fieldsHtml += '<div id="' + editorId + '" class="rich-editor" contenteditable="true" data-rich="true" oninput="markDirty()">' + raw + '</div>';
+          fieldsHtml += '</div>';
+          fieldsHtml += '</div>';
+        });
+        fieldsHtml += '</div></div>';
+      });
+
+      container.innerHTML = fieldsHtml;
+      _amFieldsLoaded = true;
+      console.log('[admin] Loaded', Object.keys(_amTransData).length, 'Armenian fields');
+
+      // Auto-expand all new fields
+      initAutoExpand();
+
+      // Auto-save baseline to localStorage
+      localStorage.setItem('agentpark-am-overrides', JSON.stringify(_amTransData));
+    }
+
+    function saveAllArmenian() {
+      // Read all fields — preserve original HTML if text unchanged
+      const strip = (html) => html ? html.replace(/<[^>]+>/g, '').trim() : '';
+      const data = {};
+      document.querySelectorAll('[data-am-key]').forEach(el => {
+        const key = el.getAttribute('data-am-key');
+        // Rich editor wraps have data-am-rich="1" — read from the contenteditable child
+        if (el.getAttribute('data-am-rich') === '1') {
+          const richEl = el.querySelector('[data-rich="true"]');
+          if (richEl) {
+            data[key] = sanitizeRichHTML(richEl.innerHTML);
+          }
+          return;
+        }
+        const val = (el.value || '').trim();
+        const rawOriginal = el.getAttribute('data-am-raw') || '';
+        // If user didn't change the visible text, keep original HTML
+        if (rawOriginal && strip(rawOriginal) === val) {
+          data[key] = rawOriginal;
+        } else if (val) {
+          data[key] = val;
+        }
+      });
+      localStorage.setItem('agentpark-am-overrides', JSON.stringify(data));
+      console.log('[admin] Saved', Object.keys(data).length, 'Armenian keys');
+      isDirty = false;
+      document.getElementById('save-badge').classList.add('hidden');
+      const msg = document.getElementById('am-save-msg');
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 3000);
+      showToast('Armenian content saved (' + Object.keys(data).length + ' keys)');
+    }
+
+    function saveCommunityContent() {
+      saveAll();
+      const msg = document.getElementById('comm-save-msg');
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 3000);
+    }
+
+    function confirmReset() {
+      if (confirm('Reset all settings to defaults? This cannot be undone.')) {
+        localStorage.removeItem('agentpark-admin');
+        showToast('Settings reset to defaults');
+        setTimeout(() => location.reload(), 1000);
+      }
+    }
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    let toastTimer;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      toast.classList.remove('hidden');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.add('hidden'), 2800);
+    }
+
+    // ============================================================
+    // TOGGLE SWITCHES
+    // ============================================================
+    function toggleSwitch(el) {
+      el.classList.toggle('on');
+      markDirty();
+    }
+
+    // ============================================================
+    // COLOR SYNC
+    // ============================================================
+    function syncColor(which) {
+      const hex = document.getElementById('color-' + which + '-hex').value;
+      if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+        document.getElementById('color-' + which).value = hex;
+      }
+      markDirty();
+    }
+
+    // ============================================================
+    // ============================================================
+    // IMAGE MANAGEMENT
+    // ============================================================
+
+    const SECTION_SLOTS = [
+      { id: 'img-hero',      label: 'Hero Photo',           section: 'Hero Section' },
+      { id: 'img-nvidia',    label: 'NVIDIA Banner',        section: 'NVIDIA Section' },
+      { id: 'img-pillar-1',  label: 'Pillar 1 – Innovation',section: 'What We Do' },
+      { id: 'img-pillar-2',  label: 'Pillar 2 – Knowledge', section: 'What We Do' },
+      { id: 'img-pillar-3',  label: 'Pillar 3 – Collaboration', section: 'What We Do' },
+      { id: 'img-pillar-4',  label: 'Pillar 4 – Partnerships', section: 'What We Do' },
+      { id: 'img-community', label: 'Community Photo',      section: 'Community Section' },
+    ];
+
+    // Default image URLs (fallback when no override saved)
+    const DEFAULT_IMAGES = {
+      'img-hero':      'https://itpark.am/wp-content/uploads/2025/08/yerevan-AI-Park.jpg',
+      'img-nvidia':    'https://itpark.am/wp-content/uploads/2025/08/Screenshot-2025-08-20-153148.jpg',
+      'img-pillar-1':  'https://itpark.am/wp-content/uploads/2025/08/Screenshot-2025-08-20-162832.jpg',
+      'img-pillar-2':  'https://itpark.am/wp-content/uploads/2025/08/Screenshot-2025-08-20-165024.jpg',
+      'img-pillar-3':  'https://itpark.am/wp-content/uploads/2025/08/Screenshot-2025-08-20-161234.jpg',
+      'img-pillar-4':  'https://itpark.am/wp-content/uploads/2025/08/Screenshot-2025-08-20-154015.jpg',
+      'img-community': 'https://itpark.am/wp-content/uploads/2025/08/Screenshot-2025-08-20-154706.jpg',
+    };
+
+    let imageAssignments = {};  // id → url
+
+    function loadImageAssignments() {
+      try { imageAssignments = JSON.parse(localStorage.getItem('agentpark-images') || '{}'); } catch { imageAssignments = {}; }
+    }
+
+    function saveImageAssignments() {
+      localStorage.setItem('agentpark-images', JSON.stringify(imageAssignments));
+    }
+
+    function renderSectionSlots() {
+      const grid = document.getElementById('section-image-slots');
+      grid.innerHTML = SECTION_SLOTS.map(slot => {
+        const src = imageAssignments[slot.id] || DEFAULT_IMAGES[slot.id] || '';
+        return `
+          <div class="rounded-xl border border-navy-tint/30 overflow-hidden bg-warm-gray">
+            <div class="relative aspect-video bg-navy/5 overflow-hidden">
+              <img src="${src}" alt="${slot.label}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/320x180'">
+            </div>
+            <div class="p-3">
+              <p class="text-xs font-semibold text-navy truncate">${slot.label}</p>
+              <p class="text-[10px] text-navy/40 mb-2">${slot.section}</p>
+              <button onclick="openImgPicker('${slot.id}','${slot.label}')" class="w-full px-3 py-1.5 bg-navy text-white text-xs font-medium rounded-lg hover:bg-navy-light transition-opacity duration-200 brand-focus">
+                Change Image
+              </button>
+              ${imageAssignments[slot.id] ? `<button onclick="resetSlot('${slot.id}')" class="w-full mt-1 px-3 py-1 text-xs text-navy/50 hover:text-red-500 transition-opacity duration-200">Reset to default</button>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function resetSlot(id) {
+      delete imageAssignments[id];
+      saveImageAssignments();
+      renderSectionSlots();
+      showToast('Reset to default image');
+    }
+
+    // ── Image Library ────────────────────────────────────────────
+    let allLibraryImages = [];
+
+    async function loadImageLibrary() {
+      const grid = document.getElementById('image-library-grid');
+      grid.innerHTML = '<div class="col-span-full text-center py-6 text-navy/40 text-xs">Loading...</div>';
+      try {
+        // Brand assets (static list)
+        const brandAssets = [
+          { name: 'AgentPark_logo.png', url: 'Brand_assets/AgentPark_logo.png' },
+          { name: 'AgentPark_logo.svg', url: 'Brand_assets/AgentPark_logo.svg' },
+        ];
+        // Uploaded images from server
+        let uploaded = [];
+        try {
+          const res = await fetch('/api/uploads');
+          if (res.ok) uploaded = await res.json();
+        } catch {}
+        allLibraryImages = [...brandAssets, ...uploaded];
+        renderLibraryGrid(allLibraryImages, grid);
+      } catch (e) {
+        grid.innerHTML = '<div class="col-span-full text-center py-6 text-red-400 text-xs">Failed to load library</div>';
+      }
+    }
+
+    function renderLibraryGrid(images, container) {
+      if (!images.length) {
+        container.innerHTML = '<div class="col-span-full text-center py-6 text-navy/40 text-xs">No images yet. Upload some above.</div>';
+        return;
+      }
+      container.innerHTML = images.map(img => `
+        <div class="group relative rounded-xl overflow-hidden border border-navy-tint/30 aspect-video bg-warm-gray flex items-center justify-center cursor-pointer" onclick="copyImgUrl('${img.url}')">
+          <img src="${img.url}" alt="${img.name}" class="max-h-full max-w-full object-contain p-2" onerror="this.style.opacity=0.3">
+          <div class="absolute inset-0 bg-navy/70 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center gap-1.5 p-2">
+            <span class="text-white text-[10px] font-medium text-center leading-tight">${img.name}</span>
+            <button onclick="event.stopPropagation();copyImgUrl('${img.url}')" class="px-2 py-1 bg-gold text-deep-ink text-[10px] font-semibold rounded hover:brightness-110">Copy URL</button>
+          </div>
+        </div>`).join('');
+    }
+
+    function copyImgUrl(url) {
+      navigator.clipboard.writeText(url).then(() => showToast('URL copied: ' + url));
+    }
+
+    // ── Upload ───────────────────────────────────────────────────
+    function handleDragOver(e) {
+      e.preventDefault();
+      document.getElementById('drop-zone').classList.add('drag-over');
+    }
+    function handleDragLeave(e) {
+      document.getElementById('drop-zone').classList.remove('drag-over');
+    }
+    function handleDrop(e) {
+      e.preventDefault();
+      document.getElementById('drop-zone').classList.remove('drag-over');
+      processFiles(e.dataTransfer.files);
+    }
+    function handleFileSelect(e) {
+      processFiles(e.target.files);
+      e.target.value = '';
+    }
+
+    async function processFiles(files) {
+      const prog = document.getElementById('upload-progress');
+      const list = Array.from(files).filter(f => f.type.startsWith('image/'));
+      if (!list.length) return;
+      prog.textContent = `Uploading ${list.length} file(s)...`;
+      prog.classList.remove('hidden');
+      let done = 0;
+      for (const file of list) {
+        try {
+          const data = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+          const res = await fetch('/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: file.name, data }),
+          });
+          if (!res.ok) throw new Error(await res.text());
+          done++;
+          prog.textContent = `Uploaded ${done}/${list.length}: ${file.name}`;
+        } catch (e) {
+          showToast('Upload failed: ' + file.name);
+        }
+      }
+      prog.textContent = `Done. ${done} image(s) saved to /uploads/.`;
+      setTimeout(() => prog.classList.add('hidden'), 3000);
+      loadImageLibrary();
+    }
+
+    // ── Image Picker Modal ───────────────────────────────────────
+    let pickerTargetId = null;
+
+    function openImgPicker(slotId, slotLabel) {
+      pickerTargetId = slotId;
+      document.getElementById('picker-slot-label').textContent = 'Changing: ' + slotLabel;
+      document.getElementById('picker-url-input').value = imageAssignments[slotId] || DEFAULT_IMAGES[slotId] || '';
+      // Render picker grid from library
+      const grid = document.getElementById('picker-grid');
+      if (allLibraryImages.length) {
+        renderPickerGrid(allLibraryImages, grid);
+      } else {
+        grid.innerHTML = '<div class="col-span-full text-center py-6 text-navy/40 text-xs">Loading...</div>';
+        fetch('/api/uploads').then(r => r.json()).then(uploaded => {
+          const brand = [
+            { name: 'AgentPark_logo.png', url: 'Brand_assets/AgentPark_logo.png' },
+            { name: 'AgentPark_logo.svg', url: 'Brand_assets/AgentPark_logo.svg' },
+          ];
+          allLibraryImages = [...brand, ...uploaded];
+          renderPickerGrid(allLibraryImages, grid);
+        }).catch(() => {
+          grid.innerHTML = '<div class="col-span-full text-xs text-red-400 text-center py-4">Could not load images</div>';
+        });
+      }
+      const modal = document.getElementById('img-picker-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeImgPicker() {
+      document.getElementById('img-picker-modal').classList.add('hidden');
+      document.getElementById('img-picker-modal').classList.remove('flex');
+      pickerTargetId = null;
+    }
+
+    function renderPickerGrid(images, container) {
+      container.innerHTML = images.map(img => `
+        <div class="group relative rounded-xl overflow-hidden border-2 border-transparent hover:border-gold aspect-video bg-warm-gray flex items-center justify-center cursor-pointer transition-all duration-150" onclick="applyPickerImage('${img.url}')">
+          <img src="${img.url}" alt="${img.name}" class="max-h-full max-w-full object-contain p-2" onerror="this.style.opacity=0.3">
+          <div class="absolute bottom-0 left-0 right-0 bg-navy/80 py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+            <span class="text-white text-[9px] truncate block">${img.name}</span>
+          </div>
+        </div>`).join('');
+    }
+
+    function applyPickerImage(url) {
+      if (!pickerTargetId) return;
+      imageAssignments[pickerTargetId] = url;
+      saveImageAssignments();
+      renderSectionSlots();
+      closeImgPicker();
+      showToast('Image updated — reload the website to see changes');
+    }
+
+    function applyPickerUrl() {
+      const url = document.getElementById('picker-url-input').value.trim();
+      if (!url) return;
+      applyPickerImage(url);
+    }
+
+    // Init images section when navigating to it
+    function initImagesSection() {
+      loadImageAssignments();
+      renderSectionSlots();
+      loadImageLibrary();
+    }
+
+    // ============================================================
+    // SUPABASE HELPERS
+    // ============================================================
+    async function sbFetch(path, options = {}) {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': options.prefer || 'return=representation',
+          ...options.headers,
+        },
+        ...options,
+      });
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err);
+      }
+      const text = await res.text();
+      return text ? JSON.parse(text) : [];
+    }
+
+    // ============================================================
+    // EVENTS CRUD
+    // ============================================================
+    let _eventsCache = [];
+    let _editingEventId = null;
+
+    // Parse image lines: "URL | Caption" or just "URL" or {url, caption} objects
+    function parseImageLines(raw) {
+      if (!raw) return null;
+      const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+      if (!lines.length) return null;
+      return lines.map(line => {
+        const parts = line.split('|').map(s => s.trim());
+        return parts.length > 1 && parts[1] ? { url: parts[0], caption: parts[1] } : { url: parts[0] };
+      });
+    }
+
+    // Convert images array back to textarea text
+    function imagesToText(images) {
+      if (!images || !images.length) return '';
+      return images.map(img => {
+        if (typeof img === 'string') return img;
+        return img.caption ? img.url + ' | ' + img.caption : img.url;
+      }).join('\n');
+    }
+
+    // ============================================================
+    // ANALYTICS
+    // ============================================================
+
+    async function loadDashboardStats() {
+      try {
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
+        const sixtyDaysAgo = new Date(Date.now() - 60 * 86400000).toISOString();
+
+        // Fetch all page views for current and previous 30-day periods
+        const [pvCurrent, pvPrevious, contacts] = await Promise.all([
+          sbFetch('page_views?select=visitor_id,duration_seconds&created_at=gte.' + thirtyDaysAgo),
+          sbFetch('page_views?select=id&created_at=gte.' + sixtyDaysAgo + '&created_at=lt.' + thirtyDaysAgo),
+          sbFetch('contact_messages?select=id')
+        ]);
+
+        const uniqueVisitors = new Set(pvCurrent.map(v => v.visitor_id)).size;
+
+        // Avg duration
+        const withDuration = pvCurrent.filter(v => v.duration_seconds != null);
+        let avgDuration = 0;
+        if (withDuration.length) {
+          avgDuration = Math.round(withDuration.reduce((s, v) => s + v.duration_seconds, 0) / withDuration.length);
+        }
+        const fmtDur = function(s) {
+          var m = Math.floor(s / 60), sec = s % 60;
+          return m + 'm ' + (sec < 10 ? '0' : '') + sec + 's';
+        };
+        var fmt = function(n) { return n.toLocaleString(); };
+
+        document.getElementById('dash-page-views').textContent = fmt(pvCurrent.length);
+        document.getElementById('dash-unique-visitors').textContent = fmt(uniqueVisitors);
+        document.getElementById('dash-contact-submissions').textContent = fmt(contacts.length);
+        document.getElementById('dash-avg-duration').textContent = fmtDur(avgDuration);
+
+        // Percentage change for page views
+        var pvEl = document.getElementById('dash-pv-change');
+        if (pvPrevious.length > 0) {
+          var pct = Math.round(((pvCurrent.length - pvPrevious.length) / pvPrevious.length) * 100);
+          pvEl.textContent = (pct >= 0 ? '+' : '') + pct + '%';
+          pvEl.className = pct >= 0
+            ? 'text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full'
+            : 'text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full';
+        } else {
+          pvEl.textContent = pvCurrent.length > 0 ? 'new' : '—';
+        }
+
+        // Hide change badges for other stats (they need historical data to compare)
+        document.getElementById('dash-uv-change').textContent = uniqueVisitors > 0 ? 'live' : '—';
+        document.getElementById('dash-cs-change').textContent = contacts.length > 0 ? 'total' : '—';
+
+      } catch (err) {
+        console.error('Dashboard stats error:', err);
+      }
+    }
+
+    async function loadAnalyticsData() {
+      try {
+        var thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
+        var fourteenDaysAgo = new Date(Date.now() - 14 * 86400000).toISOString();
+
+        var [views14, allViews, durations] = await Promise.all([
+          sbFetch('page_views?select=created_at,page_path&created_at=gte.' + fourteenDaysAgo + '&order=created_at.asc'),
+          sbFetch('page_views?select=page_path,visitor_id,session_id,duration_seconds&created_at=gte.' + thirtyDaysAgo),
+          sbFetch('page_views?select=duration_seconds&duration_seconds=not.is.null&created_at=gte.' + thirtyDaysAgo)
+        ]);
+
+        // Summary cards
+        document.getElementById('analytics-pv-count').textContent = allViews.length.toLocaleString();
+        var uvSet = new Set(allViews.map(function(v) { return v.visitor_id; }));
+        document.getElementById('analytics-uv-count').textContent = uvSet.size.toLocaleString();
+
+        // Bounce rate
+        var sessionViews = {};
+        allViews.forEach(function(v) {
+          if (v.session_id) sessionViews[v.session_id] = (sessionViews[v.session_id] || 0) + 1;
+        });
+        var totalSessions = Object.keys(sessionViews).length;
+        var bounceSessions = Object.values(sessionViews).filter(function(c) { return c === 1; }).length;
+        var bounceRate = totalSessions ? Math.round((bounceSessions / totalSessions) * 100) : 0;
+        document.getElementById('analytics-bounce').textContent = bounceRate + '%';
+
+        // Avg duration
+        if (durations.length) {
+          var avg = Math.round(durations.reduce(function(s, v) { return s + v.duration_seconds; }, 0) / durations.length);
+          document.getElementById('analytics-duration').textContent = Math.floor(avg / 60) + ':' + (avg % 60 < 10 ? '0' : '') + (avg % 60);
+        } else {
+          document.getElementById('analytics-duration').textContent = '0:00';
+        }
+
+        // === Traffic chart ===
+        var dailyCounts = {};
+        for (var i = 13; i >= 0; i--) {
+          var d = new Date(Date.now() - i * 86400000);
+          dailyCounts[d.toISOString().slice(0, 10)] = 0;
+        }
+        views14.forEach(function(v) {
+          var key = v.created_at.slice(0, 10);
+          if (dailyCounts.hasOwnProperty(key)) dailyCounts[key]++;
+        });
+
+        var maxCount = Math.max.apply(null, Object.values(dailyCounts).concat([1]));
+        var todayKey = new Date().toISOString().slice(0, 10);
+        var chartEl = document.getElementById('traffic-chart-bars');
+        chartEl.innerHTML = Object.entries(dailyCounts).map(function(entry) {
+          var date = entry[0], count = entry[1];
+          var dd = new Date(date + 'T12:00:00');
+          var label = dd.getDate() === 1
+            ? dd.toLocaleDateString('en', { month: 'short' }) + ' ' + dd.getDate()
+            : dd.getDate();
+          var pct = Math.round((count / maxCount) * 100);
+          var isToday = date === todayKey;
+          var barColor = isToday ? 'bg-gold' : (pct > 70 ? 'bg-gold/60' : 'bg-navy/8');
+          return '<div class="flex flex-col items-center gap-1 flex-1" title="' + date + ': ' + count + ' views">' +
+            '<div class="w-full ' + barColor + ' rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:' + Math.max(pct, 4) + '%"></div>' +
+            '<span class="text-[9px] text-navy/30' + (isToday ? ' font-semibold' : '') + '">' + label + '</span></div>';
+        }).join('');
+
+        // === Top pages ===
+        var pageCounts = {};
+        allViews.forEach(function(v) { pageCounts[v.page_path] = (pageCounts[v.page_path] || 0) + 1; });
+        var sorted = Object.entries(pageCounts).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 5);
+        var topMax = sorted[0] ? sorted[0][1] : 1;
+        var topPagesEl = document.getElementById('top-pages-list');
+        if (sorted.length === 0) {
+          topPagesEl.innerHTML = '<div class="text-center py-4 text-navy/40 text-xs">No data yet</div>';
+        } else {
+          topPagesEl.innerHTML = sorted.map(function(entry) {
+            var path = entry[0], count = entry[1];
+            var pct = Math.round((count / topMax) * 100);
+            var displayPath = path === '/' || path === '/index.html' ? '/ (Home)' : path;
+            return '<div class="flex items-center justify-between">' +
+              '<span class="text-sm text-navy/70 truncate max-w-[150px]">' + displayPath + '</span>' +
+              '<div class="flex items-center gap-3">' +
+              '<div class="w-24 h-1.5 rounded-full bg-warm-gray overflow-hidden"><div class="h-full bg-gold rounded-full" style="width:' + pct + '%"></div></div>' +
+              '<span class="text-xs text-navy/50 w-8 text-right">' + count.toLocaleString() + '</span>' +
+              '</div></div>';
+          }).join('');
+        }
+
+        // === Top countries ===
+        var countryViews = await sbFetch('page_views?select=country&country=not.is.null&created_at=gte.' + thirtyDaysAgo);
+        var countryCounts = {};
+        countryViews.forEach(function(v) { if (v.country) countryCounts[v.country] = (countryCounts[v.country] || 0) + 1; });
+        var countrySorted = Object.entries(countryCounts).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 5);
+        var countryTotal = countryViews.length || 1;
+        var topCountriesEl = document.getElementById('top-countries-list');
+        if (countrySorted.length === 0) {
+          topCountriesEl.innerHTML = '<div class="text-center py-4 text-navy/40 text-xs">No data yet</div>';
+        } else {
+          topCountriesEl.innerHTML = countrySorted.map(function(entry) {
+            var country = entry[0], count = entry[1];
+            var pct = Math.round((count / countryTotal) * 100);
+            return '<div class="flex items-center justify-between">' +
+              '<span class="text-sm text-navy/70">' + country + '</span>' +
+              '<div class="flex items-center gap-3">' +
+              '<div class="w-24 h-1.5 rounded-full bg-warm-gray overflow-hidden"><div class="h-full bg-gold rounded-full" style="width:' + Math.max(pct, 5) + '%"></div></div>' +
+              '<span class="text-xs text-navy/50 w-8 text-right">' + pct + '%</span>' +
+              '</div></div>';
+          }).join('');
+        }
+
+      } catch (err) {
+        console.error('Analytics error:', err);
+      }
+    }
+
+    // Helper to get current language translation
+    function tr(key) {
+      const lang = localStorage.getItem("agentpark-lang") || "en";
+      const t = ADMIN_TRANS[lang] || ADMIN_TRANS.en;
+      return t[key] || ADMIN_TRANS.en[key] || key;
+    }
+
+    // Cover image preview
+    document.getElementById('ev-cover-image').addEventListener('input', function() {
+      const url = this.value.trim();
+      const preview = document.getElementById('ev-cover-preview');
+      const img = document.getElementById('ev-cover-preview-img');
+      if (url) {
+        img.src = url;
+        img.onload = () => preview.classList.remove('hidden');
+        img.onerror = () => preview.classList.add('hidden');
+      } else {
+        preview.classList.add('hidden');
+      }
+    });
+
+    // Event images preview
+    function renderImagePreviews() {
+      const textarea = document.getElementById('ev-images');
+      const preview = document.getElementById('ev-images-preview');
+      const lines = textarea.value.trim().split('\n').filter(l => l.trim());
+      if (!lines.length) { preview.innerHTML = ''; return; }
+      preview.innerHTML = lines.map((line, i) => {
+        const parts = line.split('|');
+        const url = parts[0].trim();
+        const caption = parts[1] ? parts[1].trim() : '';
+        if (!url) return '';
+        return `<div class="relative group">
+          <img src="${url}" alt="${caption}" class="w-20 h-20 object-cover rounded-lg border border-navy-tint/30" onerror="this.parentNode.style.display='none'">
+          ${caption ? `<div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[9px] px-1 py-0.5 rounded-b-lg truncate">${caption}</div>` : ''}
+        </div>`;
+      }).join('');
+    }
+    document.getElementById('ev-images').addEventListener('input', renderImagePreviews);
+
+    // Video preview
+    function getEmbedUrl(url) {
+      if (!url) return null;
+      // YouTube
+      let m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+      if (m) return 'https://www.youtube.com/embed/' + m[1];
+      // Vimeo
+      m = url.match(/vimeo\.com\/(\d+)/);
+      if (m) return 'https://player.vimeo.com/video/' + m[1];
+      return null;
+    }
+
+    function renderVideoPreview() {
+      const url = document.getElementById('ev-video-url').value.trim();
+      const preview = document.getElementById('ev-video-preview');
+      if (!url) { preview.classList.add('hidden'); preview.innerHTML = ''; return; }
+      const embed = getEmbedUrl(url);
+      if (embed) {
+        preview.innerHTML = `<iframe src="${embed}" class="w-full max-w-md h-48 rounded-lg border border-navy-tint/30" frameborder="0" allowfullscreen></iframe>`;
+        preview.classList.remove('hidden');
+      } else if (url.match(/\.(mp4|webm|mov)(\?|$)/i)) {
+        preview.innerHTML = `<video src="${url}" class="w-full max-w-md h-48 rounded-lg border border-navy-tint/30 object-cover" controls></video>`;
+        preview.classList.remove('hidden');
+      } else {
+        preview.innerHTML = `<p class="text-[10px] text-navy/40">Video link set. Preview unavailable for this format.</p>`;
+        preview.classList.remove('hidden');
+      }
+    }
+    document.getElementById('ev-video-url').addEventListener('input', renderVideoPreview);
+
+    async function uploadEventVideo(input) {
+      const file = input.files[0];
+      if (!file) return;
+      try {
+        showToast('Uploading video...');
+        const url = await uploadToStorage(file);
+        document.getElementById('ev-video-url').value = url;
+        renderVideoPreview();
+        showToast('Video uploaded');
+      } catch(e) {
+        showToast('Upload error: ' + e.message);
+      }
+      input.value = '';
+    }
+
+    // Upload image to Supabase Storage
+    async function uploadToStorage(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      const name = Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+      const path = 'events/' + name;
+      const res = await fetch(SUPABASE_URL + '/storage/v1/object/event-images/' + path, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'apikey': SUPABASE_KEY,
+          'Content-Type': file.type,
+        },
+        body: file,
+      });
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error('Upload failed: ' + err);
+      }
+      // Return public URL
+      return SUPABASE_URL + '/storage/v1/object/public/event-images/' + path;
+    }
+
+    // Upload cover image from file input
+    async function uploadEventImage(input, targetId) {
+      const file = input.files[0];
+      if (!file) return;
+      const progress = document.getElementById('ev-cover-upload-progress');
+      const bar = progress.querySelector('div > div');
+      progress.classList.remove('hidden');
+      bar.style.width = '30%';
+      try {
+        bar.style.width = '60%';
+        const url = await uploadToStorage(file);
+        bar.style.width = '100%';
+        document.getElementById(targetId).value = url;
+        // Trigger preview
+        document.getElementById(targetId).dispatchEvent(new Event('input'));
+        showToast('Image uploaded');
+      } catch(e) {
+        showToast('Upload error: ' + e.message);
+      } finally {
+        setTimeout(() => { progress.classList.add('hidden'); bar.style.width = '0%'; }, 800);
+        input.value = '';
+      }
+    }
+
+    // Upload multiple event images from file input
+    async function uploadEventImages(input) {
+      const files = Array.from(input.files);
+      if (!files.length) return;
+      const progress = document.getElementById('ev-images-upload-progress');
+      const bar = progress.querySelector('div > div');
+      progress.classList.remove('hidden');
+      const textarea = document.getElementById('ev-images');
+      try {
+        const urls = [];
+        for (let i = 0; i < files.length; i++) {
+          bar.style.width = Math.round(((i + 0.5) / files.length) * 100) + '%';
+          const url = await uploadToStorage(files[i]);
+          urls.push(url);
+          bar.style.width = Math.round(((i + 1) / files.length) * 100) + '%';
+        }
+        // Append to existing textarea content
+        const existing = textarea.value.trim();
+        const newLines = urls.map(u => u + ' |').join('\n');
+        textarea.value = existing ? existing + '\n' + newLines : newLines;
+        renderImagePreviews();
+        showToast(urls.length + ' image' + (urls.length > 1 ? 's' : '') + ' uploaded');
+      } catch(e) {
+        showToast('Upload error: ' + e.message);
+      } finally {
+        setTimeout(() => { progress.classList.add('hidden'); bar.style.width = '0%'; }, 800);
+        input.value = '';
+      }
+    }
+
+    // ── Organizers management ──
+    let _organizers = [];
+
+    function renderOrganizers() {
+      const list = document.getElementById('ev-organizers-list');
+      if (!_organizers.length) { list.innerHTML = ''; return; }
+      list.innerHTML = _organizers.map((org, i) => `
+        <div class="flex items-center gap-2 bg-warm-gray rounded-lg px-3 py-2">
+          ${org.logo_url ? `<img src="${org.logo_url}" alt="" class="h-8 w-auto max-w-[80px] object-contain rounded" onerror="this.style.display='none'">` : ''}
+          <span class="text-sm font-medium text-navy flex-1">${org.name}</span>
+          <button onclick="_organizers.splice(${i},1);renderOrganizers()" class="text-red-400 hover:text-red-600 text-xs px-1.5 py-0.5 rounded hover:bg-red-50 transition-colors duration-150">&times;</button>
+        </div>
+      `).join('');
+    }
+
+    function addOrganizerRow() {
+      const name = document.getElementById('ev-org-name').value.trim();
+      if (!name) { showToast('Organization name is required'); return; }
+      const logo = document.getElementById('ev-org-logo').value.trim();
+      _organizers.push({ name, logo_url: logo || null });
+      document.getElementById('ev-org-name').value = '';
+      document.getElementById('ev-org-logo').value = '';
+      renderOrganizers();
+    }
+
+    async function uploadOrgLogo(input) {
+      const file = input.files[0];
+      if (!file) return;
+      try {
+        const url = await uploadToStorage(file);
+        document.getElementById('ev-org-logo').value = url;
+        showToast('Logo uploaded');
+      } catch(e) {
+        showToast('Upload error: ' + e.message);
+      }
+      input.value = '';
+    }
+
+    async function loadEvents() {
+      const list = document.getElementById('events-list');
+      list.innerHTML = '<div class="text-center py-10 text-navy/40 text-sm">' + tr('loading') + '</div>';
+      try {
+        const events = await sbFetch('events?order=date.asc&select=*');
+        _eventsCache = events;
+        if (!events.length) {
+          list.innerHTML = '<div class="text-center py-10 text-navy/40 text-sm">' + tr('no-events-yet') + '</div>';
+          return;
+        }
+        const today = new Date(); today.setHours(0,0,0,0);
+        list.innerHTML = events.map(ev => {
+          const isPast = ev.date && new Date(ev.date) < today;
+          return `
+          <div class="flex items-start justify-between gap-4 py-4 border-b border-navy-tint/20 last:border-0 ${isPast ? 'opacity-70' : ''}">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <p class="text-sm font-semibold text-navy">${ev.title}</p>
+                ${isPast ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-navy/8 text-navy/40 font-medium uppercase">' + tr('badge-past') + '</span>' : '<span class="text-[10px] px-2 py-0.5 rounded-full bg-green-50 text-green-600 font-medium uppercase">' + tr('badge-upcoming') + '</span>'}
+              </div>
+              <div class="flex flex-wrap items-center gap-3 mt-1">
+                ${ev.date ? `<span class="text-xs text-navy/50">\u{1F4C5} ${ev.date}</span>` : ''}
+                ${ev.location ? `<span class="text-xs text-navy/50">\u{1F4CD} ${ev.location}</span>` : ''}
+                ${ev.capacity ? `<span class="text-xs text-navy/50">\u{1F465} ${tr("capacity-label")}: ${ev.capacity}</span>` : ''}
+                ${ev.images && ev.images.length ? `<span class="text-xs text-navy/50">\u{1F5BC}\u{FE0F} ${ev.images.length} ${ev.images.length > 1 ? tr("images-plural") : tr("image-singular")}</span>` : ''}
+                ${ev.summary ? '<span class="text-xs text-gold">\u{270F}\u{FE0F} ' + tr('has-summary') + '</span>' : ''}
+              </div>
+              ${ev.description ? `<p class="text-xs text-navy/50 mt-1 line-clamp-2">${ev.description}</p>` : ''}
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button onclick="editEvent('${ev.id}')" class="text-xs px-3 py-1.5 rounded-lg bg-navy/8 text-navy/70 hover:bg-navy/15 transition-colors duration-150 brand-focus">
+                ${tr('edit-btn')}
+              </button>
+              <button onclick="viewRegistrations('${ev.id}', '${ev.title.replace(/'/g,"\\'")}') " class="text-xs px-3 py-1.5 rounded-lg bg-gold/10 text-gold hover:bg-gold/20 transition-colors duration-150 brand-focus">
+                ${tr('registrations')}
+              </button>
+              <button onclick="deleteEvent('${ev.id}')" class="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors duration-150 brand-focus">
+                ${tr('delete-btn')}
+              </button>
+            </div>
+          </div>
+        `}).join('');
+      } catch(e) {
+        list.innerHTML = `<div class="text-center py-8 text-red-500 text-sm">Error: ${e.message}</div>`;
+      }
+    }
+
+    async function addEvent() {
+      const title = document.getElementById('ev-title').value.trim();
+      if (!title) { showToast(tr('title-required')); return; }
+      const adding = document.getElementById('ev-adding');
+      adding.classList.remove('hidden');
+      try {
+        const images = parseImageLines(document.getElementById('ev-images').value.trim());
+        await sbFetch('events', {
+          method: 'POST',
+          body: JSON.stringify({
+            title,
+            title_am: document.getElementById('ev-title-am').value.trim() || null,
+            date: document.getElementById('ev-date').value || null,
+            end_date: document.getElementById('ev-end-date').value || null,
+            location: document.getElementById('ev-location').value || null,
+            capacity: parseInt(document.getElementById('ev-capacity').value) || null,
+            description: document.getElementById('ev-desc').value || null,
+            description_am: document.getElementById('ev-desc-am').value || null,
+            summary: document.getElementById('ev-summary').value || null,
+            summary_am: document.getElementById('ev-summary-am').value || null,
+            images: images,
+            cover_image: document.getElementById('ev-cover-image').value.trim() || null,
+            video_url: document.getElementById('ev-video-url').value.trim() || null,
+            organizers: _organizers.length ? _organizers : null,
+          }),
+        });
+        ['ev-title','ev-title-am','ev-date','ev-end-date','ev-location','ev-capacity','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('ev-cover-preview').classList.add('hidden');
+        document.getElementById('ev-images-preview').innerHTML = '';
+        document.getElementById('ev-video-preview').classList.add('hidden');
+        document.getElementById('ev-video-preview').innerHTML = '';
+        _organizers = []; renderOrganizers();
+        showToast(tr('event-added'));
+        loadEvents();
+      } catch(e) {
+        showToast('Error: ' + e.message);
+      } finally {
+        adding.classList.add('hidden');
+      }
+    }
+
+    async function deleteEvent(id) {
+      if (!confirm(tr('delete-confirm'))) return;
+      try {
+        await sbFetch('events?id=eq.' + id, { method: 'DELETE', prefer: 'return=minimal' });
+        showToast(tr('event-deleted'));
+        loadEvents();
+        document.getElementById('registrations-panel').classList.add('hidden');
+      } catch(e) {
+        showToast('Error: ' + e.message);
+      }
+    }
+
+    function editEvent(id) {
+      const ev = _eventsCache.find(e => e.id == id);
+      if (!ev) { showToast(tr('event-not-found')); return; }
+      _editingEventId = id;
+      document.getElementById('ev-title').value = ev.title || '';
+      document.getElementById('ev-title-am').value = ev.title_am || '';
+      document.getElementById('ev-date').value = ev.date || '';
+      document.getElementById('ev-end-date').value = ev.end_date || '';
+      document.getElementById('ev-location').value = ev.location || '';
+      document.getElementById('ev-capacity').value = ev.capacity || '';
+      document.getElementById('ev-desc').value = ev.description || '';
+      document.getElementById('ev-desc-am').value = ev.description_am || '';
+      document.getElementById('ev-summary').value = ev.summary || '';
+      document.getElementById('ev-summary-am').value = ev.summary_am || '';
+      document.getElementById('ev-images').value = imagesToText(ev.images);
+      renderImagePreviews();
+      document.getElementById('ev-cover-image').value = ev.cover_image || '';
+      if (ev.cover_image) {
+        document.getElementById('ev-cover-preview-img').src = ev.cover_image;
+        document.getElementById('ev-cover-preview').classList.remove('hidden');
+      } else {
+        document.getElementById('ev-cover-preview').classList.add('hidden');
+      }
+      document.getElementById('ev-video-url').value = ev.video_url || '';
+      renderVideoPreview();
+      _organizers = Array.isArray(ev.organizers) ? ev.organizers.map(o => ({name: o.name, logo_url: o.logo_url || null})) : [];
+      renderOrganizers();
+      // Switch to edit mode UI
+      const lang = localStorage.getItem('agentpark-lang') || 'en';
+      document.getElementById('ev-form-title').textContent = tr('edit-event-title');
+      document.getElementById('ev-add-btn').classList.add('hidden');
+      document.getElementById('ev-update-btn').classList.remove('hidden');
+      document.getElementById('ev-cancel-btn').classList.remove('hidden');
+      document.getElementById('ev-update-btn').textContent = tr('save-changes-event');
+      document.getElementById('ev-cancel-btn').textContent = tr('cancel-btn');
+      // Scroll to form
+      document.getElementById('ev-title').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById('ev-title').focus();
+    }
+
+    async function updateEvent() {
+      if (!_editingEventId) return;
+      const title = document.getElementById('ev-title').value.trim();
+      if (!title) { showToast('Event title is required'); return; }
+      const adding = document.getElementById('ev-adding');
+      adding.classList.remove('hidden');
+      try {
+        const updImages = parseImageLines(document.getElementById('ev-images').value.trim());
+        await sbFetch('events?id=eq.' + _editingEventId, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            title,
+            title_am: document.getElementById('ev-title-am').value.trim() || null,
+            date: document.getElementById('ev-date').value || null,
+            end_date: document.getElementById('ev-end-date').value || null,
+            location: document.getElementById('ev-location').value || null,
+            capacity: parseInt(document.getElementById('ev-capacity').value) || null,
+            description: document.getElementById('ev-desc').value || null,
+            description_am: document.getElementById('ev-desc-am').value || null,
+            summary: document.getElementById('ev-summary').value || null,
+            summary_am: document.getElementById('ev-summary-am').value || null,
+            images: updImages,
+            cover_image: document.getElementById('ev-cover-image').value.trim() || null,
+            video_url: document.getElementById('ev-video-url').value.trim() || null,
+            organizers: _organizers.length ? _organizers : null,
+          }),
+        });
+        showToast(tr('event-updated'));
+        cancelEditEvent();
+        loadEvents();
+      } catch(e) {
+        showToast('Error: ' + e.message);
+      } finally {
+        adding.classList.add('hidden');
+      }
+    }
+
+    function cancelEditEvent() {
+      _editingEventId = null;
+      ['ev-title','ev-title-am','ev-date','ev-end-date','ev-location','ev-capacity','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('ev-cover-preview').classList.add('hidden');
+      document.getElementById('ev-images-preview').innerHTML = '';
+      document.getElementById('ev-video-preview').classList.add('hidden');
+      document.getElementById('ev-video-preview').innerHTML = '';
+      _organizers = []; renderOrganizers();
+      const lang = localStorage.getItem('agentpark-lang') || 'en';
+      const t = ADMIN_TRANS[lang] || ADMIN_TRANS.en;
+      document.getElementById('ev-form-title').textContent = t['add-new-event'] || 'Add New Event';
+      document.getElementById('ev-add-btn').classList.remove('hidden');
+      document.getElementById('ev-update-btn').classList.add('hidden');
+      document.getElementById('ev-cancel-btn').classList.add('hidden');
+    }
+
+    async function viewRegistrations(eventId, eventTitle) {
+      const panel = document.getElementById('registrations-panel');
+      const list = document.getElementById('registrations-list');
+      document.getElementById('reg-event-title').textContent = eventTitle;
+      panel.classList.remove('hidden');
+      list.innerHTML = '<div class="text-center py-8 text-navy/40 text-sm">' + tr('loading') + '</div>';
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      try {
+        const regs = await sbFetch('registrations?event_id=eq.' + eventId + '&order=created_at.desc');
+        if (!regs.length) {
+          list.innerHTML = '<div class="text-center py-8 text-navy/40 text-sm">' + tr('no-registrations') + '</div>';
+          return;
+        }
+        list.innerHTML = `
+          <div class="mb-3 flex items-center justify-between">
+            <span class="text-xs text-navy/50">${regs.length} registration${regs.length !== 1 ? 's' : ''}</span>
+            <button onclick="exportCSV(${JSON.stringify(regs).replace(/"/g,'&quot;')})" class="text-xs text-gold hover:text-gold/70 transition-opacity duration-150">' + tr('export-csv') + '</button>
+          </div>
+          <div class="space-y-2">
+            ${regs.map(r => `
+              <div class="flex items-center justify-between py-2.5 px-4 rounded-xl bg-warm-gray">
+                <div>
+                  <p class="text-sm font-medium text-navy">${r.name}</p>
+                  <p class="text-xs text-navy/50">${r.email}</p>
+                </div>
+                <span class="text-[10px] text-navy/40">${new Date(r.created_at).toLocaleDateString()}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } catch(e) {
+        list.innerHTML = `<div class="text-center py-8 text-red-500 text-sm">Error: ${e.message}</div>`;
+      }
+    }
+
+    function exportCSV(regs) {
+      const rows = [[tr('csv-name'), tr('csv-email'), tr('csv-registered-at')], ...regs.map(r => [r.name, r.email, r.created_at])];
+      const csv = rows.map(r => r.join(',')).join('\n');
+      const a = document.createElement('a');
+      a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+      a.download = 'registrations.csv';
+      a.click();
+    }
+  </script>
+
+  <style>
+    .admin-lang-switch { transition: background 0.15s, color 0.15s; }
+    .admin-lang-switch.active-alang { background: rgba(203,161,75,0.3); color: #fff; border-color: rgba(203,161,75,0.5); }
+  </style>
+
+  <script>
+    // ── Admin i18n ─────────────────────────────────────────────
+    var ADMIN_TRANS = {
+      en: {
+        // Login
+        'admin-panel': 'Admin Panel', 'sign-in-desc': 'Sign in to manage your website.',
+        'username': 'Username', 'password': 'Password', 'sign-in': 'Sign In',
+        'login-error': 'Incorrect username or password.', 'login-hint': 'Default: admin / agentpark2025',
+        // Sidebar
+        'sidebar-admin-panel': 'Admin Panel',
+        'nav-dashboard': 'Dashboard', 'nav-content': 'Content', 'nav-images': 'Images',
+        'nav-analytics': 'Analytics', 'nav-events': 'Events', 'nav-settings': 'Settings',
+        'view-site': 'View Site', 'log-out': 'Log Out',
+        // Top bar
+        'unsaved-changes': 'Unsaved changes', 'save-changes': 'Save Changes',
+        // Dashboard page titles
+        'title-dashboard': 'Dashboard', 'sub-dashboard': 'Welcome back, Admin',
+        'title-content': 'Content Editor', 'sub-content': 'Edit your page copy',
+        'title-images': 'Image Manager', 'sub-images': 'Upload and manage assets',
+        'title-analytics': 'Analytics', 'sub-analytics': 'Traffic & performance overview',
+        'title-events': 'Events Manager', 'sub-events': 'Add, edit and view registrations',
+        'title-settings': 'Settings', 'sub-settings': 'Brand, contact & site options',
+        // Dashboard stat cards
+        'stat-page-views': 'Page Views (30d)', 'stat-unique-visitors': 'Unique Visitors',
+        'stat-contact-submissions': 'Contact Submissions', 'stat-avg-duration': 'Avg. Session Duration',
+        'stat-avg-label': 'avg',
+        // Dashboard quick actions
+        'quick-actions': 'Quick Actions',
+        'qa-edit-content': 'Edit Content', 'qa-edit-content-desc': 'Update page copy',
+        'qa-manage-images': 'Manage Images', 'qa-manage-images-desc': 'Upload & swap images',
+        'qa-view-analytics': 'View Analytics', 'qa-view-analytics-desc': 'Stats & traffic',
+        'qa-settings': 'Settings', 'qa-settings-desc': 'Brand & contact',
+        // Dashboard site status
+        'site-status': 'Site Status', 'status-main-site': 'Main Site', 'status-live': 'Live',
+        'status-server': 'Server', 'status-running': 'Running',
+        'status-last-updated': 'Last Updated', 'status-version': 'Version',
+        'open-website': 'Open Website',
+        // Content language and tabs
+        'editing-language': 'Editing Language:', 'lang-english': 'English', 'lang-armenian': 'Հայերեն (Armenian)',
+        'tab-hero': 'Hero', 'tab-about': 'About', 'tab-community': 'Community & Events',
+        'tab-navigation': 'Navigation', 'tab-armenian': '🇦🇲 Armenian',
+        // Content Hero
+        'hero-section': 'Hero Section',
+        'label-location-badge': 'Location Badge', 'label-headline-line1': 'Headline (line 1)',
+        'label-headline-highlighted': 'Headline (highlighted)', 'label-subheading': 'Subheading',
+        'label-primary-cta': 'Primary CTA Label', 'label-secondary-cta': 'Secondary CTA Label',
+        // Content About
+        'about-section': 'About Section', 'label-section-label': 'Section Label',
+        'label-heading': 'Heading', 'label-paragraph-1': 'Paragraph 1', 'label-paragraph-2': 'Paragraph 2',
+        // Content Community
+        'community-section': 'Community Section', 'label-section-label-comm': 'Section Label',
+        'label-heading-comm': 'Heading',
+        'feature-1': 'Feature 1', 'label-title': 'Title', 'label-description': 'Description',
+        'feature-2': 'Feature 2', 'label-title-f2': 'Title', 'label-description-f2': 'Description',
+        'feature-3': 'Feature 3', 'label-title-f3': 'Title', 'label-description-f3': 'Description',
+        'events-subsection': 'Events Subsection', 'label-events-heading': 'Events Heading',
+        'label-upcoming-label': 'Upcoming Label', 'label-past-label': 'Past Label',
+        'save-community-section': 'Save Community & Events Section', 'changes-saved-index': 'Changes saved',
+        // Content Navigation
+        'navigation-labels': 'Navigation Labels',
+        'label-link-1': 'Link 1', 'label-link-2': 'Link 2', 'label-link-3': 'Link 3', 'label-link-4': 'Link 4',
+        'label-cta-button': 'CTA Button',
+        // Content Armenian tab
+        'armenian-content-title': 'Armenian (Հայերեն) Content',
+        'armenian-content-desc': 'These translations are saved to localStorage and applied when visitors switch to Armenian on the website.',
+        'am-hero-section': 'Hero Section', 'label-h1-before-gold': 'H1 Line 1 (before gold)',
+        'label-h1-gold-text': 'H1 Gold Text', 'label-am-subheading': 'Subheading',
+        'label-cta-1': 'CTA 1', 'label-cta-2': 'CTA 2',
+        'am-about-section': 'About Section', 'label-am-heading': 'Heading',
+        'label-am-paragraph-1': 'Paragraph 1', 'label-am-paragraph-2': 'Paragraph 2',
+        'am-community-section': 'Community Section', 'label-am-comm-h2': 'Heading',
+        'label-am-f1-title': 'Feature 1 Title', 'label-am-f1-desc': 'Feature 1 Description',
+        'label-am-f2-title': 'Feature 2 Title', 'label-am-f2-desc': 'Feature 2 Description',
+        'label-am-f3-title': 'Feature 3 Title', 'label-am-f3-desc': 'Feature 3 Description',
+        'am-mission-contact': 'Mission & Contact', 'label-mission-quote': 'Mission Quote',
+        'label-contact-heading': 'Contact Section Heading', 'label-contact-description': 'Contact Description',
+        'save-armenian-content': 'Save Armenian Content', 'armenian-saved-msg': 'Armenian content saved ✓',
+        // Images
+        'upload-image': 'Upload Image',
+        'upload-image-desc': 'Upload images to the server. Supported: JPG, PNG, SVG, WebP.',
+        'drop-files': 'Drop files here or <span class="text-gold">click to browse</span>',
+        'saved-to-uploads': 'Saved to /uploads/ on the server',
+        'image-library': 'Image Library', 'refresh': 'Refresh',
+        'website-section-images': 'Website Section Images',
+        'website-section-images-desc': 'Click a slot to change which image appears in each section of the website.',
+        'choose-image': 'Choose Image', 'paste-image-url': 'Or paste an image URL', 'use-url': 'Use URL',
+        // Analytics
+        'analytics-this-month': 'This Month', 'analytics-page-views': 'page views',
+        'analytics-visitors': 'Visitors', 'analytics-unique-sessions': 'unique sessions',
+        'analytics-bounce-rate': 'Bounce Rate', 'analytics-bounce-change': '↓ 4% vs last month',
+        'analytics-avg-duration': 'Avg. Duration', 'analytics-duration-change': '↑ 12s vs last month',
+        'daily-traffic': 'Daily Traffic — March 2026', 'last-14-days': 'Last 14 days',
+        'top-pages': 'Top Pages', 'top-countries': 'Top Countries',
+        // Settings
+        'brand-colors': 'Brand Colors', 'label-primary-navy': 'Primary (Navy)', 'label-accent-gold': 'Accent (Gold)',
+        'contact-information': 'Contact Information',
+        'label-email-address': 'Email Address', 'label-phone': 'Phone', 'label-address': 'Address',
+        'seo-meta': 'SEO & Meta', 'label-page-title': 'Page Title', 'label-meta-description': 'Meta Description',
+        'site-options': 'Site Options',
+        'maintenance-mode': 'Maintenance Mode', 'maintenance-mode-desc': 'Show a coming soon page to visitors',
+        'cookie-banner': 'Cookie Banner', 'cookie-banner-desc': 'Show GDPR cookie consent banner',
+        'analytics-tracking': 'Analytics Tracking', 'analytics-tracking-desc': 'Enable visitor analytics collection',
+        'danger-zone': 'Danger Zone', 'reset-all-settings': 'Reset All Settings',
+        'reset-all-settings-desc': 'Restore all fields to their default values', 'reset-btn': 'Reset',
+        // Events
+        'add-new-event': 'Add New Event', 'label-event-title': 'Event Title *',
+        'label-date': 'Date', 'label-location': 'Location', 'label-capacity': 'Capacity',
+        'label-ev-description': 'Description', 'add-event-btn': 'Add Event', 'saving': 'Saving...',
+        'all-events': 'All Events', 'refresh-events': 'Refresh',
+        'registrations': 'Registrations', 'close-btn': 'Close',
+        'label-ev-summary': 'Post-Event Summary <span class="text-navy/30 normal-case">(for past events)</span>',
+        'label-ev-images': 'Event Images <span class="text-navy/30 normal-case">(one per line: URL | Caption)</span>',
+        'ev-images-hint': 'One image per line. Format: <code class="bg-navy/5 px-1 rounded">URL | Caption</code> — caption is optional.',
+        'ph-ev-title': 'e.g. AI Hackathon Yerevan 2026',
+        'ph-ev-location': 'e.g. AgentPark, Yerevan',
+        'ph-ev-capacity': 'e.g. 100',
+        'ph-ev-desc': 'Describe the event...',
+        'ph-ev-summary': 'Write a summary after the event has taken place...',
+        'ph-ev-images': 'https://example.com/photo1.jpg | Opening keynote',
+        'ph-picker-url': 'https://example.com/image.jpg',
+        'am-tab-desc': 'Edit all Armenian translations. Changes apply when visitors switch to Armenian.',
+        'loading-am-fields': 'Loading Armenian fields...',
+        'cancel-btn': 'Cancel',
+        'save-changes-event': 'Save Changes',
+        'edit-event-title': 'Edit Event',
+        'loading': 'Loading...',
+        'loading-events': 'Loading events...',
+        'loading-images': 'Loading images...',
+        'no-events-yet': 'No events yet. Add one above.',
+        'edit-btn': 'Edit',
+        'delete-btn': 'Delete',
+        'delete-confirm': 'Delete this event and all its registrations?',
+        'export-csv': 'Export CSV',
+        'edit-event-title': 'Edit Event',
+        'loading': 'Loading...',
+        'loading-events': 'Loading events...',
+        'loading-images': 'Loading images...',
+        'no-events-yet': 'No events yet. Add one above.',
+        'edit-btn': 'Edit',
+        'delete-btn': 'Delete',
+        'delete-confirm': 'Delete this event and all its registrations?',
+        'title-required': 'Event title is required',
+        'event-added': 'Event added successfully',
+        'event-deleted': 'Event deleted',
+        'event-updated': 'Event updated successfully',
+        'event-not-found': 'Event not found',
+        'save-changes-event': 'Save Changes',
+        'cancel-btn': 'Cancel',
+        'badge-past': 'Past',
+        'badge-upcoming': 'Upcoming',
+        'capacity-label': 'Capacity',
+        'image-singular': 'image',
+        'images-plural': 'images',
+        'has-summary': 'Has summary',
+        'no-registrations': 'No registrations yet.',
+        'registration-singular': 'registration',
+        'registrations-plural': 'registrations',
+        'csv-name': 'Name',
+        'csv-email': 'Email',
+        'csv-registered-at': 'Registered At',
+      },
+      am: {
+        // Մուտք - Login
+        'admin-panel': 'Կառավարման վահանակ',
+        'sign-in-desc': 'Մուտք գործեք կայքը կառավարելու համար:',
+        'username': 'Օգտագործողի անուն', 'password': 'Գաղտնաբառ', 'sign-in': 'Մուտք',
+        'login-error': 'Սխալ օգտագործողի անուն կամ գաղտնաբառ:',
+        'login-hint': 'Լռավելմանը՝ admin / agentpark2025',
+        // Sidebar
+        'sidebar-admin-panel': 'Կառավարման վահանակ',
+        'nav-dashboard': 'Վահանակ', 'nav-content': 'Բովանդակություն', 'nav-images': 'Պատկերներ',
+        'nav-analytics': 'Վիճակագրություն', 'nav-events': 'Միջոցառումներ', 'nav-settings': 'Կարգավորումներ',
+        'view-site': 'Դիտել կայքը', 'log-out': 'Ելք',
+        // Top bar
+        'unsaved-changes': 'Չպահպանված փոփոխություններ', 'save-changes': 'Պահպանել փոփոխությունները',
+        // Dashboard page titles
+        'title-dashboard': 'Վահանակ', 'sub-dashboard': 'Բարի գալուստ, ադմին',
+        'title-content': 'Բովանդակության խմբագիր', 'sub-content': 'Խմբագրել էջի տեքստը',
+        'title-images': 'պատկերների կառավարիչ', 'sub-images': 'Վերբեռնել և կառավարել նյութեր',
+        'title-analytics': 'Վիճակագրություն', 'sub-analytics': 'Երթևեկություն և արդյունավետություն',
+        'title-events': 'Միջոցառումների կառավարիչ', 'sub-events': 'Ավելացնել, խմբագրել և դիտել գրանցումները',
+        'title-settings': 'Կարգավորումներ', 'sub-settings': 'Բրենդ, կապ և կայքի ընտրանքներ',
+        // Dashboard stat cards
+        'stat-page-views': 'էջի դիտումներ (30օր)', 'stat-unique-visitors': 'Եզակի այցելուներ',
+        'stat-contact-submissions': 'Կապի հայտեր', 'stat-avg-duration': 'միջ. նիստի տևողություն',
+        'stat-avg-label': 'միջ.',
+        // Dashboard quick actions
+        'quick-actions': 'Արագ գործողություններ',
+        'qa-edit-content': 'Խմբագրել բովանդակությունը', 'qa-edit-content-desc': 'Տարմացել էջի տեքստը',
+        'qa-manage-images': 'Կառավարել պատկերները', 'qa-manage-images-desc': 'Վերբեռնել և փոխանակել',
+        'qa-view-analytics': 'Դիտել վիճակագրությունը', 'qa-view-analytics-desc': 'Վիճակագրություն և երթևեկություն',
+        'qa-settings': 'Կարգավորումներ', 'qa-settings-desc': 'Բրենդ և կապ',
+        // Dashboard site status
+        'site-status': 'Կայքի վիճակը', 'status-main-site': 'Հիմնական կայք', 'status-live': 'Աշխատում է',
+        'status-server': 'Սերվեր', 'status-running': 'Աշխատում է',
+        'status-last-updated': 'Վերջին թարմացումը', 'status-version': 'Տարբերակ',
+        'open-website': 'Բացել կայքը',
+        // Content language and tabs
+        'editing-language': 'Խմբագրման լեզու՝', 'lang-english': 'Անգլերեն', 'lang-armenian': 'Հայերեն (հայերեն)',
+        'tab-hero': 'Գլխավոր', 'tab-about': 'Մեր մասին', 'tab-community': 'Համայնք և միջոցառումներ',
+        'tab-navigation': 'Նավիգացիա', 'tab-armenian': '🇦🇲 Հայերեն',
+        // Content Hero
+        'hero-section': 'Գլխավոր բաժին',
+        'label-location-badge': 'Տեղադրության նշան', 'label-headline-line1': 'Վերնագիր (տող 1)',
+        'label-headline-highlighted': 'Վերնագիր (առանձնացված)', 'label-subheading': 'Ենթավերնագիր',
+        'label-primary-cta': 'Առաջնային CTA պիտակ', 'label-secondary-cta': 'Երկրորդական CTA պիտակ',
+        // Content About
+        'about-section': 'Մասին բաժին', 'label-section-label': 'Բաժնի պիտակ',
+        'label-heading': 'Վերնագիր', 'label-paragraph-1': 'Պարբերակ 1', 'label-paragraph-2': 'Պարբերակ 2',
+        // Content Community
+        'community-section': 'Համայնքի բաժին', 'label-section-label-comm': 'Բաժնի պիտակ',
+        'label-heading-comm': 'Վերնագիր',
+        'feature-1': 'Հատկանիշ 1', 'label-title': 'Վերնագիր', 'label-description': 'Նկարագրություն',
+        'feature-2': 'Հատկանիշ 2', 'label-title-f2': 'Վերնագիր', 'label-description-f2': 'Նկարագրություն',
+        'feature-3': 'Հատկանիշ 3', 'label-title-f3': 'Վերնագիր', 'label-description-f3': 'Նկարագրություն',
+        'events-subsection': 'Միջոցառումների ենթաբաժին', 'label-events-heading': 'Միջոցառումների վերնագիր', 'label-upcoming-label': 'Առաջիկա պիտակ', 'label-past-label': 'Անցյալ պիտակ',
+        'save-community-section': 'Պահպանել համայնքի և միջոցառումների բաժինը', 'changes-saved-index': 'Փոփոխությունները պահպանվեց index.html-ում',
+        // Content Navigation
+        'navigation-labels': 'Նավիգացիայի պիտակներ',
+        'label-link-1': 'Հղում 1', 'label-link-2': 'Հղում 2', 'label-link-3': 'Հղում 3', 'label-link-4': 'Հղում 4',
+        'label-cta-button': 'CTA Կոճակ',
+        // Content Armenian tab
+        'armenian-content-title': 'Հայերեն (հայերեն) բովանդակություն',
+        'armenian-content-desc': 'Այս թարգմանությունները պահպանվում են localStorage-ում և կիրառվում են, երբ այցելուները անցնում են հայերենի:',
+        'am-hero-section': 'Գլխավոր բաժին', 'label-h1-before-gold': 'H1 Տող 1 (ոսկից առաջ)',
+        'label-h1-gold-text': 'H1 Օսկե տեքստը', 'label-am-subheading': 'Ենթավերնագիր',
+        'label-cta-1': 'CTA 1', 'label-cta-2': 'CTA 2',
+        'am-about-section': 'Մասին բաժին', 'label-am-heading': 'Վերնագիր',
+        'label-am-paragraph-1': 'Պարբերակ 1', 'label-am-paragraph-2': 'Պարբերակ 2',
+        'am-community-section': 'Համայնքի բաժին', 'label-am-comm-h2': 'Վերնագիր',
+        'label-am-f1-title': 'Հատկանիշ 1 վերնագիր', 'label-am-f1-desc': 'Հատկանիշ 1 նկարագրություն',
+        'label-am-f2-title': 'Հատկանիշ 2 վերնագիր', 'label-am-f2-desc': 'Հատկանիշ 2 նկարագրություն',
+        'label-am-f3-title': 'Հատկանիշ 3 վերնագիր', 'label-am-f3-desc': 'Հատկանիշ 3 նկարագրություն',
+        'am-mission-contact': 'Առաքելություն և կապ', 'label-mission-quote': 'Առաքելության մեջբերում',
+        'label-contact-heading': 'Կապի բաժնի վերնագիր', 'label-contact-description': 'Կապի նկարագրություն',
+        'save-armenian-content': 'Պահպանել հայերեն բովանդակությունը', 'armenian-saved-msg': 'Հայերեն բովանդակությունը պահպանվեց ✓',
+        // Images
+        'upload-image': 'Վերբեռնել պատկեր',
+        'upload-image-desc': 'Վերբեռնել պատկերներ սերվեր՝ JPG, PNG, SVG, WebP:',
+        'drop-files': 'Փակեք ֆայլերը այստեղ կամ <span class="text-gold">սեղմեք ընտրելու համար</span>',
+        'saved-to-uploads': 'Պահպանվում է /uploads/ սերվերում',
+        'image-library': 'պատկերների գրադարան', 'refresh': 'Տարմացնել',
+        'website-section-images': 'Կայքի բաժնի պատկերներ',
+        'website-section-images-desc': 'Սեղմեք բնակի վրա՝ փոխելու համար, թե որ պատկերը հայտնվի կայքի բաժնում:',
+        'choose-image': 'Ընտրել պատկեր', 'paste-image-url': 'Կամ տեղադրեք պատկերի URL', 'use-url': 'Օգտագործել URL',
+        // Analytics
+        'analytics-this-month': 'Այս ամիս', 'analytics-page-views': 'էջի դիտումներ',
+        'analytics-visitors': 'Այցելուներ', 'analytics-unique-sessions': 'եզակի նիստեր',
+        'analytics-bounce-rate': 'Հենարկման տոկոս', 'analytics-bounce-change': '↓ 4% նախորդ ամսվա',
+        'analytics-avg-duration': 'միջ. տևողություն', 'analytics-duration-change': '↑ 12վ նախորդ ամսվա',
+        'daily-traffic': 'Օրական երթևեկություն — մարտ 2026', 'last-14-days': 'Վերջին 14 օր',
+        'top-pages': 'Լավագույն էջեր', 'top-countries': 'Լավագույն երկրներ',
+        // Settings
+        'brand-colors': 'Բրենդի գույներ', 'label-primary-navy': 'Առաջնային (Navy)', 'label-accent-gold': 'Շեշտադրում (օսկե)',
+        'contact-information': 'Կապի տեղեկատվություն',
+        'label-email-address': 'Էլ. հասցե', 'label-phone': 'Հեռախոս', 'label-address': 'Հասցե',
+        'seo-meta': 'SEO և Meta', 'label-page-title': 'Էջի վերնագիր', 'label-meta-description': 'Meta Նկարագրություն',
+        'site-options': 'Կայքի ընտրանքներ',
+        'maintenance-mode': 'Սպասարկման ռեժիմ', 'maintenance-mode-desc': 'Այցելուներին ցույց տալ շուտով էջ',
+        'cookie-banner': 'Cookie Ազդարագիր', 'cookie-banner-desc': 'Ցույց տալ GDPR cookie համաձայնության ազդարագիր',
+        'analytics-tracking': 'Վիճակագրության հետևում', 'analytics-tracking-desc': 'Միացնել այցելուների վիճակագրության հավաքումը',
+        'danger-zone': 'Վտանգավոր գոտի', 'reset-all-settings': 'Զրոացնել բոլոր կարգավորումները',
+        'reset-all-settings-desc': 'Վերադարձնել բոլոր դաշտերը իրենց լռավելման արժեքներին', 'reset-btn': 'Զրոացնել',
+        // Events
+        'add-new-event': 'Ավելացնել նոր միջոցառում', 'label-event-title': 'Միջոցառումի վերնագիր *',
+        'label-date': 'Ամսաթիվ', 'label-location': 'Վայրը', 'label-capacity': 'Տարողունակություն',
+        'label-ev-description': 'Նկարագրություն', 'add-event-btn': 'Ավելացնել միջոցառում', 'saving': 'Պահպանում է...',
+        'all-events': 'Բոլոր միջոցառումները', 'refresh-events': 'Տարմացնել',
+        'registrations': 'գրանցումներ', 'close-btn': 'Փակել',
+        'label-ev-summary': 'Միջոցառման հետեվանք ամփոփում <span class="text-navy/30 normal-case">(անցյալ միջոցառումների համար)</span>',
+        'label-ev-images': 'Միջոցառման պատկերներ <span class="text-navy/30 normal-case">(մեկը տողում՝ URL | մակագիր)</span>',
+        'ev-images-hint': 'Մեկ պատկեր յուրաքանչյուր տողում։ Ձևաչ՝ <code class="bg-navy/5 px-1 rounded">URL | մակագիր</code> — մակագիրը կամայական է։',
+        'ph-ev-title': 'Օր։ AI Հակաթոն երևան 2026',
+        'ph-ev-location': 'Օր։ AgentPark, Երևան',
+        'ph-ev-capacity': 'Օր։ 100',
+        'ph-ev-desc': 'Նկարագրեք միջոցառումը…',
+        'ph-ev-summary': 'Գրեք ամփոփում միջոցառումից հետո…',
+        'ph-ev-images': 'https://example.com/photo1.jpg | Բացման ելույթ',
+        'ph-picker-url': 'https://example.com/պատկեր.jpg',
+        'am-tab-desc': 'Խմբագրել բոլոր հայերեն թարգմանությունները։ Փոփոխությունները կիրառվում են, երբ այցելուները անցնում են հայերենի։',
+        'loading-am-fields': 'Բեռնվում է հայերեն դաշտերը…',
+        'cancel-btn': 'Չեղարկել',
+        'save-changes-event': 'Պահպանել փոփոխությունները',
+        'edit-event-title': 'Խմբագրել միջոցառումը',
+        'loading': 'Բեռնվում է…',
+        'loading-events': 'Բեռնվում է միջոցառումները…',
+        'loading-images': 'Բեռնվում է պատկերները…',
+        'no-events-yet': 'Դեռ միջոցառումներ չկան։ Ավելացնեք մեկը վերևում։',
+        'edit-btn': 'Խմբագրել',
+        'delete-btn': 'Ջնջել',
+        'delete-confirm': 'Ջնջել այս միջոցառումը և բոլոր գրանցումները։',
+        'export-csv': 'Արտահանել CSV',
+        'edit-event-title': 'Խմբագրել միջոցառումը',
+        'loading': 'Բեռնվում է…',
+        'loading-events': 'Բեռնվում է միջոցառումները…',
+        'loading-images': 'Բեռնվում է պատկերները…',
+        'no-events-yet': 'Դեռ միջոցառումներ չկան։ Ավելացնեք մեկը վերևում։',
+        'edit-btn': 'Խմբագրել',
+        'delete-btn': 'Ջնջել',
+        'delete-confirm': 'Ջնջել այս միջոցառումը և բոլոր գրանցումները։',
+        'title-required': 'Միջոցառման վերնագիրը պարտադիր է',
+        'event-added': 'Միջոցառումը հաջողությամբ ավելացվեց',
+        'event-deleted': 'Միջոցառումը ջնջվեց',
+        'event-updated': 'Միջոցառումը թարմացվեց',
+        'event-not-found': 'Միջոցառումը չգտնվեց',
+        'save-changes-event': 'Պահպանել փոփոխությունները',
+        'cancel-btn': 'Չեղարկել',
+        'badge-past': 'Անցյալ',
+        'badge-upcoming': 'Առաջիկա',
+        'capacity-label': 'Տարողունակություն',
+        'image-singular': 'պատկեր',
+        'images-plural': 'պատկեր',
+        'has-summary': 'Ամփոփում կա',
+        'no-registrations': 'Դեռ գրանցումներ չկան։',
+        'registration-singular': 'գրանցում',
+        'registrations-plural': 'գրանցում',
+        'csv-name': 'Անուն',
+        'csv-email': 'Էլ. հասցե',
+        'csv-registered-at': 'Գրանցվել է',
+      }
+    }
+
+    function adminSetLang(lang) {
+      if (!ADMIN_TRANS[lang]) lang = 'en';
+      localStorage.setItem('agentpark-lang', lang);
+      const t = ADMIN_TRANS[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) el.innerHTML = t[key];
+      });
+      // Apply placeholder translations
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (t[key] !== undefined) el.setAttribute('placeholder', t[key]);
+      });
+      document.querySelectorAll('.admin-lang-switch').forEach(btn => {
+        btn.classList.toggle('active-alang', btn.dataset.alang === lang);
+      });
+      // Update page title/subtitle for current section
+      if (typeof titleKeys !== 'undefined') {
+        const activeNav = document.querySelector('.nav-item.active');
+        if (activeNav && activeNav.dataset.section) {
+          const name = activeNav.dataset.section;
+          const keys = titleKeys[name];
+          if (keys) {
+            document.getElementById('page-title').textContent = t[keys[0]] || ADMIN_TRANS.en[keys[0]];
+            document.getElementById('page-sub').textContent = t[keys[1]] || ADMIN_TRANS.en[keys[1]];
+          }
+        }
+      }
+    }
+
+    (function() {
+      const saved = localStorage.getItem('agentpark-lang') || 'en';
+      adminSetLang(saved);
+    })();
+  </script>
+</body>
+</html>

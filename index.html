@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentPark — AI Innovation Hub & Accelerator | Yerevan, Armenia</title>
+  <meta name="description" content="AgentPark is Armenia's premier AI innovation hub and accelerator — connecting, growing, and launching AI-native ventures into global markets from Yerevan.">
+  <link rel="icon" type="image/png" sizes="32x32" href="Brand_assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="Brand_assets/favicon-16x16.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Armenian:wght@400;500;600;700&family=Noto+Serif+Armenian:wght@700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: '#0D2740',
+            'navy-light': '#1A3A5C',
+            gold: '#CBA14B',
+            'gold-tint': '#F5EDD8',
+            'navy-tint': '#D6DEE5',
+            'deep-ink': '#0D1027',
+            'warm-gray': '#F5F5F5',
+          },
+          fontFamily: {
+            sans: ['Inter', 'Helvetica Neue', 'Arial', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    /* SVG noise texture for grain overlay */
+    .grain-overlay::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.035;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 256px 256px;
+      z-index: 1;
+    }
+
+    /* Heading tracking */
+    .heading-tight { letter-spacing: -0.03em; }
+
+    /* Body line height */
+    .body-relaxed { line-height: 1.7; }
+
+    /* Spring easing */
+    .spring-ease { transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+    /* Smooth scroll */
+    html { scroll-behavior: smooth; }
+
+    /* Focus ring brand style */
+    .brand-focus:focus-visible {
+      outline: 2px solid #CBA14B;
+      outline-offset: 2px;
+    }
+
+    /* Layered shadow system */
+    .shadow-elevated {
+      box-shadow:
+        0 1px 2px rgba(13, 39, 64, 0.04),
+        0 4px 8px rgba(13, 39, 64, 0.06),
+        0 12px 24px rgba(13, 39, 64, 0.06);
+    }
+    .shadow-floating {
+      box-shadow:
+        0 2px 4px rgba(13, 39, 64, 0.04),
+        0 8px 16px rgba(13, 39, 64, 0.08),
+        0 24px 48px rgba(13, 39, 64, 0.1);
+    }
+
+    /* Starburst decorative element */
+    @keyframes slow-rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .starburst-bg {
+      animation: slow-rotate 120s linear infinite;
+    }
+
+    /* Nav blur */
+    .nav-blur {
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+    }
+
+    /* Armenian language overrides */
+    body.lang-am {
+      font-family: 'Noto Sans Armenian', 'Inter', sans-serif;
+    }
+    body.lang-am h1, body.lang-am h2, body.lang-am h3,
+    body.lang-am h4, body.lang-am blockquote {
+      font-family: 'Noto Serif Armenian', 'Inter', serif;
+      letter-spacing: -0.01em;
+    }
+
+    /* Language toggle */
+    .lang-toggle-btn { transition: color 0.15s, background 0.15s; }
+    .lang-toggle-btn.active-lang {
+      background: #CBA14B;
+      color: #0D1027;
+    }
+  </style>
+</head>
+<body class="font-sans text-navy bg-white antialiased">
+
+  <!-- NAVIGATION -->
+  <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-white/80 border-b border-navy-tint/50">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20 lg:h-28">
+        <!-- Logo -->
+        <a href="#" class="brand-focus flex items-center gap-3">
+          <img src="Brand_assets/AgentPark_logo.png" alt="AgentPark" class="h-16 lg:h-24 w-auto">
+        </a>
+
+        <!-- Desktop Nav -->
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#about" class="text-sm font-medium text-navy/70 hover:text-navy transition-opacity duration-200 spring-ease brand-focus" data-i18n="nav-about">About</a>
+          <a href="#pillars" class="text-sm font-medium text-navy/70 hover:text-navy transition-opacity duration-200 spring-ease brand-focus" data-i18n="nav-pillars">What We Do</a>
+          <a href="#community" class="text-sm font-medium text-navy/70 hover:text-navy transition-opacity duration-200 spring-ease brand-focus" data-i18n="nav-community">Community & Events</a>
+          <a href="#mission" class="text-sm font-medium text-navy/70 hover:text-navy transition-opacity duration-200 spring-ease brand-focus" data-i18n="nav-mission">Mission</a>
+          <!-- Language Toggle -->
+          <div class="flex items-center rounded-lg border border-navy-tint/50 overflow-hidden text-xs font-semibold">
+            <button onclick="setLang('en')" data-lang="en" class="lang-toggle-btn active-lang px-3 py-1.5 text-navy/70 hover:text-navy brand-focus">EN</button>
+            <div class="w-px h-4 bg-navy-tint/50"></div>
+            <button onclick="setLang('am')" data-lang="am" class="lang-toggle-btn px-3 py-1.5 text-navy/70 hover:text-navy brand-focus">ՀՅ</button>
+          </div>
+          <a href="#contact" class="inline-flex items-center justify-center px-5 py-2.5 bg-navy text-white text-sm font-semibold rounded-lg hover:bg-navy-light active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus">
+            <span data-i18n="nav-cta">Get in Touch</span>
+          </a>
+        </div>
+
+        <!-- Mobile menu button -->
+        <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-warm-gray transition-opacity duration-200 brand-focus" aria-label="Open menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+
+      <!-- Mobile Nav -->
+      <div id="mobile-menu" class="hidden md:hidden pb-6 border-t border-navy-tint/30 mt-2 pt-4">
+        <div class="flex flex-col gap-4">
+          <a href="#about" class="text-sm font-medium text-navy/70 hover:text-navy brand-focus" data-i18n="nav-about">About</a>
+          <a href="#pillars" class="text-sm font-medium text-navy/70 hover:text-navy brand-focus" data-i18n="nav-pillars">What We Do</a>
+          <a href="#community" class="text-sm font-medium text-navy/70 hover:text-navy brand-focus" data-i18n="nav-community">Community & Events</a>
+          <a href="#mission" class="text-sm font-medium text-navy/70 hover:text-navy brand-focus" data-i18n="nav-mission">Mission</a>
+          <div class="flex items-center gap-2">
+            <button onclick="setLang('en')" data-lang="en" class="lang-toggle-btn active-lang px-4 py-2 text-sm font-semibold rounded border border-navy-tint/50 text-navy/70 brand-focus">EN</button>
+            <button onclick="setLang('am')" data-lang="am" class="lang-toggle-btn px-4 py-2 text-sm font-semibold rounded border border-navy-tint/50 text-navy/70 brand-focus">ՀՅ</button>
+          </div>
+          <a href="#contact" class="inline-flex items-center justify-center px-5 py-2.5 bg-navy text-white text-sm font-semibold rounded-lg brand-focus w-full mt-2"><span data-i18n="nav-cta">Get in Touch</span></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="relative min-h-screen flex items-center overflow-hidden grain-overlay">
+    <!-- Background gradients -->
+    <div class="absolute inset-0">
+      <div class="absolute inset-0 bg-gradient-to-br from-deep-ink via-navy to-navy-light"></div>
+      <div class="absolute top-0 right-0 w-[80%] h-[80%] bg-[radial-gradient(ellipse_at_top_right,rgba(203,161,75,0.15),transparent_60%)]"></div>
+      <div class="absolute bottom-0 left-0 w-[60%] h-[60%] bg-[radial-gradient(ellipse_at_bottom_left,rgba(13,39,64,0.8),transparent_60%)]"></div>
+    </div>
+
+    <!-- Decorative starburst -->
+    <div class="absolute -right-32 top-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-[0.04] starburst-bg pointer-events-none">
+      <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(100,100)">
+          <ellipse rx="6" ry="80" fill="#CBA14B" transform="rotate(0)"/>
+          <ellipse rx="5" ry="75" fill="white" transform="rotate(45)"/>
+          <ellipse rx="6" ry="80" fill="white" transform="rotate(90)"/>
+          <ellipse rx="5" ry="75" fill="#CBA14B" transform="rotate(135)"/>
+          <ellipse rx="6" ry="80" fill="white" transform="rotate(180)"/>
+          <ellipse rx="5" ry="75" fill="white" transform="rotate(225)"/>
+          <ellipse rx="6" ry="80" fill="white" transform="rotate(270)"/>
+          <ellipse rx="5" ry="75" fill="white" transform="rotate(315)"/>
+          <circle r="10" fill="#CBA14B"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 pt-32 pb-20 lg:pt-40 lg:pb-32">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div>
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/10 mb-8">
+            <span class="w-2 h-2 rounded-full bg-gold animate-pulse"></span>
+            <span class="text-xs font-medium text-gold-tint tracking-widest uppercase" data-i18n="hero-badge">Yerevan, Armenia</span>
+          </div>
+
+          <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-[64px] font-bold text-white heading-tight leading-[1.08] mb-6" data-i18n="hero-h1">
+            Armenia's Next Frontier in
+            <span class="text-gold">Artificial Intelligence</span>
+          </h1>
+
+          <p class="text-lg lg:text-xl text-navy-tint body-relaxed max-w-xl mb-10" data-i18n="hero-sub">
+            AgentPark is the beating heart of Armenia's AI ecosystem — a future-focused hub that brings together innovation, entrepreneurship, and education to launch AI-native ventures into global markets.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#about" class="inline-flex items-center justify-center px-8 py-4 bg-gold text-deep-ink font-semibold text-base rounded-lg hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-floating">
+              <span data-i18n="hero-cta1">Discover AgentPark</span>
+              <svg class="w-5 h-5 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </a>
+            <a href="#contact" class="inline-flex items-center justify-center px-8 py-4 border-2 border-gold/40 text-gold-tint font-semibold text-base rounded-lg hover:border-gold/70 hover:text-white active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus" data-i18n="hero-cta2">
+              Partner with Us
+            </a>
+          </div>
+        </div>
+
+        <!-- Hero image -->
+        <div class="hidden lg:block relative">
+          <div class="relative rounded-2xl overflow-hidden shadow-floating" style="height: 480px;">
+            <img id="img-hero" src="https://itpark.am/wp-content/uploads/2025/08/yerevan-AI-Park.jpg" alt="Yerevan AI Park" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-navy/70 via-navy/20 to-transparent"></div>
+            <div class="absolute inset-0 bg-gold/10 mix-blend-multiply"></div>
+            <!-- Floating label -->
+            <div class="absolute bottom-6 left-6 right-6">
+              <p class="text-xs font-medium text-gold tracking-widest uppercase mb-1" data-i18n="hero-img-label">Yerevan AI Park</p>
+              <p class="text-white font-semibold text-sm" data-i18n="hero-img-sub">Armenia's Premier AI Innovation Hub</p>
+            </div>
+          </div>
+          <!-- Decorative ring -->
+          <div class="absolute -top-4 -right-4 w-24 h-24 rounded-full border border-gold/20 pointer-events-none"></div>
+          <div class="absolute -bottom-4 -left-4 w-16 h-16 rounded-full border border-white/10 pointer-events-none"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
+      <div class="w-6 h-10 rounded-full border-2 border-white/20 flex justify-center pt-2">
+        <div class="w-1 h-2.5 rounded-full bg-gold/60 animate-bounce"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT SECTION -->
+  <section id="about" class="relative py-24 lg:py-32 bg-warm-gray grain-overlay overflow-hidden">
+    <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+        <div>
+          <span class="text-xs font-medium text-gold tracking-[0.06em] uppercase mb-4 block" data-i18n="about-label">About AgentPark</span>
+          <h2 class="text-3xl lg:text-[40px] font-bold heading-tight leading-tight mb-6" data-i18n="about-h2">
+            Where Startups Scale, Communities Connect, and Ideas Become
+            <span class="text-gold">Impact</span>
+          </h2>
+          <div class="space-y-5 body-relaxed text-navy/75">
+            <p data-i18n="about-p1">
+              The Yerevan AgentPark is set to become the beating heart of Armenia's growing AI ecosystem — a future-focused hub that brings together innovation, entrepreneurship, and education.
+            </p>
+            <p data-i18n="about-p2">
+              The AgentPark team is composed of experienced professionals who have been actively involved in the development of Armenia's technological ecosystem, including work on the creation of high-tech clusters within the USAID CAPS program.
+            </p>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="relative rounded-2xl overflow-hidden shadow-floating bg-navy flex items-center justify-center" style="min-height: 320px;">
+            <div class="absolute inset-0 bg-gradient-to-br from-deep-ink via-navy to-navy-light"></div>
+            <div class="absolute top-0 right-0 w-3/4 h-full bg-[radial-gradient(ellipse_at_top_right,rgba(203,161,75,0.12),transparent_60%)]"></div>
+            <img src="Brand_assets/AgentPark_logo.png" alt="AgentPark" class="relative z-10 w-2/3 max-w-xs h-auto" style="filter: brightness(0) invert(1);">
+          </div>
+          <!-- Stats overlay card -->
+          <div class="absolute -bottom-6 left-4 lg:-left-6 bg-white rounded-xl p-6 shadow-elevated border border-navy-tint/30">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-lg bg-gold/10 flex items-center justify-center">
+                <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+              <div>
+                <div class="text-2xl font-bold text-navy">2026</div>
+                <div class="text-sm text-navy/60" data-i18n="about-launch-year">Launch Year</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NVIDIA AI FACTORY -->
+  <section id="nvidia" class="relative py-24 lg:py-32 bg-deep-ink grain-overlay overflow-hidden">
+    <!-- Background accents -->
+    <div class="absolute top-0 left-0 w-[40%] h-[40%] bg-[radial-gradient(ellipse_at_top_left,rgba(203,161,75,0.08),transparent_60%)]"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <span class="text-xs font-medium text-gold tracking-[0.06em] uppercase mb-4 block" data-i18n="nvidia-label">Powered by Global Momentum</span>
+        <h2 class="text-3xl lg:text-[40px] font-bold text-white heading-tight leading-tight mb-6" data-i18n="nvidia-h2">
+          NVIDIA-Based <span class="text-gold">AI Factory</span>
+        </h2>
+        <p class="text-lg text-navy-tint/80 body-relaxed" data-i18n="nvidia-desc">
+          A major milestone in Armenia's technological rise — the 2026 launch of NVIDIA's AI factory will serve as a transformative boost to the entire ecosystem.
+        </p>
+      </div>
+
+      <!-- Image banner -->
+      <div class="relative rounded-2xl overflow-hidden mb-16 shadow-floating" style="height: 300px;">
+        <img id="img-nvidia" src="https://itpark.am/wp-content/uploads/2025/08/Screenshot-2025-08-20-153148.jpg" alt="NVIDIA AI Factory" class="w-full h-full object-cover object-center" loading="lazy">
+        <div class="absolute inset-0 bg-gradient-to-r from-deep-ink/90 via-deep-ink/40 to-transparent"></div>
+        <div class="absolute inset-0 bg-gold/5 mix-blend-multiply"></div>
+        <div class="absolute inset-0 flex items-center px-10">
+          <div>
+            <p class="text-xs font-medium text-gold tracking-widest uppercase mb-2" data-i18n="nvidia-banner-label">Launching 2026</p>
+            <p class="text-white font-bold text-2xl lg:text-3xl heading-tight max-w-md" data-i18n="nvidia-banner-title">World-class AI computing infrastructure, right in Yerevan.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6 lg:gap-8">
+        <!-- Card 1 -->
+        <div class="group relative bg-white/[0.04] border border-white/[0.08] rounded-xl p-8 hover:bg-white/[0.07] transition-opacity duration-300">
+          <div class="w-12 h-12 rounded-lg bg-gold/10 flex items-center justify-center mb-6">
+            <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-white mb-3" data-i18n="nvidia-c1-title">International Attention</h3>
+          <p class="text-navy-tint/70 body-relaxed" data-i18n="nvidia-c1-desc">Attracting global focus and positioning Yerevan as a premier regional technology hub.</p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="group relative bg-white/[0.04] border border-white/[0.08] rounded-xl p-8 hover:bg-white/[0.07] transition-opacity duration-300">
+          <div class="w-12 h-12 rounded-lg bg-gold/10 flex items-center justify-center mb-6">
+            <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-white mb-3" data-i18n="nvidia-c2-title">High-Performance Computing</h3>
+          <p class="text-navy-tint/70 body-relaxed" data-i18n="nvidia-c2-desc">Injecting world-class computing capacity to power the next generation of AI ventures.</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="group relative bg-white/[0.04] border border-white/[0.08] rounded-xl p-8 hover:bg-white/[0.07] transition-opacity duration-300">
+          <div class="w-12 h-12 rounded-lg bg-gold/10 flex items-center justify-center mb-6">
+            <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-white mb-3" data-i18n="nvidia-c3-title">Regional Tech Hub</h3>
+          <p class="text-navy-tint/70 body-relaxed" data-i18n="nvidia-c3-desc">Strengthening Armenia's position on the global technology map through strategic infrastructure.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PILLARS / WHAT WE DO -->
+  <section id="pillars" class="relative py-24 lg:py-32 bg-white grain-overlay overflow-hidden">
+    <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-xs font-medium text-gold tracking-[0.06em] uppercase mb-4 block" data-i18n="pillars-label">What We Do</span>
+        <h2 class="text-3xl lg:text-[40px] font-bold heading-tight leading-tight mb-6" data-i18n="pillars-h2">
+          Building the Future of <span class="text-gold">AI in Armenia</span>
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Pillar 1: Launchpad -->
+        <div class="group relative bg-warm-gray rounded-xl overflow-hidden border border-navy-tint/20 shadow-elevated hover:shadow-floating transition-transform duration-300 spring-ease hover:-translate-y-1">
+          <div class="relative h-64 overflow-hidden">
+            <img id="img-pillar-1" src="https://itpark.am/wp-content/uploads/2025/08/Screenshot-2025-08-20-162832.jpg" alt="Innovation Services" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-navy/70 via-navy/20 to-transparent"></div>
+            <div class="absolute inset-0 bg-gold/10 mix-blend-multiply"></div>
+            <div class="absolute bottom-4 left-5">
+              <div class="w-10 h-10 rounded-lg bg-navy/80 flex items-center justify-center">
+                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="p-8 lg:p-10">
+            <h3 class="text-xl lg:text-2xl font-bold mb-3" data-i18n="p1-title">A Launchpad for Innovation</h3>
+            <p class="text-navy/70 body-relaxed" data-i18n="p1-desc">AgentPark functions as both an AI accelerator and incubator, nurturing local startups with strategic support in technology, business development, and consulting. Backed by financial investment and an experienced leadership team.</p>
+          </div>
+        </div>
+
+        <!-- Pillar 2: Knowledge -->
+        <div class="group relative bg-warm-gray rounded-xl overflow-hidden border border-navy-tint/20 shadow-elevated hover:shadow-floating transition-transform duration-300 spring-ease hover:-translate-y-1">
+          <div class="relative h-64 overflow-hidden">
+            <img id="img-pillar-2" src="https://itpark.am/wp-content/uploads/2025/08/Screenshot-2025-08-20-165024.jpg" alt="Knowledge & Talent" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-navy/70 via-navy/20 to-transparent"></div>
+            <div class="absolute inset-0 bg-gold/10 mix-blend-multiply"></div>
+            <div class="absolute bottom-4 left-5">
+              <div class="w-10 h-10 rounded-lg bg-navy/80 flex items-center justify-center">
+                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="p-8 lg:p-10">
+            <h3 class="text-xl lg:text-2xl font-bold mb-3" data-i18n="p2-title">A Knowledge & Talent Magnet</h3>
+            <p class="text-navy/70 body-relaxed" data-i18n="p2-desc">With strong ties to Armenia's leading universities, such as the Faculty of Applied Mathematics at Yerevan State University. The Park hosted its first AI Summer School in July 2025, with ongoing academic collaborations.</p>
+          </div>
+        </div>
+
+        <!-- Pillar 3: Cross-Sector -->
+        <div class="group relative bg-warm-gray rounded-xl overflow-hidden border border-navy-tint/20 shadow-elevated hover:shadow-floating transition-transform duration-300 spring-ease hover:-translate-y-1">
+          <div class="relative h-64 overflow-hidden">
+            <img id="img-pillar-3" src="https://itpark.am/wp-content/uploads/2025/08/Screenshot-2025-08-20-161234.jpg" alt="Cross-Sector Collaboration" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-navy/70 via-navy/20 to-transparent"></div>
+            <div class="absolute inset-0 bg-gold/10 mix-blend-multiply"></div>
+            <div class="absolute bottom-4 left-5">
+              <div class="w-10 h-10 rounded-lg bg-navy/80 flex items-center justify-center">
+                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="p-8 lg:p-10">
+            <h3 class="text-xl lg:text-2xl font-bold mb-3" data-i18n="p3-title">A Cross-Sector Platform</h3>
+            <p class="text-navy/70 body-relaxed" data-i18n="p3-desc">Building bridges across sectors — integrating healthcare, agriculture, design, and cultural institutions into its innovation framework. Making AI more accessible and relevant to everyday challenges.</p>
+          </div>
+        </div>
+
+        <!-- Pillar 4: Cultural & Creative -->
+        <div class="group relative bg-warm-gray rounded-xl overflow-hidden border border-navy-tint/20 shadow-elevated hover:shadow-floating transition-transform duration-300 spring-ease hover:-translate-y-1">
+          <div class="relative h-64 overflow-hidden">
+            <img id="img-pillar-4" src="https://itpark.am/wp-content/uploads/2025/08/Screenshot-2025-08-20-154015.jpg" alt="Global & Diaspora Partnerships" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-navy/70 via-navy/20 to-transparent"></div>
+            <div class="absolute inset-0 bg-gold/10 mix-blend-multiply"></div>
+            <div class="absolute bottom-4 left-5">
+              <div class="w-10 h-10 rounded-lg bg-navy/80 flex items-center justify-center">
+                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="p-8 lg:p-10">
+            <h3 class="text-xl lg:text-2xl font-bold mb-3" data-i18n="p4-title">A Cultural & Creative Nexus</h3>
+            <p class="text-navy/70 body-relaxed" data-i18n="p4-desc">More than a tech hub — a platform for art and design, where creative minds collaborate with technical experts to redefine the boundaries of expression, interaction, and intelligence.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY SECTION -->
+  <section id="community" class="relative py-24 lg:py-32 bg-warm-gray grain-overlay overflow-hidden">
+    <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center mb-20">
+        <div class="order-2 lg:order-1 relative">
+          <div class="relative rounded-2xl overflow-hidden shadow-floating">
+            <img id="img-community" src="https://itpark.am/wp-content/uploads/2025/08/Screenshot-2025-08-20-154706.jpg" alt="AgentPark Community & Events" class="w-full h-auto object-cover" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-transparent"></div>
+            <div class="absolute inset-0 bg-navy/20 mix-blend-multiply"></div>
+          </div>
+        </div>
+
+        <div class="order-1 lg:order-2">
+          <span class="text-xs font-medium text-gold tracking-[0.06em] uppercase mb-4 block" data-i18n="comm-label">Community & Events</span>
+          <h2 class="text-3xl lg:text-[40px] font-bold heading-tight leading-tight mb-6" data-i18n="comm-h2">
+            Global Events, <span class="text-gold">Local Impact</span>
+          </h2>
+          <div class="space-y-6">
+            <div class="flex gap-4">
+              <div class="w-10 h-10 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0 mt-1">
+                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold mb-1" data-i18n="comm-f1-title">Community Space</h3>
+                <p class="text-navy/70 body-relaxed" data-i18n="comm-f1-desc">Inviting local residents and students to participate in AI-related events and educational programs, bridging the gap between professionals and young enthusiasts.</p>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <div class="w-10 h-10 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0 mt-1">
+                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold mb-1" data-i18n="comm-f2-title">International Conferences & Hackathons</h3>
+                <p class="text-navy/70 body-relaxed" data-i18n="comm-f2-desc">Regular events bringing together leading minds from Armenia and abroad, sparking new ideas, partnerships, and research.</p>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <div class="w-10 h-10 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0 mt-1">
+                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold mb-1" data-i18n="comm-f3-title">Mentorship & Learning</h3>
+                <p class="text-navy/70 body-relaxed" data-i18n="comm-f3-desc">Fostering a culture of mentorship and mutual learning between seasoned professionals and the next generation of AI talent.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EVENTS -->
+      <div class="mb-8">
+        <h2 class="text-2xl lg:text-3xl font-bold heading-tight" data-i18n="events-h2">Events at AgentPark</h2>
+      </div>
+
+      <div id="events-loading" class="text-center py-12 text-navy/40 text-sm" data-i18n="ev-loading">Loading events...</div>
+
+      <!-- Upcoming Events -->
+      <div id="upcoming-section" class="hidden mb-14">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <h3 class="text-lg font-semibold text-navy" data-i18n="events-upcoming-label">Upcoming Events</h3>
+        </div>
+        <div id="upcoming-events-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr"></div>
+      </div>
+
+      <!-- Past Events -->
+      <div id="past-section" class="hidden">
+        <div class="flex items-center gap-3 mb-6 pt-4 border-t border-navy-tint/20">
+          <span class="inline-block w-2 h-2 rounded-full bg-navy/30"></span>
+          <h3 class="text-lg font-semibold text-navy/70" data-i18n="events-past-label">Past Events</h3>
+        </div>
+        <div id="past-events-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REGISTRATION MODAL -->
+  <div id="reg-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-navy/60 backdrop-blur-sm" onclick="closeRegModal()"></div>
+    <div class="relative bg-white rounded-2xl p-8 w-full max-w-md shadow-floating">
+      <button onclick="closeRegModal()" class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-warm-gray flex items-center justify-center hover:bg-navy-tint/50 transition-colors duration-150">
+        <svg class="w-4 h-4 text-navy/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+      <div class="mb-6">
+        <p class="text-xs font-medium text-gold tracking-widest uppercase mb-1" data-i18n="modal-register-label">Register</p>
+        <h3 id="modal-event-title" class="text-xl font-bold text-navy heading-tight"></h3>
+        <p id="modal-event-meta" class="text-sm text-navy/50 mt-1"></p>
+      </div>
+      <form id="reg-form" onsubmit="submitRegistration(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-navy/50 uppercase tracking-wide mb-1.5" data-i18n="modal-full-name">Full Name *</label>
+          <input id="reg-name" type="text" required placeholder="Your name" data-i18n-placeholder="modal-name-placeholder" style="width:100%;padding:10px 14px;border:1.5px solid #D6DEE5;border-radius:8px;font-size:14px;color:#0D2740;outline:none;" onfocus="this.style.borderColor='#CBA14B';this.style.boxShadow='0 0 0 3px rgba(203,161,75,0.12)'" onblur="this.style.borderColor='#D6DEE5';this.style.boxShadow='none'">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-navy/50 uppercase tracking-wide mb-1.5" data-i18n="modal-email-label">Email Address *</label>
+          <input id="reg-email" type="email" required placeholder="your@email.com" data-i18n-placeholder="modal-email-placeholder" style="width:100%;padding:10px 14px;border:1.5px solid #D6DEE5;border-radius:8px;font-size:14px;color:#0D2740;outline:none;" onfocus="this.style.borderColor='#CBA14B';this.style.boxShadow='0 0 0 3px rgba(203,161,75,0.12)'" onblur="this.style.borderColor='#D6DEE5';this.style.boxShadow='none'">
+        </div>
+        <p id="reg-error" class="text-red-500 text-xs hidden"></p>
+        <p id="reg-success" class="text-green-600 text-sm font-medium hidden" data-i18n="modal-success">You're registered! See you there.</p>
+        <button type="submit" id="reg-submit" class="w-full px-6 py-3 bg-navy text-white font-semibold text-sm rounded-lg hover:bg-navy-light active:scale-[0.97] transition-transform duration-200 brand-focus shadow-elevated mt-2" data-i18n="modal-confirm">
+          Confirm Registration
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+<script>
+// Analytics tracking
+(function() {
+  var vid = localStorage.getItem('ap_visitor_id');
+  if (!vid) {
+    vid = 'v_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+    localStorage.setItem('ap_visitor_id', vid);
+  }
+  var sid = sessionStorage.getItem('ap_session_id');
+  if (!sid) {
+    sid = 's_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+    sessionStorage.setItem('ap_session_id', sid);
+  }
+  var pageLoadTime = Date.now();
+  var rowId = null;
+  var body = {
+    page_url: location.href,
+    page_path: location.pathname + (location.hash || ''),
+    visitor_id: vid,
+    session_id: sid,
+    referrer: document.referrer || null,
+    user_agent: navigator.userAgent
+  };
+  // Try to get country from free geo-ip
+  fetch('https://ipapi.co/json/', { mode: 'cors' })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(geo) {
+      if (geo && geo.country_name) body.country = geo.country_name;
+    })
+    .catch(function() {})
+    .finally(function() {
+      fetch(SUPABASE_URL + '/rest/v1/page_views', {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(body)
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) { if (data && data[0]) rowId = data[0].id; })
+      .catch(function() {});
+    });
+  // Update duration on page hide
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden' && rowId) {
+      var duration = Math.round((Date.now() - pageLoadTime) / 1000);
+      fetch(SUPABASE_URL + '/rest/v1/page_views?id=eq.' + rowId, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ duration_seconds: duration }),
+        keepalive: true
+      });
+    }
+  });
+})();
+</script>
+  <script>
+    let currentEventId = null;
+    let currentLang = 'en';
+
+    function formatEventDate(ev) {
+      const loc = currentLang === 'am' ? 'hy-AM' : 'en-US';
+      if (!ev.date) return '';
+      const start = new Date(ev.date);
+      if (!ev.end_date || ev.end_date === ev.date) {
+        return start.toLocaleDateString(loc, {month:'long',day:'numeric',year:'numeric'});
+      }
+      const end = new Date(ev.end_date);
+      if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+        return start.toLocaleDateString(loc, {month:'long',day:'numeric'}) + '–' + end.getDate() + ', ' + end.getFullYear();
+      }
+      return start.toLocaleDateString(loc, {month:'long',day:'numeric'}) + ' – ' + end.toLocaleDateString(loc, {month:'long',day:'numeric',year:'numeric'});
+    }
+
+    function buildCardHTML(ev, isPast) {
+      const t = TRANS[currentLang] || TRANS.en;
+      const isAm = currentLang === 'am';
+      const evTitle = (isAm && ev.title_am) ? ev.title_am : ev.title;
+      const evDesc = (isAm && ev.description_am) ? ev.description_am : ev.description;
+      const coverSrc = ev.cover_image || (ev.images && ev.images.length ? (typeof ev.images[0] === 'string' ? ev.images[0] : ev.images[0].url) : null);
+      const coverImg = coverSrc ? `
+          <div class="relative -mx-6 -mt-6 mb-4 overflow-hidden rounded-t-2xl">
+            <img src="${coverSrc}" alt="${evTitle}" class="w-full h-48 object-cover" onerror="this.parentNode.remove()">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+          </div>` : '';
+      return `
+        <div class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30 flex flex-col hover:shadow-floating hover:-translate-y-1 transition-all duration-300" style="transition-property: transform, box-shadow;">
+          ${coverImg}
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            ${ev.date ? `<span class="text-xs font-medium text-navy/50">${formatEventDate(ev)}</span>` : ''}
+          </div>
+          <h3 class="text-base font-bold text-navy heading-tight mb-2">${evTitle}</h3>
+          ${evDesc ? `<p class="text-sm text-navy/60 body-relaxed flex-1 mb-4">${evDesc.length > 120 ? evDesc.slice(0, 120) + '... ' : evDesc}<a href="/event.html?id=${ev.id}" class="text-gold font-medium hover:underline">${t['ev-more']}</a></p>` : '<div class="flex-1"></div>'}
+          <div class="flex items-center justify-between mt-2">
+            ${ev.location ? `<span class="text-xs text-navy/40">\u{1F4CD} ${ev.location}</span>` : '<span></span>'}
+            ${ev.capacity ? `<span class="text-xs text-navy/40">\u{1F465} ${ev.capacity} ${t['ev-spots']}</span>` : ''}
+          </div>
+          ${ev.video_url ? `<a href="${ev.video_url}" target="_blank" rel="noopener" class="mt-3 flex items-center gap-2 px-3 py-2 bg-red-50 rounded-lg hover:bg-red-100 transition-colors duration-150 group">
+            <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            <span class="text-xs font-medium text-red-600 group-hover:text-red-700">${t['ev-watch-video'] || 'Watch Video'}</span>
+          </a>` : ''}
+          <div class="mt-${ev.video_url ? '3' : '5'} flex gap-2">
+            <a href="/event.html?id=${ev.id}"
+              class="flex-1 flex items-center justify-center px-4 py-2.5 border border-navy/20 text-navy text-sm font-medium rounded-xl hover:bg-warm-gray active:scale-[0.97] transition-transform duration-200 brand-focus">
+              ${t['ev-view-details']}
+            </a>
+            ${isPast ? `<span class="flex-1 flex items-center justify-center px-4 py-2.5 bg-navy/5 text-navy/40 text-sm font-medium rounded-xl">
+              ${t['ev-reg-closed']}
+            </span>` : `<button onclick="openRegModal('${ev.id}', '${evTitle.replace(/'/g,"\\\\'")}', '${ev.date||''}', '${ev.location||''}')"
+              class="flex-1 px-4 py-2.5 bg-navy text-white text-sm font-semibold rounded-xl hover:bg-navy-light active:scale-[0.97] transition-transform duration-200 brand-focus">
+              ${t['ev-register']}
+            </button>`}
+          </div>
+        </div>`;
+    }
+
+    function renderEventCards(events) {
+      if (!events || !events.length) return;
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+
+      const evEndDate = (ev) => new Date(ev.end_date || ev.date);
+      const upcoming = events.filter(ev => !ev.date || evEndDate(ev) >= now).sort((a, b) => new Date(a.date) - new Date(b.date));
+      const past = events.filter(ev => ev.date && evEndDate(ev) < now).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      const loadingEl = document.getElementById('events-loading');
+      if (loadingEl) loadingEl.classList.add('hidden');
+
+      const upSection = document.getElementById('upcoming-section');
+      const upGrid = document.getElementById('upcoming-events-grid');
+      if (upcoming.length) {
+        upSection.classList.remove('hidden');
+        if (upcoming.length === 1) {
+          upGrid.className = 'grid grid-cols-1 max-w-lg gap-6';
+        }
+        upGrid.innerHTML = upcoming.map(ev => buildCardHTML(ev, false)).join('');
+      }
+
+      const pastSection = document.getElementById('past-section');
+      const pastGrid = document.getElementById('past-events-grid');
+      if (past.length) {
+        pastSection.classList.remove('hidden');
+        pastGrid.innerHTML = past.map(ev => buildCardHTML(ev, true)).join('');
+      }
+
+      if (!upcoming.length && !past.length) {
+        const t = TRANS[currentLang] || TRANS.en;
+        if (loadingEl) { loadingEl.textContent = t['ev-no-events']; loadingEl.classList.remove('hidden'); }
+      }
+    }
+
+    async function loadPublicEvents() {
+      const loadingEl = document.getElementById('events-loading');
+      try {
+        const res = await fetch(SUPABASE_URL + '/rest/v1/events?order=date.asc&select=*', {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+        });
+        const events = await res.json();
+        if (!events.length) {
+          const t = TRANS[currentLang] || TRANS.en;
+          if (loadingEl) loadingEl.textContent = t['ev-no-events'];
+          return;
+        }
+        window._loadedEvents = events;
+        renderEventCards(events);
+      } catch(e) {
+        if (loadingEl) loadingEl.textContent = (TRANS[currentLang]||TRANS.en)['ev-error'];
+      }
+    }
+
+    function openRegModal(id, title, date, location) {
+      currentEventId = id;
+      document.getElementById('modal-event-title').textContent = title;
+      const meta = [date ? new Date(date).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '', location].filter(Boolean).join(' · ');
+      document.getElementById('modal-event-meta').textContent = meta;
+      document.getElementById('reg-error').classList.add('hidden');
+      document.getElementById('reg-success').classList.add('hidden');
+      document.getElementById('reg-submit').classList.remove('hidden');
+      document.getElementById('reg-name').value = '';
+      document.getElementById('reg-email').value = '';
+      const modal = document.getElementById('reg-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeRegModal() {
+      const modal = document.getElementById('reg-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function submitRegistration(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const errEl = document.getElementById('reg-error');
+      const btn = document.getElementById('reg-submit');
+      btn.textContent = 'Registering...';
+      btn.disabled = true;
+      errEl.classList.add('hidden');
+      try {
+        const res = await fetch(SUPABASE_URL + '/rest/v1/registrations', {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal',
+          },
+          body: JSON.stringify({ event_id: currentEventId, name, email }),
+        });
+        if (!res.ok) throw new Error(await res.text());
+        document.getElementById('reg-success').classList.remove('hidden');
+        btn.classList.add('hidden');
+      } catch(err) {
+        errEl.textContent = 'Something went wrong. Please try again.';
+        errEl.classList.remove('hidden');
+        btn.textContent = 'Confirm Registration';
+        btn.disabled = false;
+      }
+    }
+
+    loadPublicEvents();
+
+    // ── Contact Modal ──────────────────────────────────────────
+    function openContactModal() {
+      document.getElementById('contact-error').classList.add('hidden');
+      document.getElementById('contact-success').classList.add('hidden');
+      document.getElementById('contact-fields').classList.remove('hidden');
+      document.getElementById('contact-submit').querySelector('[data-i18n="cm-send"]').textContent = (TRANS[currentLang] || TRANS.en)['cm-send'] || 'Send Message';
+      document.getElementById('contact-submit').disabled = false;
+      document.getElementById('c-name').value = '';
+      document.getElementById('c-email').value = '';
+      document.getElementById('c-message').value = '';
+      const modal = document.getElementById('contact-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeContactModal() {
+      const modal = document.getElementById('contact-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function submitContactForm(e) {
+      e.preventDefault();
+      const name = document.getElementById('c-name').value.trim();
+      const email = document.getElementById('c-email').value.trim();
+      const message = document.getElementById('c-message').value.trim();
+      const btn = document.getElementById('contact-submit');
+      const errEl = document.getElementById('contact-error');
+      const t = TRANS[currentLang] || TRANS.en;
+      btn.querySelector('[data-i18n="cm-send"]').textContent = t['cm-sending'] || 'Sending...';
+      btn.disabled = true;
+      errEl.classList.add('hidden');
+      try {
+        const res = await fetch(SUPABASE_URL + '/rest/v1/contact_messages', {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal',
+          },
+          body: JSON.stringify({ name, email, message }),
+        });
+        if (!res.ok) throw new Error(await res.text());
+        document.getElementById('contact-success').classList.remove('hidden');
+        document.getElementById('contact-fields').classList.add('hidden');
+      } catch(err) {
+        errEl.textContent = t['cm-error'] || 'Something went wrong. Please try again.';
+        errEl.classList.remove('hidden');
+        btn.querySelector('[data-i18n="cm-send"]').textContent = t['cm-send'] || 'Send Message';
+        btn.disabled = false;
+      }
+    }
+
+    // Close contact modal on Escape
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeContactModal();
+    });
+  </script>
+
+  <!-- MISSION STATEMENT BANNER -->
+  <section id="mission" class="relative py-20 lg:py-28 bg-navy grain-overlay overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(203,161,75,0.1),transparent_60%)]"></div>
+    <div class="relative z-10 max-w-4xl mx-auto px-6 lg:px-8 text-center">
+      <blockquote class="text-2xl lg:text-3xl font-bold text-white heading-tight leading-snug mb-8" data-i18n="mission-quote">
+        "To accelerate the development and global reach of AI-driven companies by providing world-class infrastructure, mentorship, and strategic capital."
+      </blockquote>
+      <div class="flex items-center justify-center gap-3">
+        <div class="w-8 h-px bg-gold/40"></div>
+        <span class="text-sm font-medium text-gold tracking-[0.06em] uppercase" data-i18n="mission-label">Our Mission</span>
+        <div class="w-8 h-px bg-gold/40"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT / CTA SECTION -->
+  <section id="contact" class="relative py-24 lg:py-32 bg-white grain-overlay overflow-hidden">
+    <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto text-center">
+        <span class="text-xs font-medium text-gold tracking-[0.06em] uppercase mb-4 block" data-i18n="contact-label">Get Involved</span>
+        <h2 class="text-3xl lg:text-[40px] font-bold heading-tight leading-tight mb-6" data-i18n="contact-h2">
+          Ready to Shape Armenia's <span class="text-gold">AI Future</span>?
+        </h2>
+        <p class="text-lg text-navy/70 body-relaxed mb-10" data-i18n="contact-desc">
+          Whether you're a startup founder, investor, researcher, or creative professional — there's a place for you at AgentPark.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <button onclick="openContactModal()" class="inline-flex items-center justify-center px-8 py-4 bg-gold text-deep-ink font-semibold text-base rounded-lg hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-floating">
+            <span data-i18n="contact-cta1">Contact Us</span>
+            <svg class="w-5 h-5 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </button>
+          <a href="#about" class="inline-flex items-center justify-center px-8 py-4 border-2 border-gold text-navy font-semibold text-base rounded-lg hover:bg-gold-tint active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus" data-i18n="contact-cta2">
+            Learn More
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT MODAL -->
+  <div id="contact-modal" class="hidden fixed inset-0 z-[100] items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-deep-ink/70 backdrop-blur-sm" onclick="closeContactModal()"></div>
+    <!-- Panel -->
+    <div class="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-[0_32px_64px_rgba(13,39,64,0.28)] overflow-hidden">
+      <!-- Header -->
+      <div class="bg-navy px-8 py-6 relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(203,161,75,0.15),transparent_60%)]"></div>
+        <div class="relative z-10 flex items-center justify-between">
+          <div>
+            <h2 id="contact-modal-title" class="text-xl font-bold text-white heading-tight" data-i18n="cm-title">Get in Touch</h2>
+            <p class="text-navy-tint/70 text-sm mt-1" data-i18n="cm-subtitle">We'll respond within 24 hours.</p>
+          </div>
+          <button onclick="closeContactModal()" class="text-white/50 hover:text-white transition-opacity duration-200 brand-focus rounded-lg p-1" aria-label="Close">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+      <!-- Form -->
+      <form id="contact-form" onsubmit="submitContactForm(event)" class="px-8 py-7 space-y-5">
+        <div id="contact-success" class="hidden bg-gold/10 border border-gold/40 rounded-xl p-5 text-center">
+          <svg class="w-10 h-10 text-gold mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <p class="font-semibold text-navy text-lg" data-i18n="cm-sent">Message sent!</p>
+          <p class="text-navy/60 text-sm mt-1" data-i18n="cm-sent-sub">Thank you for reaching out. We'll be in touch soon.</p>
+        </div>
+        <div id="contact-error" class="hidden bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3"></div>
+        <div id="contact-fields">
+          <div class="grid sm:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label for="c-name" class="block text-xs font-semibold text-navy/60 uppercase tracking-[0.05em] mb-1.5" data-i18n="cm-name-label">Full Name</label>
+              <input id="c-name" type="text" required placeholder="Jane Smith" data-i18n-placeholder="cm-name-ph" class="w-full px-4 py-3 border border-navy-tint rounded-lg text-sm text-navy placeholder-navy/30 focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-shadow duration-200">
+            </div>
+            <div>
+              <label for="c-email" class="block text-xs font-semibold text-navy/60 uppercase tracking-[0.05em] mb-1.5" data-i18n="cm-email-label">Email Address</label>
+              <input id="c-email" type="email" required placeholder="jane@company.com" data-i18n-placeholder="cm-email-ph" class="w-full px-4 py-3 border border-navy-tint rounded-lg text-sm text-navy placeholder-navy/30 focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-shadow duration-200">
+            </div>
+          </div>
+          <div class="mb-5">
+            <label for="c-message" class="block text-xs font-semibold text-navy/60 uppercase tracking-[0.05em] mb-1.5" data-i18n="cm-msg-label">Message</label>
+            <textarea id="c-message" required rows="4" placeholder="Tell us about your startup, idea, or how you'd like to collaborate..." data-i18n-placeholder="cm-msg-ph" class="w-full px-4 py-3 border border-navy-tint rounded-lg text-sm text-navy placeholder-navy/30 focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-shadow duration-200 resize-none"></textarea>
+          </div>
+          <button id="contact-submit" type="submit" class="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-gold text-deep-ink font-semibold text-sm rounded-lg hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus">
+            <span data-i18n="cm-send">Send Message</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-deep-ink py-16 grain-overlay relative overflow-hidden">
+    <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="grid md:grid-cols-3 gap-12 lg:gap-16 mb-12 items-start">
+        <!-- Brand -->
+        <div>
+          <img src="Brand_assets/AgentPark_logo.png" alt="AgentPark" class="h-[4.5rem] w-auto mb-6 -mt-3" style="filter: brightness(0) invert(1) sepia(1) saturate(0) hue-rotate(0deg) brightness(2);">
+          <p class="text-navy-tint/60 body-relaxed text-sm" data-i18n="footer-desc">
+            Connecting, growing, and launching AI-native ventures into global markets.
+          </p>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="pt-2">
+          <h4 class="text-sm font-semibold text-white mb-4 tracking-[0.04em] uppercase" data-i18n="footer-links-heading">Quick Links</h4>
+          <ul class="space-y-3">
+            <li><a href="#about" class="text-sm text-navy-tint/60 hover:text-gold transition-opacity duration-200 brand-focus" data-i18n="nav-about">About</a></li>
+            <li><a href="#pillars" class="text-sm text-navy-tint/60 hover:text-gold transition-opacity duration-200 brand-focus" data-i18n="nav-pillars">What We Do</a></li>
+            <li><a href="#community" class="text-sm text-navy-tint/60 hover:text-gold transition-opacity duration-200 brand-focus" data-i18n="footer-community">Community & Events</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact -->
+        <div class="pt-2">
+          <h4 class="text-sm font-semibold text-white mb-4 tracking-[0.04em] uppercase" data-i18n="footer-contact-heading">Contact</h4>
+          <ul class="space-y-3">
+            <li class="text-sm text-navy-tint/60" data-i18n="footer-location">Yerevan, Armenia</li>
+            <li><a href="mailto:info@agentpark.am" class="text-sm text-navy-tint/60 hover:text-gold transition-opacity duration-200 brand-focus">info@agentpark.am</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-white/10 pt-8 flex items-center justify-center">
+        <p class="text-xs text-navy-tint/40" data-i18n="footer-copy">&copy; 2026 AgentPark Ltd. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Mobile menu toggle -->
+  <script>
+    const btn = document.getElementById('mobile-menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    btn.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+    });
+    // Close mobile menu on link click
+    menu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        menu.classList.add('hidden');
+      });
+    });
+  </script>
+
+  <!-- ── Language / i18n System ───────────────────────────────── -->
+  <script>
+    var TRANS = {
+      en: {
+        // Nav
+        'nav-about': 'About', 'nav-pillars': 'What We Do',
+        'nav-community': 'Community & Events', 'nav-mission': 'Mission', 'nav-cta': 'Get in Touch',
+        // Hero
+        'hero-badge': 'Yerevan, Armenia',
+        'hero-h1': 'Armenia\'s Next Frontier in\n            <span class="text-gold">Artificial Intelligence</span>',
+        'hero-sub': 'AgentPark is the beating heart of Armenia\'s AI ecosystem — a future-focused hub that brings together innovation, entrepreneurship, and education to launch AI-native ventures into global markets.',
+        'hero-cta1': 'Discover AgentPark', 'hero-cta2': 'Partner with Us',
+        'hero-img-label': 'Yerevan AI Park', 'hero-img-sub': 'Armenia\'s Premier AI Innovation Hub',
+        // About
+        'about-label': 'About AgentPark',
+        'about-h2': 'Where Startups Scale, Communities Connect, and Ideas Become\n            <span class="text-gold">Impact</span>',
+        'about-p1': 'The Yerevan AgentPark is set to become the beating heart of Armenia\'s growing AI ecosystem — a future-focused hub that brings together innovation, entrepreneurship, and education.',
+        'about-p2': 'The AgentPark team is composed of experienced professionals who have been actively involved in the development of Armenia\'s technological ecosystem, including work on the creation of high-tech clusters within the USAID CAPS program.',
+        'about-launch-year': 'Launch Year',
+        // NVIDIA
+        'nvidia-label': 'Powered by Global Momentum',
+        'nvidia-h2': 'NVIDIA-Based <span class="text-gold">AI Factory</span>',
+        'nvidia-desc': 'A major milestone in Armenia\'s technological rise — the 2026 launch of NVIDIA\'s AI factory will serve as a transformative boost to the entire ecosystem.',
+        'nvidia-banner-label': 'Launching 2026',
+        'nvidia-banner-title': 'World-class AI computing infrastructure, right in Yerevan.',
+        'nvidia-c1-title': 'International Attention', 'nvidia-c1-desc': 'Attracting global focus and positioning Yerevan as a premier regional technology hub.',
+        'nvidia-c2-title': 'High-Performance Computing', 'nvidia-c2-desc': 'Injecting world-class computing capacity to power the next generation of AI ventures.',
+        'nvidia-c3-title': 'Regional Tech Hub', 'nvidia-c3-desc': 'Strengthening Armenia\'s position on the global technology map through strategic infrastructure.',
+        // Pillars
+        'pillars-label': 'What We Do',
+        'pillars-h2': 'Building the Future of <span class="text-gold">AI in Armenia</span>',
+        'p1-title': 'A Launchpad for Innovation', 'p1-desc': 'AgentPark functions as both an AI accelerator and incubator, nurturing local startups with strategic support in technology, business development, and consulting. Backed by financial investment and an experienced leadership team.',
+        'p2-title': 'A Knowledge & Talent Magnet', 'p2-desc': 'With strong ties to Armenia\'s leading universities, such as the Faculty of Applied Mathematics at Yerevan State University. The Park hosted its first AI Summer School in July 2025, with ongoing academic collaborations.',
+        'p3-title': 'A Cross-Sector Platform', 'p3-desc': 'Building bridges across sectors — integrating healthcare, agriculture, design, and cultural institutions into its innovation framework. Making AI more accessible and relevant to everyday challenges.',
+        'p4-title': 'A Cultural & Creative Nexus', 'p4-desc': 'More than a tech hub — a platform for art and design, where creative minds collaborate with technical experts to redefine the boundaries of expression, interaction, and intelligence.',
+        // Community
+        'comm-label': 'Community & Events',
+        'comm-h2': 'Global Events, <span class="text-gold">Local Impact</span>',
+        'comm-f1-title': 'Community Space', 'comm-f1-desc': 'Inviting local residents and students to participate in AI-related events and educational programs, bridging the gap between professionals and young enthusiasts.',
+        'comm-f2-title': 'International Conferences & Hackathons', 'comm-f2-desc': 'Regular events bringing together leading minds from Armenia and abroad, sparking new ideas, partnerships, and research.',
+        'comm-f3-title': 'Mentorship & Learning', 'comm-f3-desc': 'Fostering a culture of mentorship and mutual learning between seasoned professionals and the next generation of AI talent.',
+        'events-h2': 'Events at AgentPark', 'events-upcoming-label': 'Upcoming Events', 'events-past-label': 'Past Events',
+        // Mission
+        'mission-quote': '"To accelerate the development and global reach of AI-driven companies by providing world-class infrastructure, mentorship, and strategic capital."',
+        'mission-label': 'Our Mission',
+        // Contact
+        'contact-label': 'Get Involved',
+        'contact-h2': 'Ready to Shape Armenia\'s <span class="text-gold">AI Future</span>?',
+        'contact-desc': 'Whether you\'re a startup founder, investor, researcher, or creative professional — there\'s a place for you at AgentPark.',
+        'contact-cta1': 'Contact Us', 'contact-cta2': 'Learn More',
+        // Footer
+        'footer-desc': 'Connecting, growing, and launching AI-native ventures into global markets.',
+        'footer-links-heading': 'Quick Links', 'footer-community': 'Community & Events',
+        'footer-contact-heading': 'Contact', 'footer-location': 'Yerevan, Armenia',
+        'footer-copy': '© 2026 AgentPark Ltd. All rights reserved.',
+        // Events UI
+        'ev-more': 'more', 'ev-spots': 'spots',
+        'ev-view-details': 'View Details',
+        'ev-register': 'Register',
+        'ev-loading': 'Loading events...',
+        'ev-reg-closed': 'Registration Closed',
+        'ev-watch-video': 'Watch Video',
+        'ev-no-events': 'No upcoming events at the moment. Check back soon.',
+        'ev-error': 'Could not load events.',
+        // Modal
+        'modal-register-label': 'Register',
+        'modal-full-name': 'Full Name *',
+        'modal-name-placeholder': 'Your name',
+        'modal-email-label': 'Email Address *',
+        'modal-email-placeholder': 'your@email.com',
+        'modal-confirm': 'Confirm Registration',
+        'modal-success': "You're registered! See you there.",
+        // Contact modal
+        'cm-title': 'Get in Touch',
+        'cm-subtitle': "We'll respond within 24 hours.",
+        'cm-sent': 'Message sent!',
+        'cm-sent-sub': "Thank you for reaching out. We'll be in touch soon.",
+        'cm-name-label': 'Full Name',
+        'cm-name-ph': 'Jane Smith',
+        'cm-email-label': 'Email Address',
+        'cm-email-ph': 'jane@company.com',
+        'cm-msg-label': 'Message',
+        'cm-msg-ph': "Tell us about your startup, idea, or how you'd like to collaborate...",
+        'cm-send': 'Send Message',
+        'cm-sending': 'Sending...',
+        'cm-error': 'Something went wrong. Please try again.',
+      },
+      am: {}
+    };
+
+    // Armenian translations
+    TRANS.am = {
+      'nav-about': 'Մասին',
+      'nav-pillars': 'Գործունեություն',
+      'nav-community': 'Միջոցառումներ',
+      'nav-mission': 'Առաքելություն',
+      'nav-cta': 'Կապ հաստատել',
+      'hero-badge': 'Երեվան, հայաստան',
+      'hero-h1': 'Հայաստանի առաջադար հարթակ <span class="text-gold">AI-ի նորարարության կենտրոն</span>',
+      'hero-sub': 'AgentPark-ը հայաստանի AI համակարգի սիրտն ե — ապագային հարթակ, վոր հավակում ե նորարարությունը, լիդերությունը ևվ կրթությունըՠ AI-ի կենտրոնները համաշխարհային շուկաներ լարկելու համար:',
+      'hero-cta1': 'Բացահայտել AgentPark-ը',
+      'hero-cta2': 'Գործակից դառնալ',
+      'hero-img-label': 'Երեվանի AI պարկ',
+      'hero-img-sub': 'Հայաստանի AI նորարարության կենտրոն',
+      'about-label': 'AgentPark-ի մասին',
+      'about-h2': 'Որտեղ Startap-ները զարգանում են համայնկները կապ են կանում գաղափառները դառնում են <span class="text-gold">իրականություն</span>',
+      'about-p1': 'Երեվանի AgentPark-ը կենտրոնն ե հայաստանի AI համակարգի — ապագային հարթակ, վոր հավակում ե նորարարությունը, լիդերությունը ևվ կրթությունը:',
+      'about-p2': 'AgentPark-ի թիմը բաղկացված ե փորխառության ունեցող մասնագետներից, ովկեր ակտիվորևն հայաստանի տեխնոլոգիական զարգացման գործին, USAID CAPS ծրագիրի շրլանակներում:',
+      'about-launch-year': 'Հիմնադրման տարի',
+      'nvidia-label': 'Համաշխարհային զարկացությամբ',
+      'nvidia-h2': 'NVIDIA-ի վրա հիմնված <span class="text-gold">AI գործարան</span>',
+      'nvidia-desc': '2026-ի NVIDIA AI գործարանի գործարկումը կկդառնա ամբոլի համակարգի հզայլիչ խթիր — հայաստանի տեխնոլոգիական բոլոր բնագավառի կարևոր կետք:',
+      'nvidia-banner-label': '2026-ին գործարկվում',
+      'nvidia-banner-title': 'Համաշխարհային AI հաշվոգային կառուցվածություն — երեվանում:',
+      'nvidia-c1-title': 'Միջազգային ուժադրություն',
+      'nvidia-c1-desc': 'Համաշխարհային ուժադրությանը գրավելով երեվանին դիրկում օրպես տարածաշրլկային տեխնոլոգիական կենտրոն:',
+      'nvidia-c2-title': 'Բարձռ կավարակություն',
+      'nvidia-c2-desc': 'Համաշխարհային կարգի AI կավարակությանը լավլագոծել AI կենտրոնների հաջորդ սերնդին:',
+      'nvidia-c3-title': 'Տարածաշրլկային Tech կենտրոն',
+      'nvidia-c3-desc': 'Հայաստանի դիրկորությունը համաշխարհային տեխնոլոգիական կառլին վրա ամրապնդում:',
+      'pillars-label': 'Մեր կառլկները',
+      'pillars-h2': 'Կառուցնել հայաստանում <span class="text-gold">AI-ի ապականը</span>',
+      'p1-title': 'Նորարարության հարթակ',
+      'p1-desc': 'AgentPark-ը գործում ե իրևնորբևն AI արագացուցիչ ևվ ինկուբատոր, խթիրաբանությամբ ստարտապներ տեխնիկական, բիզնեսի զարգացման ևվ խորհրդակցության բնագավառում:',
+      'p2-title': 'Գիտելիքի ևվ տալանտի գրավիչ',
+      'p2-desc': 'Հայաստանի առաջատար բուհերի հետ ամուր կապերով: Պարկը իր առաջին AI ամառային դպրոցն անցկացրել հիլիս 2025-ին:',
+      'p3-title': 'Բխբազգային հարթակ',
+      'p3-desc': 'Կամուրլժնել կապեր բխբազգային օլորտների միջևվ — արոգլիչ հաբակագիտություն, գյուլատնեսություն ևվ դիզայն բնագավառում:',
+      'p4-title': 'Մշակութային ևվ ստեգագործական հանգուկ',
+      'p4-desc': 'Ավելին քոչ տեխ կենտրոն — արվեստի ևվ դիզայնի հարթակ, որտեղ ստեգագործ մտկերը համագործակցում են տեխնիկական փորխագետների հետ:',
+      'comm-label': 'Համայնկ ևվ արժադրություններ',
+      'comm-h2': 'Համաշխարհային արժադրություններ, <span class="text-gold">տեգական ազդեկություն</span>',
+      'comm-f1-title': 'Համայնկային տարած',
+      'comm-f1-desc': 'Հրավիրում ենք տեղակիչ բնակիչներին ևվ ուսանողներին մասնակցել AI-ին կապված արժադրություններին:',
+      'comm-f2-title': 'Միջազգային կոնֆերանսներ ևվ հակաթոններ',
+      'comm-f2-desc': 'Կանոնավոր արժադրություններ, հավակելով հայաստանից ևվ արտասերծից արիչագույն մտկեր:',
+      'comm-f3-title': 'Մենտորություն ևվ ուսուցում',
+      'comm-f3-desc': 'Փորխարելով մենտորության ևվ արդյունաբեր ուսուցումի միլիև փորխագետների ևվ AI-ի նոր սերնդի միլիև:',
+      'events-label': 'Առժժալիկ արժադրություններ',
+      'events-h2': 'Արժադրություններ AgentPark-ում',
+      'events-upcoming-label': 'Առաջիկա միջոցառումներ',
+      'events-past-label': 'Անցյալ միջոցառումներ',
+      'mission-quote': '«Արագացնել AI-ի վրա հիմնված կերպակների զարգացումը ևվ համաշխարհային հասանելիությունը ամրապնդելով, աջբոբանությամբ համաշխարհային կառուցվածություն, մենտորություն ևվ ռատմավարական կապիտալալ:»',
+      'mission-label': 'Մեր առաքելությունը',
+      'contact-label': 'Անդլնալ',
+      'contact-h2': 'Պատրաստ եկ ակտիվ լինել հայաստանի <span class="text-gold">AI ապականին</span>?',
+      'contact-desc': 'Լինեք ստարտապ հիմնադիր, ներդրող, հետազոտող ևվ ստեգագործ մասնագետ — AgentPark-ում դեզ համար տեղ կա:',
+      'contact-cta1': 'Կապ հաստատել',
+      'contact-cta2': 'Ավելին իմանալ',
+      'footer-desc': 'Կապակցնելով, զարգացնելով և AI նորարարությունները համաշխարհային շուկաներ մուտքագրելով:',
+      'footer-links-heading': 'Արագ հլումներ',
+      'footer-community': 'Համայնկ ևվ արժադրություններ',
+      'footer-contact-heading': 'Կապ',
+      'footer-location': 'Երեվան, հայաստան',
+      'footer-copy': '© 2026 AgentPark Ltd. Բոլոր իրավունկները պահպանված են:',
+      // Events UI
+      'ev-more': 'ավելին', 'ev-spots': 'տեղ',
+      'ev-view-details': 'Դիտել մանրամասները',
+      'ev-register': 'Գրանցվել',
+      'ev-loading': 'Բեռնվում են միջոցառումները...',
+      'ev-reg-closed': 'Գրանցումը փակ է',
+      'ev-watch-video': 'Դիտել տեսանյութը',
+      'ev-no-events': 'Առայժմ մոտ ապագայի միջոցառումներ չկան:',
+      'ev-error': 'Հնարավոր չէ բեռնել միջոցառումները:',
+      // Modal
+      'modal-register-label': 'Գրանցվել',
+      'modal-full-name': 'Անուն ազգանուն *',
+      'modal-name-placeholder': 'Ձեր անունը',
+      'modal-email-label': 'Էլ. հասցե *',
+      'modal-email-placeholder': 'your@email.com',
+      'modal-confirm': 'Հաստատել գրանցումը',
+      'modal-success': 'Դուք գրանցված եք։ Հանդիպենք այնտեղ:',
+      // Contact modal
+      'cm-title': 'Կապ հաստատել',
+      'cm-subtitle': 'Մենք կպատասխանենք 24 ժամի ընթացքում:',
+      'cm-sent': 'Հաղորդագրությունը ուղարկվել է!',
+      'cm-sent-sub': 'Շնորհակալություն կապի համար: Մենք շուտով կկապվենք:',
+      'cm-name-label': 'Անուն ազգանուն',
+      'cm-name-ph': 'Ձեր անունը',
+      'cm-email-label': 'Էլ. հասցե',
+      'cm-email-ph': 'email@example.com',
+      'cm-msg-label': 'Հաղորդագրություն',
+      'cm-msg-ph': 'Պատմեցեք ձեր ստարտապի, գաղափարի կամ համագործակցության մասին...',
+      'cm-send': 'Ուղարկել',
+      'cm-sending': 'Ուղարկվում է...',
+      'cm-error': 'Ինչ-որ սխալ տեղի ունեցավ: Խնդրեմ կրկին փորձեք:',
+    };
+
+    function setLang(lang) {
+      if (!TRANS[lang]) lang = 'en';
+      currentLang = lang;
+      document.documentElement.lang = lang === 'am' ? 'hy' : 'en';
+      localStorage.setItem('agentpark-lang', lang);
+      const t = TRANS[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) el.innerHTML = t[key];
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (t[key] !== undefined) el.placeholder = t[key];
+      });
+      document.body.classList.toggle('lang-am', lang === 'am');
+      document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+        btn.classList.toggle('active-lang', btn.dataset.lang === lang);
+      });
+      if (window._loadedEvents) renderEventCards(window._loadedEvents);
+    }
+
+    // Sanitize admin HTML overrides: keep only color spans, strip contenteditable artifacts
+    function _sanitizeOverride(html) {
+      if (!html || !/</.test(html)) return html; // no HTML tags, return as-is
+      var s = html.replace(/<\/(div|p|br)>/gi, '');
+      s = s.replace(/<(div|p)[^>]*>/gi, ' ');
+      s = s.replace(/<br\s*\/?>/gi, ' ');
+      var colorSpans = [];
+      s = s.replace(/<span\s+(?:style\s*=\s*"color:\s*[^"]*"|class\s*=\s*"text-[^"]*")\s*>([\s\S]*?)<\/span>/gi, function(m) {
+        colorSpans.push(m);
+        return '\x00CS' + (colorSpans.length - 1) + '\x00';
+      });
+      s = s.replace(/<[^>]+>/g, '');
+      s = s.replace(/\x00CS(\d+)\x00/g, function(_, i) { return colorSpans[parseInt(i)]; });
+      return s.replace(/\s{2,}/g, ' ').trim();
+    }
+
+    // Apply admin English overrides from localStorage
+    (function() {
+      try {
+        const ov = JSON.parse(localStorage.getItem('agentpark-admin') || '{}');
+        const keys = Object.keys(ov);
+        if (keys.length) {
+          Object.entries(ov).forEach(([k, v]) => { if (v && TRANS.en[k] !== undefined) TRANS.en[k] = _sanitizeOverride(v); });
+        }
+      } catch(e) {}
+    })();
+
+    // Apply admin Armenian overrides from localStorage
+    (function() {
+      try {
+        const ov = JSON.parse(localStorage.getItem('agentpark-am-overrides') || '{}');
+        const keys = Object.keys(ov);
+        if (keys.length) {
+          Object.entries(ov).forEach(([k, v]) => { if (v) TRANS.am[k] = _sanitizeOverride(v); });
+          console.log('[i18n] Applied', keys.length, 'Armenian overrides from admin:', keys);
+        }
+      } catch(e) { console.log('[i18n] Error reading overrides:', e); }
+    })();
+
+    // Init lang from localStorage
+    (function() {
+      const saved = localStorage.getItem('agentpark-lang') || 'en';
+      setLang(saved);
+    })();
+  </script>
+
+  <!-- Apply admin image overrides from localStorage -->
+  <script>
+    (function() {
+      try {
+        const imgs = JSON.parse(localStorage.getItem('agentpark-images') || '{}');
+        Object.entries(imgs).forEach(([id, src]) => {
+          const el = document.getElementById(id);
+          if (el && src) el.src = src;
+        });
+      } catch(e) {}
+    })();
+  </script>
+</body>
+</html>

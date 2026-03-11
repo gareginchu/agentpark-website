@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Debug localStorage</title></head>
+<body style="font-family:monospace;padding:20px">
+<h2>localStorage Debug</h2>
+
+<button id="sync-btn" style="padding:10px 20px;background:#CBA14B;color:#0D1027;font-weight:bold;border:none;border-radius:8px;cursor:pointer;margin-bottom:20px;font-size:16px">
+  Sync Armenian from index.html → localStorage
+</button>
+<div id="sync-result" style="margin-bottom:20px;color:green;font-weight:bold"></div>
+
+<div id="out"></div>
+
+<script>
+function showDebug() {
+  const el = document.getElementById('out');
+  el.innerHTML = '';
+  const keys = ['agentpark-am-overrides','agentpark-admin','agentpark-lang','agentpark-images'];
+  keys.forEach(k => {
+    const val = localStorage.getItem(k);
+    const div = document.createElement('div');
+    div.style.marginBottom = '20px';
+    div.style.borderBottom = '1px solid #ccc';
+    div.style.paddingBottom = '10px';
+    if (val) {
+      try {
+        const obj = JSON.parse(val);
+        div.innerHTML = '<b style="color:green">' + k + '</b> (' + Object.keys(obj).length + ' keys):<br><pre style="max-height:200px;overflow:auto;background:#f5f5f5;padding:8px">' + JSON.stringify(obj, null, 2) + '</pre>';
+      } catch(e) {
+        div.innerHTML = '<b style="color:green">' + k + '</b>: ' + val;
+      }
+    } else {
+      div.innerHTML = '<b style="color:red">' + k + '</b>: (empty/null)';
+    }
+    el.appendChild(div);
+  });
+}
+
+document.getElementById('sync-btn').addEventListener('click', async () => {
+  const result = document.getElementById('sync-result');
+  result.textContent = 'Fetching index.html...';
+  try {
+    const res = await fetch('/index.html');
+    const html = await res.text();
+    result.textContent = 'Fetched ' + html.length + ' chars. Parsing TRANS.am...';
+
+    const block = html.match(/TRANS\.am\s*=\s*\{([\s\S]*?)\n\s*\};/);
+    if (!block) {
+      result.textContent = 'ERROR: Could not find TRANS.am block in index.html';
+      result.style.color = 'red';
+      return;
+    }
+
+    const obj = {};
+    const re = /'([^']+)'\s*:\s*'((?:[^'\\]|\\.)*)'/g;
+    let m;
+    while ((m = re.exec(block[1])) !== null) {
+      obj[m[1]] = m[2].replace(/\\'/g, "'").replace(/\\n/g, '\n');
+    }
+
+    result.textContent = 'Parsed ' + Object.keys(obj).length + ' Armenian keys. Saving to localStorage...';
+    localStorage.setItem('agentpark-am-overrides', JSON.stringify(obj));
+    result.textContent = 'SUCCESS: Saved ' + Object.keys(obj).length + ' Armenian keys to agentpark-am-overrides!';
+    result.style.color = 'green';
+    showDebug();
+  } catch(e) {
+    result.textContent = 'ERROR: ' + e.message;
+    result.style.color = 'red';
+  }
+});
+
+showDebug();
+</script>
+</body></html>
