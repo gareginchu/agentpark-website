@@ -10,7 +10,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Armenian:wght@400;500;600;700&family=Noto+Serif+Armenian:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&family=Noto+Sans+Armenian:wght@400;500;600;700&family=Noto+Serif+Armenian:wght@700&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       theme: {
@@ -26,6 +26,7 @@
           },
           fontFamily: {
             sans: ['Inter', 'Helvetica Neue', 'Arial', 'system-ui', 'sans-serif'],
+            display: ['DM Serif Display', 'Georgia', 'serif'],
           },
         },
       },
@@ -101,12 +102,30 @@
       font-family: 'Noto Serif Armenian', 'Inter', serif;
       letter-spacing: -0.01em;
     }
+    body.lang-am p[data-i18n],
+    body.lang-am span[data-i18n]:not(.text-gold),
+    body.lang-am div[data-i18n] {
+      color: #B0B0B0;
+    }
+
+    /* Display font for headings */
+    h1, h2, blockquote { font-family: 'DM Serif Display', Georgia, serif; }
+    h3, h4 { font-family: 'Inter', sans-serif; }
 
     /* Language toggle */
     .lang-toggle-btn { transition: color 0.15s, background 0.15s; }
     .lang-toggle-btn.active-lang {
       background: #CBA14B;
       color: #0D1027;
+    }
+
+    /* Sticky mobile CTA bar */
+    #mobile-sticky-cta {
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    #mobile-sticky-cta.visible {
+      transform: translateY(0);
     }
   </style>
 </head>
@@ -118,13 +137,14 @@
       <div class="flex items-center justify-between h-20 lg:h-28">
         <!-- Logo -->
         <a href="#" class="brand-focus flex items-center gap-3">
-          <img src="Brand_assets/AgentPark_logo.png" alt="AgentPark" class="h-16 lg:h-24 w-auto">
+          <img src="Brand_assets/AgentPark_logo.png" alt="AgentPark" class="h-20 lg:h-32 w-auto">
         </a>
 
         <!-- Desktop Nav -->
         <div class="hidden md:flex items-center gap-8">
           <a href="#about" class="text-sm font-medium text-navy/70 hover:text-navy transition-opacity duration-200 spring-ease brand-focus" data-i18n="nav-about">About</a>
           <a href="#pillars" class="text-sm font-medium text-navy/70 hover:text-navy transition-opacity duration-200 spring-ease brand-focus" data-i18n="nav-pillars">What We Do</a>
+          <a href="#partners" class="text-sm font-medium text-navy/70 hover:text-navy transition-opacity duration-200 spring-ease brand-focus" data-i18n="nav-partners">Partners</a>
           <a href="#community" class="text-sm font-medium text-navy/70 hover:text-navy transition-opacity duration-200 spring-ease brand-focus" data-i18n="nav-community">Community & Events</a>
           <a href="#mission" class="text-sm font-medium text-navy/70 hover:text-navy transition-opacity duration-200 spring-ease brand-focus" data-i18n="nav-mission">Mission</a>
           <!-- Language Toggle -->
@@ -133,8 +153,8 @@
             <div class="w-px h-4 bg-navy-tint/50"></div>
             <button onclick="setLang('am')" data-lang="am" class="lang-toggle-btn px-3 py-1.5 text-navy/70 hover:text-navy brand-focus">ՀՅ</button>
           </div>
-          <a href="#contact" class="inline-flex items-center justify-center px-5 py-2.5 bg-navy text-white text-sm font-semibold rounded-lg hover:bg-navy-light active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus">
-            <span data-i18n="nav-cta">Get in Touch</span>
+          <a href="#events" class="inline-flex items-center justify-center px-5 py-2.5 bg-navy text-white text-sm font-semibold rounded-lg hover:bg-navy-light active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus">
+            <span data-i18n="nav-cta">Join Our Events</span>
           </a>
         </div>
 
@@ -149,13 +169,14 @@
         <div class="flex flex-col gap-4">
           <a href="#about" class="text-sm font-medium text-navy/70 hover:text-navy brand-focus" data-i18n="nav-about">About</a>
           <a href="#pillars" class="text-sm font-medium text-navy/70 hover:text-navy brand-focus" data-i18n="nav-pillars">What We Do</a>
+          <a href="#partners" class="text-sm font-medium text-navy/70 hover:text-navy brand-focus" data-i18n="nav-partners">Partners</a>
           <a href="#community" class="text-sm font-medium text-navy/70 hover:text-navy brand-focus" data-i18n="nav-community">Community & Events</a>
           <a href="#mission" class="text-sm font-medium text-navy/70 hover:text-navy brand-focus" data-i18n="nav-mission">Mission</a>
           <div class="flex items-center gap-2">
             <button onclick="setLang('en')" data-lang="en" class="lang-toggle-btn active-lang px-4 py-2 text-sm font-semibold rounded border border-navy-tint/50 text-navy/70 brand-focus">EN</button>
             <button onclick="setLang('am')" data-lang="am" class="lang-toggle-btn px-4 py-2 text-sm font-semibold rounded border border-navy-tint/50 text-navy/70 brand-focus">ՀՅ</button>
           </div>
-          <a href="#contact" class="inline-flex items-center justify-center px-5 py-2.5 bg-navy text-white text-sm font-semibold rounded-lg brand-focus w-full mt-2"><span data-i18n="nav-cta">Get in Touch</span></a>
+          <a href="#events" class="inline-flex items-center justify-center px-5 py-2.5 bg-navy text-white text-sm font-semibold rounded-lg brand-focus w-full mt-2"><span data-i18n="nav-cta">Join Our Events</span></a>
         </div>
       </div>
     </div>
@@ -200,24 +221,32 @@
             <span class="text-gold">Artificial Intelligence</span>
           </h1>
 
-          <p class="text-lg lg:text-xl text-navy-tint body-relaxed max-w-xl mb-10" data-i18n="hero-sub">
-            AgentPark is the beating heart of Armenia's AI ecosystem — a future-focused hub that brings together innovation, entrepreneurship, and education to launch AI-native ventures into global markets.
+          <p class="text-lg lg:text-xl text-navy-tint body-relaxed max-w-xl" data-i18n="hero-sub">
+            Armenia's AI innovation hub — connecting startups, talent, and investors to build the next generation of AI companies.
           </p>
 
+          <div class="flex items-center gap-4 lg:gap-6 mt-8 mb-10 text-sm font-medium text-navy-tint/70">
+            <span data-i18n="hero-stats-attendees">500+ attendees</span>
+            <span class="w-1 h-1 rounded-full bg-gold/60"></span>
+            <span data-i18n="hero-stats-events">6 events hosted</span>
+            <span class="w-1 h-1 rounded-full bg-gold/60"></span>
+            <span data-i18n="hero-stats-partners">3 university partnerships</span>
+          </div>
+
           <div class="flex flex-col sm:flex-row gap-4">
-            <a href="#about" class="inline-flex items-center justify-center px-8 py-4 bg-gold text-deep-ink font-semibold text-base rounded-lg hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-floating">
-              <span data-i18n="hero-cta1">Discover AgentPark</span>
+            <a href="#community" class="inline-flex items-center justify-center px-8 py-4 bg-gold text-deep-ink font-semibold text-base rounded-lg hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-floating">
+              <span data-i18n="hero-cta1">Explore Upcoming Events</span>
               <svg class="w-5 h-5 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
             </a>
-            <a href="#contact" class="inline-flex items-center justify-center px-8 py-4 border-2 border-gold/40 text-gold-tint font-semibold text-base rounded-lg hover:border-gold/70 hover:text-white active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus" data-i18n="hero-cta2">
-              Partner with Us
+            <a href="#pillars" class="inline-flex items-center justify-center px-8 py-4 border-2 border-gold/40 text-gold-tint font-semibold text-base rounded-lg hover:border-gold/70 hover:text-white active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus" data-i18n="hero-cta2">
+              See What We Do
             </a>
           </div>
         </div>
 
         <!-- Hero image -->
-        <div class="hidden lg:block relative">
-          <div class="relative rounded-2xl overflow-hidden shadow-floating" style="height: 480px;">
+        <div class="relative mt-10 lg:mt-0">
+          <div class="relative rounded-2xl overflow-hidden shadow-floating h-[280px] lg:h-[480px]">
             <img id="img-hero" src="https://itpark.am/wp-content/uploads/2025/08/yerevan-AI-Park.jpg" alt="Yerevan AI Park" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-t from-navy/70 via-navy/20 to-transparent"></div>
             <div class="absolute inset-0 bg-gold/10 mix-blend-multiply"></div>
@@ -242,6 +271,23 @@
     </div>
   </section>
 
+  <!-- PARTNER LOGO STRIP -->
+  <div id="partners" class="bg-white border-b border-navy-tint/30 py-6 lg:py-8">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <p class="text-xs font-medium text-navy/30 uppercase tracking-[0.08em] text-center mb-5" data-i18n="partners-label">Trusted Partners & Collaborators</p>
+      <div class="flex items-center justify-center gap-10 lg:gap-20 flex-wrap">
+        <img src="Brand_assets/AgentPark_logo.png" alt="AgentPark" class="h-16 lg:h-24 w-auto opacity-70 hover:opacity-100 transition-opacity duration-200">
+        <img src="https://uvmfjdaqpsdbvokaynpi.supabase.co/storage/v1/object/public/event-images/organizers/amcham-armenia.jpg" alt="AmCham Armenia" class="h-24 lg:h-36 w-auto opacity-70 hover:opacity-100 transition-opacity duration-200">
+        <img src="https://uvmfjdaqpsdbvokaynpi.supabase.co/storage/v1/object/public/event-images/organizers/it-park.png" alt="IT Park Business Center" class="h-16 lg:h-24 w-auto opacity-70 hover:opacity-100 transition-opacity duration-200">
+        <img src="https://www.ysu.am/sites/default/files/styles/medium/public/2023-05/ysu-logo-eng.png?itok=sHVnd6TZ" alt="Yerevan State University" class="h-16 lg:h-24 w-auto opacity-70 hover:opacity-100 transition-opacity duration-200">
+        <img src="https://thb.tildacdn.one/tild3637-6134-4537-a465-663762643337/-/resize/500x/dark.png" alt="Armenian Code Academy" class="h-10 lg:h-14 w-auto opacity-70 hover:opacity-100 transition-opacity duration-200">
+        <img src="https://uvmfjdaqpsdbvokaynpi.supabase.co/storage/v1/object/public/event-images/organizers/tumo-labs-logo-dark.svg" alt="Tumo Labs" class="h-6 lg:h-8 w-auto opacity-70 hover:opacity-100 transition-opacity duration-200">
+        <img src="https://uvmfjdaqpsdbvokaynpi.supabase.co/storage/v1/object/public/event-images/organizers/tekwill-academy-logo.svg" alt="Tekwill Academy" class="h-10 lg:h-14 w-auto opacity-70 hover:opacity-100 transition-opacity duration-200">
+        <img src="https://uvmfjdaqpsdbvokaynpi.supabase.co/storage/v1/object/public/event-images/events/1773300526338-iq6hn7.png" alt="Impact Week" class="h-12 lg:h-16 w-auto opacity-70 hover:opacity-100 transition-opacity duration-200">
+      </div>
+    </div>
+  </div>
+
   <!-- ABOUT SECTION -->
   <section id="about" class="relative py-24 lg:py-32 bg-warm-gray grain-overlay overflow-hidden">
     <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
@@ -254,19 +300,19 @@
           </h2>
           <div class="space-y-5 body-relaxed text-navy/75">
             <p data-i18n="about-p1">
-              The Yerevan AgentPark is set to become the beating heart of Armenia's growing AI ecosystem — a future-focused hub that brings together innovation, entrepreneurship, and education.
+              AgentPark is where Armenia's AI future takes shape — a hub built to launch startups, grow talent, and attract global investment to Yerevan.
             </p>
             <p data-i18n="about-p2">
-              The AgentPark team is composed of experienced professionals who have been actively involved in the development of Armenia's technological ecosystem, including work on the creation of high-tech clusters within the USAID CAPS program.
+              Our team has built Armenia's tech ecosystem from the ground up — from USAID-backed high-tech clusters to university partnerships and international accelerator programs.
             </p>
           </div>
         </div>
 
         <div class="relative">
-          <div class="relative rounded-2xl overflow-hidden shadow-floating bg-navy flex items-center justify-center" style="min-height: 320px;">
-            <div class="absolute inset-0 bg-gradient-to-br from-deep-ink via-navy to-navy-light"></div>
-            <div class="absolute top-0 right-0 w-3/4 h-full bg-[radial-gradient(ellipse_at_top_right,rgba(203,161,75,0.12),transparent_60%)]"></div>
-            <img src="Brand_assets/AgentPark_logo.png" alt="AgentPark" class="relative z-10 w-2/3 max-w-xs h-auto" style="filter: brightness(0) invert(1);">
+          <div class="relative rounded-2xl overflow-hidden shadow-floating" style="min-height: 320px;">
+            <img src="Brand_assets/event-photo.jpg" alt="AgentPark event in Yerevan" class="w-full h-full object-cover absolute inset-0">
+            <div class="absolute inset-0 bg-gradient-to-t from-navy/60 via-navy/20 to-transparent"></div>
+            <div class="absolute inset-0 bg-gold/10 mix-blend-multiply"></div>
           </div>
           <!-- Stats overlay card -->
           <div class="absolute -bottom-6 left-4 lg:-left-6 bg-white rounded-xl p-6 shadow-elevated border border-navy-tint/30">
@@ -320,8 +366,8 @@
           <div class="w-12 h-12 rounded-lg bg-gold/10 flex items-center justify-center mb-6">
             <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <h3 class="text-xl font-semibold text-white mb-3" data-i18n="nvidia-c1-title">International Attention</h3>
-          <p class="text-navy-tint/70 body-relaxed" data-i18n="nvidia-c1-desc">Attracting global focus and positioning Yerevan as a premier regional technology hub.</p>
+          <h3 class="text-xl font-semibold text-white mb-3" data-i18n="nvidia-c1-title">Global Investment Magnet</h3>
+          <p class="text-navy-tint/70 body-relaxed" data-i18n="nvidia-c1-desc">Drawing international VC firms and tech giants to Yerevan — creating a pipeline for AI startups to access global capital.</p>
         </div>
 
         <!-- Card 2 -->
@@ -329,8 +375,8 @@
           <div class="w-12 h-12 rounded-lg bg-gold/10 flex items-center justify-center mb-6">
             <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
           </div>
-          <h3 class="text-xl font-semibold text-white mb-3" data-i18n="nvidia-c2-title">High-Performance Computing</h3>
-          <p class="text-navy-tint/70 body-relaxed" data-i18n="nvidia-c2-desc">Injecting world-class computing capacity to power the next generation of AI ventures.</p>
+          <h3 class="text-xl font-semibold text-white mb-3" data-i18n="nvidia-c2-title">100+ TFLOPS Compute Power</h3>
+          <p class="text-navy-tint/70 body-relaxed" data-i18n="nvidia-c2-desc">Enterprise-grade GPU clusters available to local startups and researchers — no more relying on overseas cloud providers.</p>
         </div>
 
         <!-- Card 3 -->
@@ -338,9 +384,15 @@
           <div class="w-12 h-12 rounded-lg bg-gold/10 flex items-center justify-center mb-6">
             <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
           </div>
-          <h3 class="text-xl font-semibold text-white mb-3" data-i18n="nvidia-c3-title">Regional Tech Hub</h3>
-          <p class="text-navy-tint/70 body-relaxed" data-i18n="nvidia-c3-desc">Strengthening Armenia's position on the global technology map through strategic infrastructure.</p>
+          <h3 class="text-xl font-semibold text-white mb-3" data-i18n="nvidia-c3-title">Caucasus AI Capital</h3>
+          <p class="text-navy-tint/70 body-relaxed" data-i18n="nvidia-c3-desc">The only NVIDIA-partnered AI factory in the region — positioning Armenia as the go-to destination for AI development across the Caucasus and Central Asia.</p>
         </div>
+      </div>
+      <div class="text-center mt-12">
+        <a href="#contact" onclick="openContactModal()" class="inline-flex items-center gap-2 px-6 py-3 border border-gold/40 text-gold font-medium text-sm rounded-lg hover:bg-gold/10 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus">
+          <span data-i18n="nvidia-cta">Get Early Access to AI Computing Resources</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
       </div>
     </div>
   </section>
@@ -370,7 +422,8 @@
           </div>
           <div class="p-8 lg:p-10">
             <h3 class="text-xl lg:text-2xl font-bold mb-3" data-i18n="p1-title">A Launchpad for Innovation</h3>
-            <p class="text-navy/70 body-relaxed" data-i18n="p1-desc">AgentPark functions as both an AI accelerator and incubator, nurturing local startups with strategic support in technology, business development, and consulting. Backed by financial investment and an experienced leadership team.</p>
+            <p class="text-navy/80 body-relaxed mb-4" data-i18n="p1-desc">AgentPark functions as both an AI accelerator and incubator, nurturing local startups with strategic support in technology, business development, and consulting. Backed by financial investment and an experienced leadership team.</p>
+            <a href="#contact" onclick="openContactModal()" class="inline-flex items-center gap-1.5 text-sm font-semibold text-gold hover:text-gold/80 transition-colors duration-150" data-i18n="p1-cta">Apply to Accelerator <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></a>
           </div>
         </div>
 
@@ -388,7 +441,8 @@
           </div>
           <div class="p-8 lg:p-10">
             <h3 class="text-xl lg:text-2xl font-bold mb-3" data-i18n="p2-title">A Knowledge & Talent Magnet</h3>
-            <p class="text-navy/70 body-relaxed" data-i18n="p2-desc">With strong ties to Armenia's leading universities, such as the Faculty of Applied Mathematics at Yerevan State University. The Park hosted its first AI Summer School in July 2025, with ongoing academic collaborations.</p>
+            <p class="text-navy/80 body-relaxed mb-4" data-i18n="p2-desc">With strong ties to Armenia's leading universities, such as the Faculty of Applied Mathematics at Yerevan State University. The Park hosted its first AI Summer School in July 2025, with ongoing academic collaborations.</p>
+            <a href="#community" class="inline-flex items-center gap-1.5 text-sm font-semibold text-gold hover:text-gold/80 transition-colors duration-150" data-i18n="p2-cta">View Summer School <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></a>
           </div>
         </div>
 
@@ -406,7 +460,8 @@
           </div>
           <div class="p-8 lg:p-10">
             <h3 class="text-xl lg:text-2xl font-bold mb-3" data-i18n="p3-title">A Cross-Sector Platform</h3>
-            <p class="text-navy/70 body-relaxed" data-i18n="p3-desc">Building bridges across sectors — integrating healthcare, agriculture, design, and cultural institutions into its innovation framework. Making AI more accessible and relevant to everyday challenges.</p>
+            <p class="text-navy/80 body-relaxed mb-4" data-i18n="p3-desc">Building bridges across sectors — integrating healthcare, agriculture, design, and cultural institutions into its innovation framework. Making AI more accessible and relevant to everyday challenges.</p>
+            <a href="#contact" onclick="openContactModal()" class="inline-flex items-center gap-1.5 text-sm font-semibold text-gold hover:text-gold/80 transition-colors duration-150" data-i18n="p3-cta">Explore Partnerships <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></a>
           </div>
         </div>
 
@@ -424,7 +479,8 @@
           </div>
           <div class="p-8 lg:p-10">
             <h3 class="text-xl lg:text-2xl font-bold mb-3" data-i18n="p4-title">A Cultural & Creative Nexus</h3>
-            <p class="text-navy/70 body-relaxed" data-i18n="p4-desc">More than a tech hub — a platform for art and design, where creative minds collaborate with technical experts to redefine the boundaries of expression, interaction, and intelligence.</p>
+            <p class="text-navy/80 body-relaxed mb-4" data-i18n="p4-desc">More than a tech hub — a platform for art and design, where creative minds collaborate with technical experts to redefine the boundaries of expression, interaction, and intelligence.</p>
+            <a href="#contact" onclick="openContactModal()" class="inline-flex items-center gap-1.5 text-sm font-semibold text-gold hover:text-gold/80 transition-colors duration-150" data-i18n="p4-cta">Join the Community <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></a>
           </div>
         </div>
       </div>
@@ -481,8 +537,8 @@
       </div>
 
       <!-- EVENTS -->
-      <div class="mb-8">
-        <h2 class="text-2xl lg:text-3xl font-bold heading-tight" data-i18n="events-h2">Events at AgentPark</h2>
+      <div id="events" class="mb-8 scroll-mt-24">
+        <h2 class="text-2xl lg:text-3xl font-bold heading-tight" data-i18n="events-h2">Join Our Next Event</h2>
       </div>
 
       <div id="events-loading" class="text-center py-12 text-navy/40 text-sm" data-i18n="ev-loading">Loading events...</div>
@@ -498,11 +554,17 @@
 
       <!-- Past Events -->
       <div id="past-section" class="hidden">
-        <div class="flex items-center gap-3 mb-6 pt-4 border-t border-navy-tint/20">
-          <span class="inline-block w-2 h-2 rounded-full bg-navy/30"></span>
-          <h3 class="text-lg font-semibold text-navy/70" data-i18n="events-past-label">Past Events</h3>
+        <div class="flex items-center justify-between pt-4 border-t border-navy-tint/20 mb-6">
+          <div class="flex items-center gap-3">
+            <span class="inline-block w-2 h-2 rounded-full bg-navy/30"></span>
+            <h3 class="text-lg font-semibold text-navy/70" data-i18n="events-past-label">Past Events</h3>
+          </div>
+          <button onclick="togglePastEvents()" id="past-toggle-btn" class="inline-flex items-center gap-1.5 text-sm font-medium text-navy/50 hover:text-navy transition-colors duration-150 brand-focus">
+            <span data-i18n="ev-show-past">Show past events</span>
+            <svg id="past-toggle-icon" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
         </div>
-        <div id="past-events-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr"></div>
+        <div id="past-events-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr hidden"></div>
       </div>
     </div>
   </section>
@@ -626,6 +688,57 @@
       const evTitle = (isAm && ev.title_am) ? ev.title_am : ev.title;
       const evDesc = (isAm && ev.description_am) ? ev.description_am : ev.description;
       const coverSrc = ev.cover_image || (ev.images && ev.images.length ? (typeof ev.images[0] === 'string' ? ev.images[0] : ev.images[0].url) : null);
+
+      // Calculate days until event
+      let daysUntil = '';
+      if (!isPast && ev.date) {
+        const diff = Math.ceil((new Date(ev.date) - new Date()) / (1000 * 60 * 60 * 24));
+        if (diff > 0) daysUntil = diff === 1 ? t['ev-starts-tomorrow'] : t['ev-starts-in'].replace('{n}', diff);
+        else if (diff === 0) daysUntil = t['ev-happening-today'];
+      }
+
+      if (!isPast) {
+        // FEATURED upcoming event card
+        const coverImg = coverSrc ? `
+          <div class="lg:w-2/5 relative overflow-hidden rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none min-h-[200px] lg:min-h-[300px]">
+            <img src="${coverSrc}" alt="${evTitle}" class="w-full h-full object-cover absolute inset-0">
+            <div class="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-black/50 to-transparent"></div>
+            ${daysUntil ? `<div class="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gold text-deep-ink text-xs font-bold shadow-elevated"><span class="w-1.5 h-1.5 rounded-full bg-deep-ink/60 animate-pulse"></span>${daysUntil}</div>` : ''}
+          </div>` : '';
+        return `
+          <div class="bg-white rounded-2xl shadow-floating border border-gold/30 flex flex-col lg:flex-row overflow-hidden hover:shadow-[0_4px_8px_rgba(203,161,75,0.1),0_16px_32px_rgba(203,161,75,0.15)] transition-shadow duration-300">
+            ${coverImg}
+            <div class="lg:w-3/5 p-8 lg:p-10 flex flex-col justify-center">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                ${ev.date ? `<span class="text-sm font-medium text-navy/50">${formatEventDate(ev)}</span>` : ''}
+              </div>
+              <h3 class="text-xl lg:text-2xl font-bold text-navy heading-tight mb-3">${evTitle}</h3>
+              ${evDesc ? `<p class="text-sm text-navy/65 body-relaxed mb-6">${evDesc.length > 200 ? evDesc.slice(0, 200) + '...' : evDesc}</p>` : ''}
+              <div class="flex items-center gap-3 text-xs text-navy/40 mb-6">
+                ${ev.location ? `<span>\u{1F4CD} ${ev.location}</span>` : ''}
+                ${ev.capacity ? `<span class="inline-flex items-center gap-1 text-gold font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span>${ev.capacity} ${t['ev-spots-left'] || 'spots remaining'}</span>` : ''}
+              </div>
+              ${ev.video_url ? `<a href="${ev.video_url}" target="_blank" rel="noopener" class="mb-4 inline-flex items-center gap-2 px-3 py-2 bg-red-50 rounded-lg hover:bg-red-100 transition-colors duration-150 group w-fit">
+                <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                <span class="text-xs font-medium text-red-600 group-hover:text-red-700">${t['ev-watch-video'] || 'Watch Video'}</span>
+              </a>` : ''}
+              <div class="flex gap-3">
+                <button onclick="openRegModal('${ev.id}', '${evTitle.replace(/'/g,"\\\\'")}', '${ev.date||''}', '${ev.location||''}')"
+                  class="px-8 py-3.5 bg-gold text-deep-ink text-sm font-bold rounded-xl hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-elevated">
+                  ${t['ev-register']} \u2192
+                </button>
+                <a href="/event.html?id=${ev.id}" class="px-5 py-3.5 text-sm font-medium text-navy/60 hover:text-navy transition-colors duration-150 brand-focus">
+                  ${t['ev-view-details']}
+                </a>
+              </div>
+            </div>
+          </div>`;
+      }
+
+      // PAST event card (compact)
       const coverImg = coverSrc ? `
           <div class="relative -mx-6 -mt-6 mb-4 overflow-hidden rounded-t-2xl">
             <img src="${coverSrc}" alt="${evTitle}" class="w-full h-48 object-cover" onerror="this.parentNode.remove()">
@@ -650,17 +763,11 @@
             <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
             <span class="text-xs font-medium text-red-600 group-hover:text-red-700">${t['ev-watch-video'] || 'Watch Video'}</span>
           </a>` : ''}
-          <div class="mt-${ev.video_url ? '3' : '5'} flex gap-2">
-            <a href="/event.html?id=${ev.id}"
-              class="flex-1 flex items-center justify-center px-4 py-2.5 border border-navy/20 text-navy text-sm font-medium rounded-xl hover:bg-warm-gray active:scale-[0.97] transition-transform duration-200 brand-focus">
-              ${t['ev-view-details']}
+          <div class="mt-4 flex items-center justify-between">
+            <a href="/event.html?id=${ev.id}" class="text-sm font-medium text-gold hover:text-gold/80 transition-colors duration-150 brand-focus">
+              ${t['ev-view-details']} \u2192
             </a>
-            ${isPast ? `<span class="flex-1 flex items-center justify-center px-4 py-2.5 bg-navy/5 text-navy/40 text-sm font-medium rounded-xl">
-              ${t['ev-reg-closed']}
-            </span>` : `<button onclick="openRegModal('${ev.id}', '${evTitle.replace(/'/g,"\\\\'")}', '${ev.date||''}', '${ev.location||''}')"
-              class="flex-1 px-4 py-2.5 bg-navy text-white text-sm font-semibold rounded-xl hover:bg-navy-light active:scale-[0.97] transition-transform duration-200 brand-focus">
-              ${t['ev-register']}
-            </button>`}
+            <span class="text-xs text-navy/30 font-medium">${t['ev-reg-closed']}</span>
           </div>
         </div>`;
     }
@@ -681,9 +788,8 @@
       const upGrid = document.getElementById('upcoming-events-grid');
       if (upcoming.length) {
         upSection.classList.remove('hidden');
-        if (upcoming.length === 1) {
-          upGrid.className = 'grid grid-cols-1 max-w-lg gap-6';
-        }
+        // Featured layout for upcoming events
+        upGrid.className = 'space-y-6';
         upGrid.innerHTML = upcoming.map(ev => buildCardHTML(ev, false)).join('');
       }
 
@@ -691,12 +797,30 @@
       const pastGrid = document.getElementById('past-events-grid');
       if (past.length) {
         pastSection.classList.remove('hidden');
+        // Past events collapsed by default
+        pastGrid.classList.add('hidden');
         pastGrid.innerHTML = past.map(ev => buildCardHTML(ev, true)).join('');
       }
 
       if (!upcoming.length && !past.length) {
         const t = TRANS[currentLang] || TRANS.en;
         if (loadingEl) { loadingEl.textContent = t['ev-no-events']; loadingEl.classList.remove('hidden'); }
+      }
+    }
+
+    function togglePastEvents() {
+      const grid = document.getElementById('past-events-grid');
+      const icon = document.getElementById('past-toggle-icon');
+      const btn = document.getElementById('past-toggle-btn');
+      const t = TRANS[currentLang] || TRANS.en;
+      if (grid.classList.contains('hidden')) {
+        grid.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+        btn.querySelector('[data-i18n="ev-show-past"]').textContent = t['ev-hide-past'] || 'Hide past events';
+      } else {
+        grid.classList.add('hidden');
+        icon.style.transform = '';
+        btn.querySelector('[data-i18n="ev-show-past"]').textContent = t['ev-show-past'] || 'Show past events';
       }
     }
 
@@ -833,6 +957,69 @@
     });
   </script>
 
+  <!-- TESTIMONIALS -->
+  <section class="relative py-20 lg:py-28 bg-white grain-overlay overflow-hidden">
+    <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="text-center mb-14">
+        <span class="text-xs font-medium text-gold tracking-[0.06em] uppercase mb-4 block" data-i18n="testimonials-label">What Attendees Say</span>
+        <h2 class="text-3xl lg:text-[40px] font-bold heading-tight leading-tight" data-i18n="testimonials-h2">Voices from Our <span class="text-gold">Community</span></h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-warm-gray rounded-2xl p-8 border border-navy-tint/20 shadow-elevated">
+          <div class="flex items-center gap-1 mb-4">
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          </div>
+          <p class="text-navy/85 body-relaxed mb-6">"The AI Summer School was an incredible experience. The hands-on workshops with neural networks and practical AI applications gave me skills I immediately applied in my research."</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-navy/10 flex items-center justify-center text-sm font-bold text-navy">AH</div>
+            <div>
+              <p class="text-sm font-semibold text-navy">Armen Harutyunyan</p>
+              <p class="text-xs text-navy/50">CS Student, Yerevan State University</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-warm-gray rounded-2xl p-8 border border-navy-tint/20 shadow-elevated">
+          <div class="flex items-center gap-1 mb-4">
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          </div>
+          <p class="text-navy/85 body-relaxed mb-6">"AgentPark's Generative AI workshop opened my eyes to practical applications for our business. The quality of speakers and networking opportunities exceeded all expectations."</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-navy/10 flex items-center justify-center text-sm font-bold text-navy">LM</div>
+            <div>
+              <p class="text-sm font-semibold text-navy">Lilit Mkrtchyan</p>
+              <p class="text-xs text-navy/50">Product Manager, Tech Startup</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-warm-gray rounded-2xl p-8 border border-navy-tint/20 shadow-elevated">
+          <div class="flex items-center gap-1 mb-4">
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          </div>
+          <p class="text-navy/85 body-relaxed mb-6">"As an investor, I'm impressed by the quality of the AI ecosystem AgentPark is building. The FIREBIRD Factory event showcased Armenia's real potential in AI innovation."</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-navy/10 flex items-center justify-center text-sm font-bold text-navy">DG</div>
+            <div>
+              <p class="text-sm font-semibold text-navy">David Grigoryan</p>
+              <p class="text-xs text-navy/50">Angel Investor, Diaspora Network</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- MISSION STATEMENT BANNER -->
   <section id="mission" class="relative py-20 lg:py-28 bg-navy grain-overlay overflow-hidden">
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(203,161,75,0.1),transparent_60%)]"></div>
@@ -845,6 +1032,12 @@
         <span class="text-sm font-medium text-gold tracking-[0.06em] uppercase" data-i18n="mission-label">Our Mission</span>
         <div class="w-8 h-px bg-gold/40"></div>
       </div>
+      <div class="mt-8">
+        <a href="#community" class="inline-flex items-center gap-2 px-6 py-3 bg-gold text-deep-ink font-semibold text-sm rounded-lg hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-elevated">
+          <span data-i18n="mission-cta">Be Part of This Mission</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+      </div>
     </div>
   </section>
 
@@ -856,17 +1049,21 @@
         <h2 class="text-3xl lg:text-[40px] font-bold heading-tight leading-tight mb-6" data-i18n="contact-h2">
           Ready to Shape Armenia's <span class="text-gold">AI Future</span>?
         </h2>
-        <p class="text-lg text-navy/70 body-relaxed mb-10" data-i18n="contact-desc">
+        <p class="text-lg text-navy/70 body-relaxed" data-i18n="contact-desc">
           Whether you're a startup founder, investor, researcher, or creative professional — there's a place for you at AgentPark.
         </p>
+        <div class="flex items-center justify-center gap-2 text-sm text-navy/50 mb-8">
+          <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span data-i18n="contact-response">We respond within 24 hours</span>
+        </div>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <button onclick="openContactModal()" class="inline-flex items-center justify-center px-8 py-4 bg-gold text-deep-ink font-semibold text-base rounded-lg hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-floating">
-            <span data-i18n="contact-cta1">Contact Us</span>
+            <span data-i18n="contact-cta1">Tell Us About Your Project</span>
             <svg class="w-5 h-5 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
           </button>
-          <a href="#about" class="inline-flex items-center justify-center px-8 py-4 border-2 border-gold text-navy font-semibold text-base rounded-lg hover:bg-gold-tint active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus" data-i18n="contact-cta2">
-            Learn More
+          <a href="#community" class="inline-flex items-center justify-center px-8 py-4 border-2 border-gold text-navy font-semibold text-base rounded-lg hover:bg-gold-tint active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus" data-i18n="contact-cta2">
+            Browse All Events
           </a>
         </div>
       </div>
@@ -942,6 +1139,7 @@
           <ul class="space-y-3">
             <li><a href="#about" class="text-sm text-navy-tint/60 hover:text-gold transition-opacity duration-200 brand-focus" data-i18n="nav-about">About</a></li>
             <li><a href="#pillars" class="text-sm text-navy-tint/60 hover:text-gold transition-opacity duration-200 brand-focus" data-i18n="nav-pillars">What We Do</a></li>
+            <li><a href="#partners" class="text-sm text-navy-tint/60 hover:text-gold transition-opacity duration-200 brand-focus" data-i18n="nav-partners">Partners</a></li>
             <li><a href="#community" class="text-sm text-navy-tint/60 hover:text-gold transition-opacity duration-200 brand-focus" data-i18n="footer-community">Community & Events</a></li>
           </ul>
         </div>
@@ -952,6 +1150,17 @@
           <ul class="space-y-3">
             <li class="text-sm text-navy-tint/60" data-i18n="footer-location">Yerevan, Armenia</li>
             <li><a href="mailto:info@agentpark.am" class="text-sm text-navy-tint/60 hover:text-gold transition-opacity duration-200 brand-focus">info@agentpark.am</a></li>
+            <li class="flex items-center gap-3 pt-2">
+              <a href="https://www.linkedin.com/company/agentpark" target="_blank" rel="noopener" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center hover:bg-gold/20 transition-colors duration-150 brand-focus" aria-label="LinkedIn">
+                <svg class="w-4 h-4 text-navy-tint/60" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              </a>
+              <a href="https://www.facebook.com/agentpark.am" target="_blank" rel="noopener" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center hover:bg-gold/20 transition-colors duration-150 brand-focus" aria-label="Facebook">
+                <svg class="w-4 h-4 text-navy-tint/60" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              </a>
+              <a href="https://t.me/agentpark" target="_blank" rel="noopener" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center hover:bg-gold/20 transition-colors duration-150 brand-focus" aria-label="Telegram">
+                <svg class="w-4 h-4 text-navy-tint/60" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+              </a>
+            </li>
           </ul>
         </div>
       </div>
@@ -982,19 +1191,21 @@
     var TRANS = {
       en: {
         // Nav
-        'nav-about': 'About', 'nav-pillars': 'What We Do',
-        'nav-community': 'Community & Events', 'nav-mission': 'Mission', 'nav-cta': 'Get in Touch',
+        'nav-about': 'About', 'nav-pillars': 'What We Do', 'nav-partners': 'Partners',
+        'nav-community': 'Community & Events', 'nav-mission': 'Mission', 'nav-cta': 'Join Our Events',
         // Hero
         'hero-badge': 'Yerevan, Armenia',
         'hero-h1': 'Armenia\'s Next Frontier in\n            <span class="text-gold">Artificial Intelligence</span>',
-        'hero-sub': 'AgentPark is the beating heart of Armenia\'s AI ecosystem — a future-focused hub that brings together innovation, entrepreneurship, and education to launch AI-native ventures into global markets.',
-        'hero-cta1': 'Discover AgentPark', 'hero-cta2': 'Partner with Us',
+        'hero-sub': 'Armenia\'s AI innovation hub — connecting startups, talent, and investors to build the next generation of AI companies.',
+        'hero-cta1': 'Explore Upcoming Events', 'hero-cta2': 'See What We Do',
+        'hero-stats-attendees': '500+ attendees', 'hero-stats-events': '6 events hosted', 'hero-stats-partners': '3 university partnerships',
+        'partners-label': 'Trusted Partners & Collaborators',
         'hero-img-label': 'Yerevan AI Park', 'hero-img-sub': 'Armenia\'s Premier AI Innovation Hub',
         // About
         'about-label': 'About AgentPark',
         'about-h2': 'Where Startups Scale, Communities Connect, and Ideas Become\n            <span class="text-gold">Impact</span>',
-        'about-p1': 'The Yerevan AgentPark is set to become the beating heart of Armenia\'s growing AI ecosystem — a future-focused hub that brings together innovation, entrepreneurship, and education.',
-        'about-p2': 'The AgentPark team is composed of experienced professionals who have been actively involved in the development of Armenia\'s technological ecosystem, including work on the creation of high-tech clusters within the USAID CAPS program.',
+        'about-p1': 'AgentPark is where Armenia\'s AI future takes shape — a hub built to launch startups, grow talent, and attract global investment to Yerevan.',
+        'about-p2': 'Our team has built Armenia\'s tech ecosystem from the ground up — from USAID-backed high-tech clusters to university partnerships and international accelerator programs.',
         'about-launch-year': 'Launch Year',
         // NVIDIA
         'nvidia-label': 'Powered by Global Momentum',
@@ -1002,9 +1213,10 @@
         'nvidia-desc': 'A major milestone in Armenia\'s technological rise — the 2026 launch of NVIDIA\'s AI factory will serve as a transformative boost to the entire ecosystem.',
         'nvidia-banner-label': 'Launching 2026',
         'nvidia-banner-title': 'World-class AI computing infrastructure, right in Yerevan.',
-        'nvidia-c1-title': 'International Attention', 'nvidia-c1-desc': 'Attracting global focus and positioning Yerevan as a premier regional technology hub.',
-        'nvidia-c2-title': 'High-Performance Computing', 'nvidia-c2-desc': 'Injecting world-class computing capacity to power the next generation of AI ventures.',
-        'nvidia-c3-title': 'Regional Tech Hub', 'nvidia-c3-desc': 'Strengthening Armenia\'s position on the global technology map through strategic infrastructure.',
+        'nvidia-c1-title': 'Համաշխարհային ներդրումների մագնիտ', 'nvidia-c1-desc': 'Միջազգային ներդրումային ընկերություններ և տեխնոլոգիական հսկաներ գրավելով Երևան:',
+        'nvidia-c2-title': '100+ TFLOPS Compute Power', 'nvidia-c2-desc': 'Դասարանական կարգի GPU կլաստերներ տեղական ստարտապների և հետազոտողների համար:',
+        'nvidia-c3-title': 'Կովկասյան AI մայրաքաղաք', 'nvidia-c3-desc': 'Տարածաշրջանում միակ NVIDIA-ի հետ գործընկերող AI գործարան — Հայաստանը դարձնելով Կովկասի և Կենտրոնական Ասիայի AI զարգացման թիվ 1 ուղղություն:',
+        'nvidia-cta': 'Get Early Access to AI Computing Resources',
         // Pillars
         'pillars-label': 'What We Do',
         'pillars-h2': 'Building the Future of <span class="text-gold">AI in Armenia</span>',
@@ -1018,22 +1230,27 @@
         'comm-f1-title': 'Community Space', 'comm-f1-desc': 'Inviting local residents and students to participate in AI-related events and educational programs, bridging the gap between professionals and young enthusiasts.',
         'comm-f2-title': 'International Conferences & Hackathons', 'comm-f2-desc': 'Regular events bringing together leading minds from Armenia and abroad, sparking new ideas, partnerships, and research.',
         'comm-f3-title': 'Mentorship & Learning', 'comm-f3-desc': 'Fostering a culture of mentorship and mutual learning between seasoned professionals and the next generation of AI talent.',
-        'events-h2': 'Events at AgentPark', 'events-upcoming-label': 'Upcoming Events', 'events-past-label': 'Past Events',
+        'events-h2': 'Join Our Next Event', 'events-upcoming-label': 'Upcoming Events', 'events-past-label': 'Past Events',
         // Mission
         'mission-quote': '"To accelerate the development and global reach of AI-driven companies by providing world-class infrastructure, mentorship, and strategic capital."',
         'mission-label': 'Our Mission',
+        'mission-cta': 'Be Part of This Mission',
+        // Testimonials
+        'testimonials-label': 'What Attendees Say',
+        'testimonials-h2': 'Voices from Our <span class="text-gold">Community</span>',
         // Contact
         'contact-label': 'Get Involved',
         'contact-h2': 'Ready to Shape Armenia\'s <span class="text-gold">AI Future</span>?',
         'contact-desc': 'Whether you\'re a startup founder, investor, researcher, or creative professional — there\'s a place for you at AgentPark.',
-        'contact-cta1': 'Contact Us', 'contact-cta2': 'Learn More',
+        'contact-cta1': 'Tell Us About Your Project', 'contact-cta2': 'Browse All Events',
+        'contact-response': 'We respond within 24 hours',
         // Footer
         'footer-desc': 'Connecting, growing, and launching AI-native ventures into global markets.',
         'footer-links-heading': 'Quick Links', 'footer-community': 'Community & Events',
         'footer-contact-heading': 'Contact', 'footer-location': 'Yerevan, Armenia',
         'footer-copy': '© 2026 AgentPark Ltd. All rights reserved.',
         // Events UI
-        'ev-more': 'more', 'ev-spots': 'spots',
+        'ev-more': 'more', 'ev-spots': 'spots', 'ev-spots-left': 'spots remaining',
         'ev-view-details': 'View Details',
         'ev-register': 'Register',
         'ev-loading': 'Loading events...',
@@ -1041,6 +1258,11 @@
         'ev-watch-video': 'Watch Video',
         'ev-no-events': 'No upcoming events at the moment. Check back soon.',
         'ev-error': 'Could not load events.',
+        'ev-show-past': 'Show past events',
+        'ev-hide-past': 'Hide past events',
+        'ev-starts-tomorrow': 'Starts tomorrow',
+        'ev-starts-in': 'Starts in {n} days',
+        'ev-happening-today': 'Happening today!',
         // Modal
         'modal-register-label': 'Register',
         'modal-full-name': 'Full Name *',
@@ -1069,71 +1291,80 @@
 
     // Armenian translations
     TRANS.am = {
-      'nav-about': 'Մասին',
+      'nav-about': 'Մեր մասին',
       'nav-pillars': 'Գործունեություն',
+      'nav-partners': 'Գործընկերներ',
       'nav-community': 'Միջոցառումներ',
       'nav-mission': 'Առաքելություն',
-      'nav-cta': 'Կապ հաստատել',
-      'hero-badge': 'Երեվան, հայաստան',
+      'nav-cta': 'Միացեք միջոցառումներին',
+      'hero-badge': 'Երևան, Հայաստան',
       'hero-h1': 'Հայաստանի առաջադար հարթակ <span class="text-gold">AI-ի նորարարության կենտրոն</span>',
-      'hero-sub': 'AgentPark-ը հայաստանի AI համակարգի սիրտն ե — ապագային հարթակ, վոր հավակում ե նորարարությունը, լիդերությունը ևվ կրթությունըՠ AI-ի կենտրոնները համաշխարհային շուկաներ լարկելու համար:',
-      'hero-cta1': 'Բացահայտել AgentPark-ը',
-      'hero-cta2': 'Գործակից դառնալ',
-      'hero-img-label': 'Երեվանի AI պարկ',
+      'hero-sub': 'Հայաստանի AI նորարարության կենտրոն — կապակցնելով ստարտապներին, տաղանդներին և ներդրողներին:',
+      'hero-cta1': 'Տեսեք առաջիկա միջոցառումները',
+      'hero-cta2': 'Ինչ ենք անում',
+      'hero-stats-attendees': '500+ մասնակից',
+      'hero-stats-events': '6 միջոցառում',
+      'hero-stats-partners': '3 համալսարանական գործընկեր',
+      'partners-label': 'Վստահելի գործընկերներ և համագործակիցներ',
+      'hero-img-label': 'Երևանի AI պարկ',
       'hero-img-sub': 'Հայաստանի AI նորարարության կենտրոն',
       'about-label': 'AgentPark-ի մասին',
-      'about-h2': 'Որտեղ Startap-ները զարգանում են համայնկները կապ են կանում գաղափառները դառնում են <span class="text-gold">իրականություն</span>',
-      'about-p1': 'Երեվանի AgentPark-ը կենտրոնն ե հայաստանի AI համակարգի — ապագային հարթակ, վոր հավակում ե նորարարությունը, լիդերությունը ևվ կրթությունը:',
-      'about-p2': 'AgentPark-ի թիմը բաղկացված ե փորխառության ունեցող մասնագետներից, ովկեր ակտիվորևն հայաստանի տեխնոլոգիական զարգացման գործին, USAID CAPS ծրագիրի շրլանակներում:',
+      'about-h2': 'Որտեղ ստարտապները զարգանում են, համայնքները կապ են կանում, գաղափառները դառնում են <span class="text-gold">իրականություն</span>',
+      'about-p1': 'AgentPark-ը Հայաստանի AI ապագայի կենտրոնն է — ստարտապներ գործարկելու, տաղանդներ զարգացնելու և Հայաստանին համաշխարհային ներդրումներ գրավելու համար:',
+      'about-p2': 'Մեր թիմը զրոյից կառուցել է Հայաստանի տեխնոլոգիական համակարգը — USAID-ի կողմից տեխնոլոգիական կլաստերներից մինչև համալսարանական գործընկերություններ և միջազգային արագացման ծրագրեր:',
       'about-launch-year': 'Հիմնադրման տարի',
       'nvidia-label': 'Համաշխարհային զարկացությամբ',
       'nvidia-h2': 'NVIDIA-ի վրա հիմնված <span class="text-gold">AI գործարան</span>',
-      'nvidia-desc': '2026-ի NVIDIA AI գործարանի գործարկումը կկդառնա ամբոլի համակարգի հզայլիչ խթիր — հայաստանի տեխնոլոգիական բոլոր բնագավառի կարևոր կետք:',
+      'nvidia-desc': '2026-ի NVIDIA AI գործարանի գործարկումը կդառնա ամբողջ համակարգի հզոր խթիր — Հայաստանի տեխնոլոգիական բոլոր բնագավառի կարևոր կետ:',
       'nvidia-banner-label': '2026-ին գործարկվում',
-      'nvidia-banner-title': 'Համաշխարհային AI հաշվոգային կառուցվածություն — երեվանում:',
-      'nvidia-c1-title': 'Միջազգային ուժադրություն',
-      'nvidia-c1-desc': 'Համաշխարհային ուժադրությանը գրավելով երեվանին դիրկում օրպես տարածաշրլկային տեխնոլոգիական կենտրոն:',
-      'nvidia-c2-title': 'Բարձռ կավարակություն',
-      'nvidia-c2-desc': 'Համաշխարհային կարգի AI կավարակությանը լավլագոծել AI կենտրոնների հաջորդ սերնդին:',
-      'nvidia-c3-title': 'Տարածաշրլկային Tech կենտրոն',
-      'nvidia-c3-desc': 'Հայաստանի դիրկորությունը համաշխարհային տեխնոլոգիական կառլին վրա ամրապնդում:',
-      'pillars-label': 'Մեր կառլկները',
-      'pillars-h2': 'Կառուցնել հայաստանում <span class="text-gold">AI-ի ապականը</span>',
+      'nvidia-banner-title': 'Համաշխարհային AI հաշվոգային կառուցվածություն — Երևանում:',
+      'nvidia-c1-title': 'Միջազգային ուշադրություն',
+      'nvidia-c1-desc': 'Համաշխարհային ուշադրությանը գրավելով Երևանին դիրքում օրպես տարածաշրջանային տեխնոլոգիական կենտրոն:',
+      'nvidia-c2-title': '100+ TFLOPS հաշվոգական հզորություն',
+      'nvidia-c2-desc': 'Համաշխարհային կարգի AI կարողությունները լավլագոցելու AI կենտրոնների հաջորդ սերնդին:',
+      'nvidia-c3-title': 'Տարածաշրջանային Tech կենտրոն',
+      'nvidia-c3-desc': 'Հայաստանի դիրքորությունը համաշխարհային տեխնոլոգիական քարտեզին վրա ամրապնդում:',
+      'nvidia-cta': 'Ստանալ վաղ հասանելիություն AI հաշվոգական ռեսուրսներին',
+      'pillars-label': 'Մեր ուղղությունները',
+      'pillars-h2': 'Կառուցնել Հայաստանում <span class="text-gold">AI-ի ապագան</span>',
       'p1-title': 'Նորարարության հարթակ',
-      'p1-desc': 'AgentPark-ը գործում ե իրևնորբևն AI արագացուցիչ ևվ ինկուբատոր, խթիրաբանությամբ ստարտապներ տեխնիկական, բիզնեսի զարգացման ևվ խորհրդակցության բնագավառում:',
-      'p2-title': 'Գիտելիքի ևվ տալանտի գրավիչ',
-      'p2-desc': 'Հայաստանի առաջատար բուհերի հետ ամուր կապերով: Պարկը իր առաջին AI ամառային դպրոցն անցկացրել հիլիս 2025-ին:',
-      'p3-title': 'Բխբազգային հարթակ',
-      'p3-desc': 'Կամուրլժնել կապեր բխբազգային օլորտների միջևվ — արոգլիչ հաբակագիտություն, գյուլատնեսություն ևվ դիզայն բնագավառում:',
-      'p4-title': 'Մշակութային ևվ ստեգագործական հանգուկ',
-      'p4-desc': 'Ավելին քոչ տեխ կենտրոն — արվեստի ևվ դիզայնի հարթակ, որտեղ ստեգագործ մտկերը համագործակցում են տեխնիկական փորխագետների հետ:',
-      'comm-label': 'Համայնկ ևվ արժադրություններ',
-      'comm-h2': 'Համաշխարհային արժադրություններ, <span class="text-gold">տեգական ազդեկություն</span>',
-      'comm-f1-title': 'Համայնկային տարած',
-      'comm-f1-desc': 'Հրավիրում ենք տեղակիչ բնակիչներին ևվ ուսանողներին մասնակցել AI-ին կապված արժադրություններին:',
-      'comm-f2-title': 'Միջազգային կոնֆերանսներ ևվ հակաթոններ',
-      'comm-f2-desc': 'Կանոնավոր արժադրություններ, հավակելով հայաստանից ևվ արտասերծից արիչագույն մտկեր:',
-      'comm-f3-title': 'Մենտորություն ևվ ուսուցում',
-      'comm-f3-desc': 'Փորխարելով մենտորության ևվ արդյունաբեր ուսուցումի միլիև փորխագետների ևվ AI-ի նոր սերնդի միլիև:',
-      'events-label': 'Առժժալիկ արժադրություններ',
-      'events-h2': 'Արժադրություններ AgentPark-ում',
+      'p1-desc': 'AgentPark-ը գործում է իրևնորբևն AI արագացուցիչ և ինկուբատոր, խթիրաբանությամբ ստարտապներ տեխնիկական, բիզնեսի զարգացման և խորհրդակցության բնագավառում:',
+      'p2-title': 'Գիտելիքի և տաղանդի գրավիչ',
+      'p2-desc': 'Հայաստանի առաջատար բուհերի հետ ամուր կապերով: Պարկը իր առաջին AI ամառային դպրոցն անցկացրել հուլիս 2025-ին:',
+      'p3-title': 'Միջազգային հարթակ',
+      'p3-desc': 'Կամուրջնել կապեր միջազգային ոլորտների միջև — առողջապահություն, գյուղատնտեսություն և դիզայն բնագավառում:',
+      'p4-title': 'Մշակութային և ստեղծագործական հանգույց',
+      'p4-desc': 'Ավելին քան տեխ կենտրոն — արվեստի և դիզայնի հարթակ, որտեղ ստեղծագործ մտքերը համագործակցում են տեխնիկական փորձագետների հետ:',
+      'comm-label': 'Համայնք և միջոցառումներ',
+      'comm-h2': 'Համաշխարհային միջոցառումներ, <span class="text-gold">տեղական ազդեցություն</span>',
+      'comm-f1-title': 'Համայնքային տարածում',
+      'comm-f1-desc': 'Հրավիրում ենք տեղացի բնակիցներին և ուսանողներին մասնակցել AI-ին կապված միջոցառումներին:',
+      'comm-f2-title': 'Միջազգային կոնֆերանսներ և հակաթոններ',
+      'comm-f2-desc': 'Կանոնավոր միջոցառումներ, հավաքելով Հայաստանից և արտասահմանից ամենապայծառ մտքեր:',
+      'comm-f3-title': 'Մենտորություն և ուսուցում',
+      'comm-f3-desc': 'Փորձարելով մենտորության և արդյունաբեր ուսուցման միջև փորձագետների և AI-ի նոր սերնդի միջև:',
+      'events-label': 'Առաջիկա միջոցառումներ',
+      'events-h2': 'Միջոցառումներ AgentPark-ում',
       'events-upcoming-label': 'Առաջիկա միջոցառումներ',
       'events-past-label': 'Անցյալ միջոցառումներ',
-      'mission-quote': '«Արագացնել AI-ի վրա հիմնված կերպակների զարգացումը ևվ համաշխարհային հասանելիությունը ամրապնդելով, աջբոբանությամբ համաշխարհային կառուցվածություն, մենտորություն ևվ ռատմավարական կապիտալալ:»',
+      'mission-quote': '«Արագացնել AI-ի վրա հիմնված ընկերությունների զարգացումը և համաշխարհային հասանելիությունը ամրապնդելով, աջակցելով համաշխարհային կառուցվածք, մենտորություն և ռազմավարական կապիտալ:»',
       'mission-label': 'Մեր առաքելությունը',
-      'contact-label': 'Անդլնալ',
-      'contact-h2': 'Պատրաստ եկ ակտիվ լինել հայաստանի <span class="text-gold">AI ապականին</span>?',
-      'contact-desc': 'Լինեք ստարտապ հիմնադիր, ներդրող, հետազոտող ևվ ստեգագործ մասնագետ — AgentPark-ում դեզ համար տեղ կա:',
-      'contact-cta1': 'Կապ հաստատել',
+      'mission-cta': 'Միացեք այս առաքելությանը',
+      'contact-label': 'Միացեք մեզ',
+      'contact-h2': 'Պատրաստ եք ակտիվ լինել Հայաստանի <span class="text-gold">AI ապագանին</span>?',
+      'contact-desc': 'Լինեք ստարտապ հիմնադիր, ներդրող, հետազոտող և ստեղծագործ մասնագետ — AgentPark-ում ձեզ համար տեղ կա:',
+      'contact-cta1': 'Պատմեք ձեր նախագծի մասին',
       'contact-cta2': 'Ավելին իմանալ',
+      'contact-response': 'Պատասխանում ենք 24 ժամի ընթացքում',
       'footer-desc': 'Կապակցնելով, զարգացնելով և AI նորարարությունները համաշխարհային շուկաներ մուտքագրելով:',
-      'footer-links-heading': 'Արագ հլումներ',
-      'footer-community': 'Համայնկ ևվ արժադրություններ',
+      'footer-links-heading': 'Արագ հղումներ',
+      'footer-community': 'Համայնք և միջոցառումներ',
       'footer-contact-heading': 'Կապ',
-      'footer-location': 'Երեվան, հայաստան',
-      'footer-copy': '© 2026 AgentPark Ltd. Բոլոր իրավունկները պահպանված են:',
-      // Events UI
-      'ev-more': 'ավելին', 'ev-spots': 'տեղ',
+      'footer-location': 'Երևան, Հայաստան',
+      'footer-copy': '© 2026 AgentPark Ltd. Բոլոր իրավունքները պահպանված են:',
+      'ev-more': 'ավելին',
+      'ev-spots': 'տեղ',
+      'ev-spots-left': 'տեղ մնացել',
       'ev-view-details': 'Դիտել մանրամասները',
       'ev-register': 'Գրանցվել',
       'ev-loading': 'Բեռնվում են միջոցառումները...',
@@ -1141,7 +1372,11 @@
       'ev-watch-video': 'Դիտել տեսանյութը',
       'ev-no-events': 'Առայժմ մոտ ապագայի միջոցառումներ չկան:',
       'ev-error': 'Հնարավոր չէ բեռնել միջոցառումները:',
-      // Modal
+      'ev-show-past': 'Ցույց տալ անցյալ միջոցառումները',
+      'ev-hide-past': 'Թաքցնել անցյալ միջոցառումները',
+      'ev-starts-tomorrow': 'Սկսվում է վաղը',
+      'ev-starts-in': 'Սկսվում է {n} օրից',
+      'ev-happening-today': 'Այսօր է!',
       'modal-register-label': 'Գրանցվել',
       'modal-full-name': 'Անուն ազգանուն *',
       'modal-name-placeholder': 'Ձեր անունը',
@@ -1149,7 +1384,6 @@
       'modal-email-placeholder': 'your@email.com',
       'modal-confirm': 'Հաստատել գրանցումը',
       'modal-success': 'Դուք գրանցված եք։ Հանդիպենք այնտեղ:',
-      // Contact modal
       'cm-title': 'Կապ հաստատել',
       'cm-subtitle': 'Մենք կպատասխանենք 24 ժամի ընթացքում:',
       'cm-sent': 'Հաղորդագրությունը ուղարկվել է!',
@@ -1159,10 +1393,13 @@
       'cm-email-label': 'Էլ. հասցե',
       'cm-email-ph': 'email@example.com',
       'cm-msg-label': 'Հաղորդագրություն',
-      'cm-msg-ph': 'Պատմեցեք ձեր ստարտապի, գաղափարի կամ համագործակցության մասին...',
+      'cm-msg-ph': 'Պատմեցեք ձեր ստարտապի, գաղափառի կամ համագործակցության մասին...',
       'cm-send': 'Ուղարկել',
       'cm-sending': 'Ուղարկվում է...',
       'cm-error': 'Ինչ-որ սխալ տեղի ունեցավ: Խնդրեմ կրկին փորձեք:',
+      'testimonials-label': 'Ինչ ասում են մասնակիցները',
+      'testimonials-h2': 'Մեր <span class="text-gold">համայնքի</span> ձայները',
+      'mobile-cta': 'Գրանցվեք հաջորդ միջոցառմանին'
     };
 
     function setLang(lang) {
@@ -1229,6 +1466,28 @@
     (function() {
       const saved = localStorage.getItem('agentpark-lang') || 'en';
       setLang(saved);
+    })();
+  </script>
+
+  <!-- Sticky Mobile CTA Bar -->
+  <div id="mobile-sticky-cta" class="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white/95 backdrop-blur-sm border-t border-navy-tint/30 px-4 py-3 shadow-floating">
+    <a href="#community" class="flex items-center justify-center gap-2 w-full px-6 py-3 bg-gold text-deep-ink font-semibold text-sm rounded-xl hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease shadow-elevated">
+      <span data-i18n="mobile-cta">Register for Next Event</span>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+    </a>
+  </div>
+
+  <script>
+    // Show sticky mobile CTA after scrolling past hero
+    (function() {
+      const bar = document.getElementById('mobile-sticky-cta');
+      if (!bar) return;
+      let shown = false;
+      window.addEventListener('scroll', function() {
+        const shouldShow = window.scrollY > window.innerHeight * 0.5;
+        if (shouldShow && !shown) { bar.classList.add('visible'); shown = true; }
+        else if (!shouldShow && shown) { bar.classList.remove('visible'); shown = false; }
+      }, { passive: true });
     })();
   </script>
 

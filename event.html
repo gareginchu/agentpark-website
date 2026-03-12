@@ -143,9 +143,9 @@
   <!-- NAV -->
   <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-white/80 border-b border-navy-tint/50">
     <div class="max-w-7xl mx-auto px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16 lg:h-20">
+      <div class="flex items-center justify-between h-20 lg:h-28">
         <a href="/" class="brand-focus flex items-center gap-3">
-          <img src="Brand_assets/AgentPark_logo.png" alt="AgentPark" class="h-10 lg:h-14 w-auto">
+          <img src="Brand_assets/AgentPark_logo.png" alt="AgentPark" class="h-16 lg:h-24 w-auto">
         </a>
         <!-- Desktop nav -->
         <div class="hidden sm:flex items-center gap-4">
@@ -441,6 +441,10 @@
       document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
         btn.classList.toggle('active-lang', btn.dataset.lang === lang);
       });
+      // Re-render event content in new language
+      if (window._currentEvent && typeof renderEvent === 'function') {
+        renderEvent(window._currentEvent);
+      }
     }
 
     (function() {
@@ -485,6 +489,7 @@
         });
         const data = await res.json();
         if (!data.length) { showError(); return; }
+        window._currentEvent = data[0];
         renderEvent(data[0]);
       } catch(e) {
         showError();
@@ -606,7 +611,7 @@
         orgList.innerHTML = ev.organizers.map(org => {
           if (org.logo_url) {
             return `<div class="flex items-center gap-2.5 bg-warm-gray rounded-lg px-3 py-2">
-              <img src="${org.logo_url}" alt="${org.name}" class="h-16 max-w-[140px] w-auto object-contain">
+              <img src="${org.logo_url}" alt="${org.name}" class="h-20 max-w-[200px] w-auto object-contain">
               <span class="text-sm font-medium text-navy">${org.name}</span>
             </div>`;
           }
