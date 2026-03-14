@@ -1032,6 +1032,10 @@
                 <input id="ev-location" type="text" class="admin-input" placeholder="e.g. AgentPark, Yerevan" data-i18n-placeholder="ph-ev-location">
               </div>
               <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-meeting-url">Meeting Link <span class="text-navy/30 normal-case">(Zoom, Google Meet, etc.)</span></label>
+                <input id="ev-meeting-url" type="url" class="admin-input" placeholder="https://zoom.us/j/123456789" data-i18n-placeholder="ph-ev-meeting-url">
+              </div>
+              <div>
                 <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-capacity">Capacity</label>
                 <input id="ev-capacity" type="number" class="admin-input" placeholder="e.g. 100" data-i18n-placeholder="ph-ev-capacity">
               </div>
@@ -2590,6 +2594,7 @@
             start_time: document.getElementById('ev-start-time').value || null,
             end_time: document.getElementById('ev-end-time').value || null,
             location: document.getElementById('ev-location').value || null,
+            meeting_url: document.getElementById('ev-meeting-url').value.trim() || null,
             capacity: parseInt(document.getElementById('ev-capacity').value) || null,
             price: parseInt(document.getElementById('ev-price').value) || 0,
             currency: document.getElementById('ev-currency').value || 'AMD',
@@ -2604,7 +2609,7 @@
             organizers: _organizers.length ? _organizers : null,
           }),
         });
-        ['ev-title','ev-title-am','ev-date','ev-end-date','ev-start-time','ev-end-time','ev-location','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
+        ['ev-title','ev-title-am','ev-date','ev-end-date','ev-start-time','ev-end-time','ev-location','ev-meeting-url','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('ev-currency').value = 'AMD';
         document.getElementById('ev-price-display').value = 'hide';
         document.getElementById('ev-cover-preview').classList.add('hidden');
@@ -2644,6 +2649,7 @@
       document.getElementById('ev-start-time').value = ev.start_time || '';
       document.getElementById('ev-end-time').value = ev.end_time || '';
       document.getElementById('ev-location').value = ev.location || '';
+      document.getElementById('ev-meeting-url').value = ev.meeting_url || '';
       document.getElementById('ev-capacity').value = ev.capacity || '';
       document.getElementById('ev-price').value = ev.price || 0;
       document.getElementById('ev-currency').value = ev.currency || 'AMD';
@@ -2696,6 +2702,7 @@
             start_time: document.getElementById('ev-start-time').value || null,
             end_time: document.getElementById('ev-end-time').value || null,
             location: document.getElementById('ev-location').value || null,
+            meeting_url: document.getElementById('ev-meeting-url').value.trim() || null,
             capacity: parseInt(document.getElementById('ev-capacity').value) || null,
             price: parseInt(document.getElementById('ev-price').value) || 0,
             currency: document.getElementById('ev-currency').value || 'AMD',
@@ -2722,7 +2729,7 @@
 
     function cancelEditEvent() {
       _editingEventId = null;
-      ['ev-title','ev-title-am','ev-date','ev-end-date','ev-start-time','ev-end-time','ev-location','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
+      ['ev-title','ev-title-am','ev-date','ev-end-date','ev-start-time','ev-end-time','ev-location','ev-meeting-url','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('ev-currency').value = 'AMD';
       document.getElementById('ev-cover-preview').classList.add('hidden');
       document.getElementById('ev-images-preview').innerHTML = '';
@@ -2913,6 +2920,8 @@
         'add-new-event': 'Add New Event', 'label-event-title': 'Event Title *',
         'label-date': 'Date', 'label-location': 'Location', 'label-capacity': 'Capacity',
         'label-start-date': 'Start Date', 'label-end-date': 'End Date <span class="text-navy/30 normal-case">(for multi-day events)</span>',
+        'label-meeting-url': 'Meeting Link <span class="text-navy/30 normal-case">(Zoom, Google Meet, etc.)</span>',
+        'ph-ev-meeting-url': 'https://zoom.us/j/123456789',
         'label-price': 'Price', 'label-currency': 'Currency', 'label-price-display': 'Price Display',
         'price-hide': 'Hide price (free events)', 'price-show': 'Show price on cards', 'price-contact': 'Show "Contact us for pricing"',
         'email-label': 'Email',
@@ -3077,6 +3086,8 @@
         // Events
         'add-new-event': 'Ավելացնել նոր միջոցառում', 'label-event-title': 'Միջոցառումի վերնագիր *',
         'label-date': 'Ամսաթիվ', 'label-location': 'Վայրը', 'label-capacity': 'Տարողունակություն',
+        'label-meeting-url': 'Հանդիպման հղում <span class="text-navy/30 normal-case">(Zoom, Google Meet և այլն)</span>',
+        'ph-ev-meeting-url': 'https://zoom.us/j/123456789',
         'label-price': 'Գին', 'label-currency': 'Արժույթ', 'label-price-display': 'Գնի ցուցադրում',
         'ph-ev-price': 'օր. 5000', 'ev-free-badge': 'Անվճար',
         'price-hide': 'Թաքցնել գինը (անվճար միջոցառումներ)', 'price-show': 'Ցույց տալ գինը քարտերին', 'price-contact': 'Ցույց տալ "Կապվել մեզ գների համար"',

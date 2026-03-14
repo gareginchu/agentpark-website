@@ -44,13 +44,13 @@ serve(async (req) => {
 
     const { data: event } = await supabase
       .from("events")
-      .select("title, title_am, date, end_date, location")
+      .select("title, title_am, date, end_date, start_time, end_time, location, meeting_url")
       .eq("id", reg.event_id)
       .single();
 
     const emailApiKey = Deno.env.get("EMAIL_API_KEY");
     if (!emailApiKey) {
-      console.log("EMAIL_API_KEY not set — skipping email send");
+      console.log("EMAIL_API_KEY not set \u2014 skipping email send");
       return new Response(JSON.stringify({ skipped: true, reason: "No email API key" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -58,17 +58,24 @@ serve(async (req) => {
 
     const titleEn = event?.title || "AgentPark Event";
     const titleAm = event?.title_am || titleEn;
-    const dateEn = event?.date
-      ? new Date(event.date).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
-      : "TBD";
-    const dateAm = event?.date
-      ? new Date(event.date).toLocaleDateString("hy-AM", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
-      : "Չի նշված";
+
+    // Format date with optional time
+    function formatDate(locale: string, fallback: string): string {
+      if (!event?.date) return fallback;
+      let d = new Date(event.date).toLocaleDateString(locale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+      if (event.start_time) {
+        d += ", " + event.start_time + (event.end_time ? "\u2013" + event.end_time : "");
+      }
+      return d;
+    }
+
+    const dateEn = formatDate("en-US", "TBD");
+    const dateAm = formatDate("hy-AM", "\u0549\u056B \u0576\u0577\u057E\u0561\u056E");
     const location = event?.location || "TBD";
+    const meetingUrl = event?.meeting_url || "";
     const isPaid = reg.payment_status === "paid" && reg.payment_amount > 0;
     const amountDisplay = isPaid ? `${reg.payment_amount.toLocaleString()} ${reg.payment_currency}` : "";
 
-    // Primary language first based on user's site language
     const isAm = lang === "am";
 
     const sectionStyle = `background: #f8f9fa; border-radius: 16px; padding: 24px; margin-bottom: 16px;`;
@@ -78,8 +85,21 @@ serve(async (req) => {
     const paidRowStyle = `border-top: 1px solid #e9ecef;`;
     const paidLabelStyle = `padding: 12px 0 8px; color: #6c757d; font-size: 13px;`;
     const paidValueStyle = `padding: 12px 0 8px; color: #CBA14B; font-size: 15px; font-weight: 700; text-align: right;`;
+    const meetingBtnStyle = `display: inline-block; padding: 10px 24px; background: #0D2740; color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 8px;`;
 
-    function buildSection(t: { greeting: string; message: string; title: string; date: string; dateLabel: string; locationLabel: string; paidLabel: string }) {
+    interface SectionData {
+      greeting: string;
+      message: string;
+      title: string;
+      date: string;
+      dateLabel: string;
+      locationLabel: string;
+      paidLabel: string;
+      meetingLabel: string;
+      joinBtnLabel: string;
+    }
+
+    function buildSection(t: SectionData): string {
       return `
         <div style="${sectionStyle}">
           <p style="color: #0D2740; font-size: 14px; margin: 0 0 4px;">${t.greeting}</p>
@@ -102,6 +122,12 @@ serve(async (req) => {
               <td style="${paidValueStyle}">${amountDisplay}</td>
             </tr>` : ""}
           </table>
+          ${meetingUrl ? `
+          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e9ecef; text-align: center;">
+            <p style="color: #6c757d; font-size: 12px; margin: 0 0 10px;">${t.meetingLabel}</p>
+            <a href="${meetingUrl}" style="${meetingBtnStyle}" target="_blank">${t.joinBtnLabel}</a>
+            <p style="color: #9ca3af; font-size: 11px; margin: 8px 0 0; word-break: break-all;">${meetingUrl}</p>
+          </div>` : ""}
         </div>`;
     }
 
@@ -115,6 +141,8 @@ serve(async (req) => {
       dateLabel: "Date",
       locationLabel: "Location",
       paidLabel: "Amount Paid",
+      meetingLabel: "Join the event online:",
+      joinBtnLabel: "\u{1F4F9} Join Meeting",
     });
 
     const amSection = buildSection({
@@ -127,6 +155,8 @@ serve(async (req) => {
       dateLabel: "\u0531\u0574\u057D\u0561\u0569\u056B\u057E",
       locationLabel: "\u054E\u0561\u0575\u0580",
       paidLabel: "\u054E\u0573\u0561\u0580\u057E\u0561\u056E \u0563\u0578\u0582\u0574\u0561\u0580",
+      meetingLabel: "\u0544\u056B\u0561\u0576\u0561\u056C \u0574\u056B\u057B\u0578\u0581\u0561\u057C\u0574\u0561\u0576\u0568 \u0561\u057C\u0581\u0561\u0576\u0581\u056D",
+      joinBtnLabel: "\u{1F4F9} \u0544\u056B\u0561\u0576\u0561\u056C \u0570\u0561\u0576\u0564\u056B\u057A\u0574\u0561\u0576\u056B\u0576",
     });
 
     const primarySection = isAm ? amSection : enSection;

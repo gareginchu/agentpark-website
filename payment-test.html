@@ -40,6 +40,10 @@
             <span class="text-sm text-gray-600">Registrant</span>
             <span id="registrant-name" class="text-sm font-semibold text-gray-900">—</span>
           </div>
+          <div id="event-date-row" class="flex justify-between hidden">
+            <span class="text-sm text-gray-600">Date & Time</span>
+            <span id="event-date-display" class="text-sm font-semibold text-gray-900">—</span>
+          </div>
           <div class="flex justify-between border-t pt-2 mt-2">
             <span class="text-sm font-medium text-gray-700">Total Amount</span>
             <span id="amount" class="text-lg font-bold text-[#003366]">—</span>
@@ -93,6 +97,9 @@
     const registrantName = params.get('name') || 'Test User';
     const registrationId = params.get('registration_id') || '';
     const eventId = params.get('event_id') || '';
+    const eventDate = params.get('event_date') || '';
+    const startTime = params.get('start_time') || '';
+    const endTime = params.get('end_time') || '';
     const userLang = params.get('lang') || 'en';
     const returnUrl = params.get('return_url') || '/event.html';
 
@@ -100,6 +107,13 @@
     document.getElementById('event-title').textContent = eventTitle;
     document.getElementById('registrant-name').textContent = registrantName;
     document.getElementById('amount').textContent = amount.toLocaleString() + ' ' + currency;
+    if (eventDate) {
+      const loc = userLang === 'am' ? 'hy-AM' : 'en-US';
+      let dateStr = new Date(eventDate).toLocaleDateString(loc, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      if (startTime) dateStr += ', ' + startTime + (endTime ? '–' + endTime : '');
+      document.getElementById('event-date-display').textContent = dateStr;
+      document.getElementById('event-date-row').classList.remove('hidden');
+    }
 
     function simulatePayment(status) {
       // In test mode, we update the registration directly via Supabase

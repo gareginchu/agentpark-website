@@ -42,6 +42,9 @@ async function createPaymentOrder(eventId, name, email, event) {
       + '&name=' + encodeURIComponent(name)
       + '&registration_id=' + regId
       + '&event_id=' + eventId
+      + '&event_date=' + encodeURIComponent(event.date || '')
+      + '&start_time=' + encodeURIComponent(event.start_time || '')
+      + '&end_time=' + encodeURIComponent(event.end_time || '')
       + '&lang=' + (window.currentLang || 'en')
       + '&return_url=' + encodeURIComponent(returnUrl);
     return { payment_url: paymentUrl, order_id: orderId };
