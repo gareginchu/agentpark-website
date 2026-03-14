@@ -1014,14 +1014,14 @@
                 <input id="ev-title-am" type="text" class="admin-input" placeholder="e.g. AI Հdelays Երevան 2026">
               </div>
               <div>
-                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">Start Date</label>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-start-date">Start Date</label>
                 <div class="flex gap-2">
                   <input id="ev-date" type="date" class="admin-input flex-1">
                   <input id="ev-start-time" type="time" class="admin-input w-28" placeholder="HH:MM">
                 </div>
               </div>
               <div>
-                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">End Date <span class="text-navy/30 normal-case">(for multi-day events)</span></label>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-end-date">End Date <span class="text-navy/30 normal-case">(for multi-day events)</span></label>
                 <div class="flex gap-2">
                   <input id="ev-end-date" type="date" class="admin-input flex-1">
                   <input id="ev-end-time" type="time" class="admin-input w-28" placeholder="HH:MM">
@@ -1050,9 +1050,9 @@
               <div>
                 <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-price-display">Price Display</label>
                 <select id="ev-price-display" class="admin-input">
-                  <option value="hide">Hide price (free events)</option>
-                  <option value="show">Show price on cards</option>
-                  <option value="contact">Show "Contact us for pricing"</option>
+                  <option value="hide" data-i18n="price-hide">Hide price (free events)</option>
+                  <option value="show" data-i18n="price-show">Show price on cards</option>
+                  <option value="contact" data-i18n="price-contact">Show "Contact us for pricing"</option>
                 </select>
               </div>
               <div class="sm:col-span-2">
@@ -2912,7 +2912,10 @@
         // Events
         'add-new-event': 'Add New Event', 'label-event-title': 'Event Title *',
         'label-date': 'Date', 'label-location': 'Location', 'label-capacity': 'Capacity',
+        'label-start-date': 'Start Date', 'label-end-date': 'End Date <span class="text-navy/30 normal-case">(for multi-day events)</span>',
         'label-price': 'Price', 'label-currency': 'Currency', 'label-price-display': 'Price Display',
+        'price-hide': 'Hide price (free events)', 'price-show': 'Show price on cards', 'price-contact': 'Show "Contact us for pricing"',
+        'email-label': 'Email',
         'ph-ev-price': 'e.g. 5000',
         'ev-free-badge': 'Free',
         'label-ev-description': 'Description', 'add-event-btn': 'Add Event', 'saving': 'Saving...',
@@ -3074,6 +3077,11 @@
         // Events
         'add-new-event': 'Ավելացնել նոր միջոցառում', 'label-event-title': 'Միջոցառումի վերնագիր *',
         'label-date': 'Ամսաթիվ', 'label-location': 'Վայրը', 'label-capacity': 'Տարողունակություն',
+        'label-price': 'Գին', 'label-currency': 'Արժույթ', 'label-price-display': 'Գնի ցուցադրում',
+        'ph-ev-price': 'օր. 5000', 'ev-free-badge': 'Անվճար',
+        'price-hide': 'Թաքցնել գինը (անվճար միջոցառումներ)', 'price-show': 'Ցույց տալ գինը քարտերին', 'price-contact': 'Ցույց տալ "Կապվել մեզ գների համար"',
+        'email-label': 'Էլ. հասցե',
+        'label-start-date': 'Սկսբի ամսաթիվ', 'label-end-date': 'Ավարտի ամսաթիվ <span class="text-navy/30 normal-case">(բազմաօանակ օրերի միջոցառումների համար)</span>',
         'label-ev-description': 'Նկարագրություն', 'add-event-btn': 'Ավելացնել միջոցառում', 'saving': 'Պահպանում է...',
         'all-events': 'Բոլոր միջոցառումները', 'refresh-events': 'Տարմացնել',
         'registrations': 'գրանցումներ', 'close-btn': 'Փակել',

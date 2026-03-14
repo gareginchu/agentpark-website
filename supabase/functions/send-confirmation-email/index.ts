@@ -63,7 +63,7 @@ serve(async (req) => {
       : "TBD";
     const dateAm = event?.date
       ? new Date(event.date).toLocaleDateString("hy-AM", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
-      : "Չdelays որdelays";
+      : "Չի նշված";
     const location = event?.location || "TBD";
     const isPaid = reg.payment_status === "paid" && reg.payment_amount > 0;
     const amountDisplay = isPaid ? `${reg.payment_amount.toLocaleString()} ${reg.payment_currency}` : "";
