@@ -1138,6 +1138,21 @@
                 </div>
                 <div id="ev-video-preview" class="mt-2 hidden"></div>
               </div>
+              <!-- Certificate Template -->
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-certificate">Certificate Template <span class="text-navy/30 normal-case">(for past events — PNG, JPG, or PDF)</span></label>
+                <div class="flex items-center gap-2">
+                  <input id="ev-certificate-template" type="text" class="admin-input flex-1" placeholder="https://... or upload template" data-i18n-placeholder="ph-ev-certificate">
+                  <label class="px-3 py-1.5 bg-navy/8 text-navy/70 text-[11px] font-medium rounded-lg hover:bg-navy/15 transition-colors duration-150 cursor-pointer flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Upload
+                    <input type="file" accept="image/png,image/jpeg,application/pdf" class="hidden" onchange="uploadCertTemplate(this)">
+                  </label>
+                </div>
+                <div id="ev-cert-preview" class="mt-2 hidden">
+                  <img id="ev-cert-preview-img" class="h-20 rounded border border-navy/10" alt="Certificate template preview">
+                </div>
+              </div>
             </div>
             <div class="flex items-center gap-3 mt-5">
               <button id="ev-add-btn" onclick="addEvent()" class="px-6 py-2.5 bg-navy text-white text-sm font-semibold rounded-lg hover:bg-navy-light active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-elevated" data-i18n="add-event-btn">
@@ -2415,6 +2430,33 @@
       input.value = '';
     }
 
+    async function uploadCertTemplate(input) {
+      const file = input.files[0];
+      if (!file) return;
+      try {
+        showToast('Uploading certificate template...');
+        const ext = file.name.split('.').pop().toLowerCase();
+        const name = Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+        const path = 'certificates/' + name;
+        const res = await fetch(SUPABASE_URL + '/storage/v1/object/event-images/' + path, {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + SUPABASE_KEY, 'apikey': SUPABASE_KEY, 'Content-Type': file.type },
+          body: file,
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const url = SUPABASE_URL + '/storage/v1/object/public/event-images/' + path;
+        document.getElementById('ev-certificate-template').value = url;
+        if (!file.type.includes('pdf')) {
+          document.getElementById('ev-cert-preview-img').src = url;
+          document.getElementById('ev-cert-preview').classList.remove('hidden');
+        }
+        showToast('Certificate template uploaded');
+      } catch(e) {
+        showToast('Upload error: ' + e.message);
+      }
+      input.value = '';
+    }
+
     // Upload image to Supabase Storage
     async function uploadToStorage(file) {
       const ext = file.name.split('.').pop().toLowerCase();
@@ -2606,10 +2648,11 @@
             images: images,
             cover_image: document.getElementById('ev-cover-image').value.trim() || null,
             video_url: document.getElementById('ev-video-url').value.trim() || null,
+            certificate_template: document.getElementById('ev-certificate-template').value.trim() || null,
             organizers: _organizers.length ? _organizers : null,
           }),
         });
-        ['ev-title','ev-title-am','ev-date','ev-end-date','ev-start-time','ev-end-time','ev-location','ev-meeting-url','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
+        ['ev-title','ev-title-am','ev-date','ev-end-date','ev-start-time','ev-end-time','ev-location','ev-meeting-url','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url','ev-certificate-template'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('ev-currency').value = 'AMD';
         document.getElementById('ev-price-display').value = 'hide';
         document.getElementById('ev-cover-preview').classList.add('hidden');
@@ -2668,6 +2711,8 @@
         document.getElementById('ev-cover-preview').classList.add('hidden');
       }
       document.getElementById('ev-video-url').value = ev.video_url || '';
+      document.getElementById('ev-certificate-template').value = ev.certificate_template || '';
+      if (ev.certificate_template && !ev.certificate_template.endsWith('.pdf')) { document.getElementById('ev-cert-preview-img').src = ev.certificate_template; document.getElementById('ev-cert-preview').classList.remove('hidden'); }
       renderVideoPreview();
       _organizers = Array.isArray(ev.organizers) ? ev.organizers.map(o => ({name: o.name, logo_url: o.logo_url || null})) : [];
       renderOrganizers();
@@ -2714,6 +2759,7 @@
             images: updImages,
             cover_image: document.getElementById('ev-cover-image').value.trim() || null,
             video_url: document.getElementById('ev-video-url').value.trim() || null,
+            certificate_template: document.getElementById('ev-certificate-template').value.trim() || null,
             organizers: _organizers.length ? _organizers : null,
           }),
         });
@@ -2729,7 +2775,7 @@
 
     function cancelEditEvent() {
       _editingEventId = null;
-      ['ev-title','ev-title-am','ev-date','ev-end-date','ev-start-time','ev-end-time','ev-location','ev-meeting-url','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
+      ['ev-title','ev-title-am','ev-date','ev-end-date','ev-start-time','ev-end-time','ev-location','ev-meeting-url','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url','ev-certificate-template'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('ev-currency').value = 'AMD';
       document.getElementById('ev-cover-preview').classList.add('hidden');
       document.getElementById('ev-images-preview').innerHTML = '';
@@ -2920,6 +2966,8 @@
         'add-new-event': 'Add New Event', 'label-event-title': 'Event Title *',
         'label-date': 'Date', 'label-location': 'Location', 'label-capacity': 'Capacity',
         'label-start-date': 'Start Date', 'label-end-date': 'End Date <span class="text-navy/30 normal-case">(for multi-day events)</span>',
+        'label-certificate': 'Certificate Template <span class="text-navy/30 normal-case">(for past events — PNG, JPG, or PDF)</span>',
+        'ph-ev-certificate': 'https://... or upload template',
         'label-meeting-url': 'Meeting Link <span class="text-navy/30 normal-case">(Zoom, Google Meet, etc.)</span>',
         'ph-ev-meeting-url': 'https://zoom.us/j/123456789',
         'label-price': 'Price', 'label-currency': 'Currency', 'label-price-display': 'Price Display',
@@ -3086,6 +3134,8 @@
         // Events
         'add-new-event': 'Ավելացնել նոր միջոցառում', 'label-event-title': 'Միջոցառումի վերնագիր *',
         'label-date': 'Ամսաթիվ', 'label-location': 'Վայրը', 'label-capacity': 'Տարողունակություն',
+        'label-certificate': 'Վկայագրի ձևանմուշ <span class="text-navy/30 normal-case">(անցյալ միջոցառումների համար — PNG, JPG կամ PDF)</span>',
+        'ph-ev-certificate': 'https://... կամ վերբեռնեք ձևանմուշ',
         'label-meeting-url': 'Հանդիպման հղում <span class="text-navy/30 normal-case">(Zoom, Google Meet և այլն)</span>',
         'ph-ev-meeting-url': 'https://zoom.us/j/123456789',
         'label-price': 'Գին', 'label-currency': 'Արժույթ', 'label-price-display': 'Գնի ցուցադրում',

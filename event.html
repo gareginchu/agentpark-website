@@ -23,6 +23,7 @@
 
   <link rel="icon" type="image/png" sizes="32x32" href="Brand_assets/favicon-32x32.png">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <script src="config.js?v=2"></script>
 <script>
 // Analytics tracking
@@ -306,6 +307,36 @@
                 </div>
               </div>
 
+              <!-- Certificate Claim (past events with template) -->
+              <div id="cert-claim-wrap" class="hidden">
+                <div class="text-center mb-4">
+                  <div class="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                  </div>
+                  <p class="text-sm font-bold text-navy mb-1" data-i18n="cert-claim-title">Get Your Certificate</p>
+                  <p class="text-xs text-navy/40" data-i18n="cert-claim-desc">Enter your details to download your certificate of participation.</p>
+                </div>
+                <div id="cert-preview" class="mb-4 rounded-lg overflow-hidden border border-navy/10"></div>
+                <form id="cert-form" onsubmit="claimCertificate(event)" class="space-y-4">
+                  <div>
+                    <label class="block text-xs font-medium text-navy/50 uppercase tracking-wide mb-1.5" data-i18n="cert-first-name">First Name *</label>
+                    <input id="cert-fname" type="text" required placeholder="John" class="admin-input">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-navy/50 uppercase tracking-wide mb-1.5" data-i18n="cert-last-name">Last Name *</label>
+                    <input id="cert-lname" type="text" required placeholder="Smith" class="admin-input">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-navy/50 uppercase tracking-wide mb-1.5" data-i18n="modal-email-label">Email Address *</label>
+                    <input id="cert-email" type="email" required placeholder="your@email.com" class="admin-input">
+                  </div>
+                  <p id="cert-error" class="text-red-500 text-xs hidden"></p>
+                  <button type="submit" id="cert-btn" class="w-full px-6 py-3 bg-gold text-deep-ink font-bold text-sm rounded-xl hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-elevated" data-i18n="cert-download-btn">
+                    Download Certificate
+                  </button>
+                </form>
+              </div>
+
               <!-- Form -->
               <div id="reg-form-wrap">
                 <h3 class="text-sm font-bold text-navy mb-4" data-i18n="register-for-event">Register for this Event</h3>
@@ -408,6 +439,9 @@
         'spots-available': 'spots available', 'attendees': 'attendees',
         'no-description': 'No description provided.',
         'registering': 'Registering...', 'try-again': 'Something went wrong. Please try again.',
+        'cert-claim-title': 'Get Your Certificate', 'cert-claim-desc': 'Enter your details to download your certificate of participation.',
+        'cert-first-name': 'First Name *', 'cert-last-name': 'Last Name *',
+        'cert-download-btn': 'Download Certificate', 'cert-not-found': 'We could not find a registration with that name and email.', 'cert-generating': 'Generating certificate...',
       },
       am: {
         'all-events': 'Բոլոր միջոցառումները',
@@ -439,6 +473,9 @@
         'spots-available': 'տեղ հասանելի', 'attendees': 'մասնակից',
         'no-description': 'Նկարագրություն չի տրամադրվել:',
         'registering': 'Գրանցվում է...', 'try-again': 'Ինչ-որ բան սխալ գնաց: Խնդրում ենք կրկին փորձել:',
+        'cert-claim-title': 'Ստանալ վկայագիր', 'cert-claim-desc': 'Մուտքագրեք ձեր տվյալները՝ մասնակցության վկայագիրը ներբեռնելու համար:',
+        'cert-first-name': 'Անուն *', 'cert-last-name': 'Ազգանուն *',
+        'cert-download-btn': 'Ներբեռնել վկայագիրը', 'cert-not-found': 'Մենք չկարողացանք գտնել գրանցում այդ անունով և էլ. հասցեով:', 'cert-generating': 'Վկայագիրը ստեղծվում է...',
       }
     };
     var currentLang = 'en';
@@ -579,9 +616,18 @@
         document.getElementById('event-badge-past').style.display = 'inline-flex';
         // Hero background tint for past
         document.getElementById('event-hero').classList.add('opacity-90');
-        // Show closed, hide form
+        // Show closed or certificate claim, hide form
         document.getElementById('reg-form-wrap').classList.add('hidden');
-        document.getElementById('reg-closed-wrap').classList.remove('hidden');
+        if (ev.certificate_template) {
+          window._certTemplateUrl = ev.certificate_template;
+          // Show certificate template preview if image
+          if (!ev.certificate_template.endsWith('.pdf')) {
+            document.getElementById('cert-preview').innerHTML = '<img src="' + ev.certificate_template + '" alt="Certificate" class="w-full">';
+          }
+          document.getElementById('cert-claim-wrap').classList.remove('hidden');
+        } else {
+          document.getElementById('reg-closed-wrap').classList.remove('hidden');
+        }
       } else {
         // Update registration button for paid events
         const regBtn = document.getElementById('reg-btn');
@@ -742,6 +788,97 @@
     function showError() {
       document.getElementById('loading').classList.add('hidden');
       document.getElementById('error-state').classList.remove('hidden');
+    }
+
+    async function claimCertificate(e) {
+      e.preventDefault();
+      const fname = document.getElementById('cert-fname').value.trim();
+      const lname = document.getElementById('cert-lname').value.trim();
+      const email = document.getElementById('cert-email').value.trim();
+      const fullName = fname + ' ' + lname;
+      const errEl = document.getElementById('cert-error');
+      const btn = document.getElementById('cert-btn');
+      const t = TRANS[currentLang] || TRANS.en;
+      errEl.classList.add('hidden');
+      btn.textContent = t['cert-generating'] || 'Generating certificate...';
+      btn.disabled = true;
+
+      try {
+        // Verify registration exists
+        const res = await fetch(SUPABASE_URL + '/rest/v1/registrations?event_id=eq.' + eventId + '&email=eq.' + encodeURIComponent(email) + '&select=id,name', {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+        });
+        const regs = await res.json();
+        // Check if any registration matches (case-insensitive name check)
+        const match = regs.find(r => {
+          const regName = (r.name || '').toLowerCase();
+          return regName.includes(fname.toLowerCase()) && regName.includes(lname.toLowerCase());
+        });
+        if (!match) {
+          errEl.textContent = t['cert-not-found'] || 'We could not find a registration with that name and email.';
+          errEl.classList.remove('hidden');
+          btn.textContent = t['cert-download-btn'] || 'Download Certificate';
+          btn.disabled = false;
+          return;
+        }
+
+        // Generate PDF with pdf-lib
+        const { PDFDocument, rgb, StandardFonts } = PDFLib;
+        const templateUrl = window._certTemplateUrl;
+        const templateBytes = await fetch(templateUrl).then(r => r.arrayBuffer());
+
+        let pdfDoc, page;
+        if (templateUrl.toLowerCase().endsWith('.pdf')) {
+          pdfDoc = await PDFDocument.load(templateBytes);
+          page = pdfDoc.getPages()[0];
+        } else {
+          pdfDoc = await PDFDocument.create();
+          let img;
+          if (templateUrl.toLowerCase().endsWith('.png')) {
+            img = await pdfDoc.embedPng(templateBytes);
+          } else {
+            img = await pdfDoc.embedJpg(templateBytes);
+          }
+          page = pdfDoc.addPage([img.width, img.height]);
+          page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
+        }
+
+        // Overlay name centered
+        const font = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+        let fontSize = 48;
+        const pageWidth = page.getWidth();
+        const pageHeight = page.getHeight();
+        // Scale font if name is too wide
+        let textWidth = font.widthOfTextAtSize(fullName, fontSize);
+        while (textWidth > pageWidth * 0.75 && fontSize > 16) {
+          fontSize -= 2;
+          textWidth = font.widthOfTextAtSize(fullName, fontSize);
+        }
+        const x = (pageWidth - textWidth) / 2;
+        const y = pageHeight * 0.45; // slightly above center
+        page.drawText(fullName, { x, y, size: fontSize, font, color: rgb(0.05, 0.15, 0.25) });
+
+        // Download
+        const pdfBytes = await pdfDoc.save();
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Certificate-' + fullName.replace(/\s+/g, '-') + '.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        btn.textContent = t['cert-download-btn'] || 'Download Certificate';
+        btn.disabled = false;
+      } catch(err) {
+        console.error('Certificate error:', err);
+        errEl.textContent = t['try-again'] || 'Something went wrong. Please try again.';
+        errEl.classList.remove('hidden');
+        btn.textContent = t['cert-download-btn'] || 'Download Certificate';
+        btn.disabled = false;
+      }
     }
 
     async function submitReg(e) {
