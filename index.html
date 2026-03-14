@@ -648,7 +648,7 @@
     </div>
   </div>
 
-  <script src="config.js"></script>
+  <script src="config.js?v=2"></script>
 <script>
 // Analytics tracking
 (function() {
@@ -721,14 +721,22 @@
       const loc = currentLang === 'am' ? 'hy-AM' : 'en-US';
       if (!ev.date) return '';
       const start = new Date(ev.date);
+      let result;
       if (!ev.end_date || ev.end_date === ev.date) {
-        return start.toLocaleDateString(loc, {month:'long',day:'numeric',year:'numeric'});
+        result = start.toLocaleDateString(loc, {month:'long',day:'numeric',year:'numeric'});
+      } else {
+        const end = new Date(ev.end_date);
+        if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+          result = start.toLocaleDateString(loc, {month:'long',day:'numeric'}) + '–' + end.getDate() + ', ' + end.getFullYear();
+        } else {
+          result = start.toLocaleDateString(loc, {month:'long',day:'numeric'}) + ' – ' + end.toLocaleDateString(loc, {month:'long',day:'numeric',year:'numeric'});
+        }
       }
-      const end = new Date(ev.end_date);
-      if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
-        return start.toLocaleDateString(loc, {month:'long',day:'numeric'}) + '–' + end.getDate() + ', ' + end.getFullYear();
+      if (ev.start_time) {
+        const timePart = ev.end_time ? ev.start_time + '–' + ev.end_time : ev.start_time;
+        result += ', ' + timePart;
       }
-      return start.toLocaleDateString(loc, {month:'long',day:'numeric'}) + ' – ' + end.toLocaleDateString(loc, {month:'long',day:'numeric',year:'numeric'});
+      return result;
     }
 
     function buildCardHTML(ev, isPast) {
@@ -978,7 +986,7 @@
             fetch(SUPABASE_URL + '/functions/v1/send-confirmation-email', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_KEY },
-              body: JSON.stringify({ registration_id: regData[0].id }),
+              body: JSON.stringify({ registration_id: regData[0].id, lang: currentLang }),
             });
           }
         } catch(_) {}

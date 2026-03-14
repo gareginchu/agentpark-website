@@ -1,6 +1,6 @@
 // AgentPark Site Configuration
 const SUPABASE_URL = 'https://uvmfjdaqpsdbvokaynpi.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_KZTPHLXQHfPGCdRfzYK76Q_yKx4nMCX';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2bWZqZGFxcHNkYnZva2F5bnBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjkyMzMsImV4cCI6MjA4ODgwNTIzM30.aML-rv78JdyxUakBCAC-nE28tLLRcwOWRBp8wZt3ows';
 
 // Payment Configuration
 // Set to 'live' when ACBA VPOS credentials are ready
@@ -42,6 +42,7 @@ async function createPaymentOrder(eventId, name, email, event) {
       + '&name=' + encodeURIComponent(name)
       + '&registration_id=' + regId
       + '&event_id=' + eventId
+      + '&lang=' + (window.currentLang || 'en')
       + '&return_url=' + encodeURIComponent(returnUrl);
     return { payment_url: paymentUrl, order_id: orderId };
   } else {

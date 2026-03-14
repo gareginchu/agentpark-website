@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="Brand_assets/favicon-32x32.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="config.js"></script>
+  <script src="config.js?v=2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -1015,11 +1015,17 @@
               </div>
               <div>
                 <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">Start Date</label>
-                <input id="ev-date" type="date" class="admin-input">
+                <div class="flex gap-2">
+                  <input id="ev-date" type="date" class="admin-input flex-1">
+                  <input id="ev-start-time" type="time" class="admin-input w-28" placeholder="HH:MM">
+                </div>
               </div>
               <div>
                 <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">End Date <span class="text-navy/30 normal-case">(for multi-day events)</span></label>
-                <input id="ev-end-date" type="date" class="admin-input">
+                <div class="flex gap-2">
+                  <input id="ev-end-date" type="date" class="admin-input flex-1">
+                  <input id="ev-end-time" type="time" class="admin-input w-28" placeholder="HH:MM">
+                </div>
               </div>
               <div>
                 <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-location">Location</label>
@@ -2540,7 +2546,7 @@
                 ${isPast ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-navy/8 text-navy/40 font-medium uppercase">' + tr('badge-past') + '</span>' : '<span class="text-[10px] px-2 py-0.5 rounded-full bg-green-50 text-green-600 font-medium uppercase">' + tr('badge-upcoming') + '</span>'}
               </div>
               <div class="flex flex-wrap items-center gap-3 mt-1">
-                ${ev.date ? `<span class="text-xs text-navy/50">\u{1F4C5} ${ev.date}</span>` : ''}
+                ${ev.date ? `<span class="text-xs text-navy/50">\u{1F4C5} ${ev.date}${ev.start_time ? ' ' + ev.start_time : ''}${ev.end_time ? '–' + ev.end_time : ''}</span>` : ''}
                 ${ev.location ? `<span class="text-xs text-navy/50">\u{1F4CD} ${ev.location}</span>` : ''}
                 ${ev.capacity ? `<span class="text-xs text-navy/50">\u{1F465} ${tr("capacity-label")}: ${ev.capacity}</span>` : ''}
                 ${ev.price && ev.price > 0 ? `<span class="text-xs text-gold font-semibold">\u{1F4B0} ${ev.price.toLocaleString()} ${ev.currency || 'AMD'}</span>` : `<span class="text-xs text-green-500">${tr('ev-free-badge')}</span>`}
@@ -2581,6 +2587,8 @@
             title_am: document.getElementById('ev-title-am').value.trim() || null,
             date: document.getElementById('ev-date').value || null,
             end_date: document.getElementById('ev-end-date').value || null,
+            start_time: document.getElementById('ev-start-time').value || null,
+            end_time: document.getElementById('ev-end-time').value || null,
             location: document.getElementById('ev-location').value || null,
             capacity: parseInt(document.getElementById('ev-capacity').value) || null,
             price: parseInt(document.getElementById('ev-price').value) || 0,
@@ -2596,7 +2604,7 @@
             organizers: _organizers.length ? _organizers : null,
           }),
         });
-        ['ev-title','ev-title-am','ev-date','ev-end-date','ev-location','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
+        ['ev-title','ev-title-am','ev-date','ev-end-date','ev-start-time','ev-end-time','ev-location','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('ev-currency').value = 'AMD';
         document.getElementById('ev-price-display').value = 'hide';
         document.getElementById('ev-cover-preview').classList.add('hidden');
@@ -2633,6 +2641,8 @@
       document.getElementById('ev-title-am').value = ev.title_am || '';
       document.getElementById('ev-date').value = ev.date || '';
       document.getElementById('ev-end-date').value = ev.end_date || '';
+      document.getElementById('ev-start-time').value = ev.start_time || '';
+      document.getElementById('ev-end-time').value = ev.end_time || '';
       document.getElementById('ev-location').value = ev.location || '';
       document.getElementById('ev-capacity').value = ev.capacity || '';
       document.getElementById('ev-price').value = ev.price || 0;
@@ -2683,6 +2693,8 @@
             title_am: document.getElementById('ev-title-am').value.trim() || null,
             date: document.getElementById('ev-date').value || null,
             end_date: document.getElementById('ev-end-date').value || null,
+            start_time: document.getElementById('ev-start-time').value || null,
+            end_time: document.getElementById('ev-end-time').value || null,
             location: document.getElementById('ev-location').value || null,
             capacity: parseInt(document.getElementById('ev-capacity').value) || null,
             price: parseInt(document.getElementById('ev-price').value) || 0,
@@ -2710,7 +2722,7 @@
 
     function cancelEditEvent() {
       _editingEventId = null;
-      ['ev-title','ev-title-am','ev-date','ev-end-date','ev-location','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
+      ['ev-title','ev-title-am','ev-date','ev-end-date','ev-start-time','ev-end-time','ev-location','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('ev-currency').value = 'AMD';
       document.getElementById('ev-cover-preview').classList.add('hidden');
       document.getElementById('ev-images-preview').innerHTML = '';

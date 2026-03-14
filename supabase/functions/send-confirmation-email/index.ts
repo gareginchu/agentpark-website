@@ -1,5 +1,5 @@
 // Supabase Edge Function: send-confirmation-email
-// Sends a registration confirmation email via Resend
+// Sends a bilingual (EN + AM) registration confirmation email via Resend
 // Deploy: supabase functions deploy send-confirmation-email
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
@@ -16,7 +16,7 @@ serve(async (req) => {
   }
 
   try {
-    const { registration_id } = await req.json();
+    const { registration_id, lang } = await req.json();
     if (!registration_id) {
       return new Response(JSON.stringify({ error: "Missing registration_id" }), {
         status: 400,
@@ -29,7 +29,6 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Fetch registration + event details
     const { data: reg, error: regErr } = await supabase
       .from("registrations")
       .select("id, name, email, payment_status, payment_amount, payment_currency, event_id")
@@ -57,48 +56,100 @@ serve(async (req) => {
       });
     }
 
-    const eventTitle = event?.title || "AgentPark Event";
-    const eventDate = event?.date
+    const titleEn = event?.title || "AgentPark Event";
+    const titleAm = event?.title_am || titleEn;
+    const dateEn = event?.date
       ? new Date(event.date).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
       : "TBD";
-    const eventLocation = event?.location || "TBD";
+    const dateAm = event?.date
+      ? new Date(event.date).toLocaleDateString("hy-AM", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
+      : "Չdelays որdelays";
+    const location = event?.location || "TBD";
     const isPaid = reg.payment_status === "paid" && reg.payment_amount > 0;
+    const amountDisplay = isPaid ? `${reg.payment_amount.toLocaleString()} ${reg.payment_currency}` : "";
+
+    // Primary language first based on user's site language
+    const isAm = lang === "am";
+
+    const sectionStyle = `background: #f8f9fa; border-radius: 16px; padding: 24px; margin-bottom: 16px;`;
+    const cardStyle = `border: 1px solid #e9ecef; border-radius: 12px; padding: 20px; margin-bottom: 24px;`;
+    const labelStyle = `padding: 8px 0; color: #6c757d; font-size: 13px;`;
+    const valueStyle = `padding: 8px 0; color: #0D2740; font-size: 13px; font-weight: 600; text-align: right;`;
+    const paidRowStyle = `border-top: 1px solid #e9ecef;`;
+    const paidLabelStyle = `padding: 12px 0 8px; color: #6c757d; font-size: 13px;`;
+    const paidValueStyle = `padding: 12px 0 8px; color: #CBA14B; font-size: 15px; font-weight: 700; text-align: right;`;
+
+    function buildSection(t: { greeting: string; message: string; title: string; date: string; dateLabel: string; locationLabel: string; paidLabel: string }) {
+      return `
+        <div style="${sectionStyle}">
+          <p style="color: #0D2740; font-size: 14px; margin: 0 0 4px;">${t.greeting}</p>
+          <p style="color: #0D2740; font-size: 14px; margin: 0;">${t.message}</p>
+        </div>
+        <div style="${cardStyle}">
+          <h2 style="color: #0D2740; font-size: 18px; margin: 0 0 16px;">${t.title}</h2>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="${labelStyle}">${t.dateLabel}</td>
+              <td style="${valueStyle}">${t.date}</td>
+            </tr>
+            <tr>
+              <td style="${labelStyle}">${t.locationLabel}</td>
+              <td style="${valueStyle}">${location}</td>
+            </tr>
+            ${isPaid ? `
+            <tr style="${paidRowStyle}">
+              <td style="${paidLabelStyle}">${t.paidLabel}</td>
+              <td style="${paidValueStyle}">${amountDisplay}</td>
+            </tr>` : ""}
+          </table>
+        </div>`;
+    }
+
+    const enSection = buildSection({
+      greeting: `Hello <strong>${reg.name}</strong>,`,
+      message: isPaid
+        ? "Your payment has been received and your registration is confirmed!"
+        : "Your registration is confirmed!",
+      title: titleEn,
+      date: dateEn,
+      dateLabel: "Date",
+      locationLabel: "Location",
+      paidLabel: "Amount Paid",
+    });
+
+    const amSection = buildSection({
+      greeting: `\u0540\u0561\u0580\u0563\u0565\u056c\u056b <strong>${reg.name}</strong>,`,
+      message: isPaid
+        ? "\u0541\u0565\u0580 \u057E\u0573\u0561\u0580\u0578\u0582\u0574\u0568 \u057D\u057F\u0561\u0581\u057E\u0565\u056c \u0567 \u0587 \u0563\u0580\u0561\u0576\u0581\u0578\u0582\u0574\u0568 \u0570\u0561\u057D\u057F\u0561\u057F\u057E\u0561\u056E \u0567\u0589"
+        : "\u0541\u0565\u0580 \u0563\u0580\u0561\u0576\u0581\u0578\u0582\u0574\u0568 \u0570\u0561\u057D\u057F\u0561\u057F\u057E\u0561\u056E \u0567\u0589",
+      title: titleAm,
+      date: dateAm,
+      dateLabel: "\u0531\u0574\u057D\u0561\u0569\u056B\u057E",
+      locationLabel: "\u054E\u0561\u0575\u0580",
+      paidLabel: "\u054E\u0573\u0561\u0580\u057E\u0561\u056E \u0563\u0578\u0582\u0574\u0561\u0580",
+    });
+
+    const primarySection = isAm ? amSection : enSection;
+    const secondarySection = isAm ? enSection : amSection;
 
     const htmlBody = `
-      <div style="font-family: 'Inter', Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px;">
+      <div style="font-family: 'Inter', Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; background: #ffffff;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="color: #0D2740; font-size: 24px; margin: 0;">AgentPark</h1>
-          <p style="color: #CBA14B; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px;">Event Registration</p>
-        </div>
-
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
-          <p style="color: #0D2740; font-size: 14px; margin: 0 0 4px;">Hello <strong>${reg.name}</strong>,</p>
-          <p style="color: #0D2740; font-size: 14px; margin: 0;">
-            ${isPaid
-              ? "Your payment has been received and your registration is confirmed!"
-              : "Your registration is confirmed!"}
+          <p style="color: #CBA14B; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px;">
+            ${isAm ? "\u0544\u056B\u057B\u0578\u0581\u0561\u057C\u0574\u0561\u0576 \u0563\u0580\u0561\u0576\u0581\u0578\u0582\u0574" : "Event Registration"} / ${isAm ? "Event Registration" : "\u0544\u056B\u057B\u0578\u0581\u0561\u057C\u0574\u0561\u0576 \u0563\u0580\u0561\u0576\u0581\u0578\u0582\u0574"}
           </p>
         </div>
 
-        <div style="border: 1px solid #e9ecef; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-          <h2 style="color: #0D2740; font-size: 18px; margin: 0 0 16px;">${eventTitle}</h2>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr>
-              <td style="padding: 8px 0; color: #6c757d; font-size: 13px;">Date</td>
-              <td style="padding: 8px 0; color: #0D2740; font-size: 13px; font-weight: 600; text-align: right;">${eventDate}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 0; color: #6c757d; font-size: 13px;">Location</td>
-              <td style="padding: 8px 0; color: #0D2740; font-size: 13px; font-weight: 600; text-align: right;">${eventLocation}</td>
-            </tr>
-            ${isPaid ? `
-            <tr style="border-top: 1px solid #e9ecef;">
-              <td style="padding: 12px 0 8px; color: #6c757d; font-size: 13px;">Amount Paid</td>
-              <td style="padding: 12px 0 8px; color: #CBA14B; font-size: 15px; font-weight: 700; text-align: right;">${reg.payment_amount.toLocaleString()} ${reg.payment_currency}</td>
-            </tr>
-            ` : ""}
-          </table>
+        ${primarySection}
+
+        <div style="border-top: 1px dashed #d1d5db; margin: 8px 0 24px; position: relative;">
+          <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 12px; color: #9ca3af; font-size: 11px;">
+            ${isAm ? "English" : "\u0540\u0561\u0575\u0565\u0580\u0565\u0576"}
+          </span>
         </div>
+
+        ${secondarySection}
 
         <p style="color: #6c757d; font-size: 12px; text-align: center; margin-top: 32px;">
           &copy; 2026 AgentPark Ltd. &bull; Yerevan, Armenia
@@ -106,7 +157,10 @@ serve(async (req) => {
       </div>
     `;
 
-    // Send via Resend
+    const subject = isAm
+      ? `\u0533\u0580\u0561\u0576\u0581\u0578\u0582\u0574\u0568 \u0570\u0561\u057D\u057F\u0561\u057F\u057E\u0561\u056E \u0567\u0589 ${titleAm}`
+      : `Registration Confirmed: ${titleEn}`;
+
     const emailRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -116,7 +170,7 @@ serve(async (req) => {
       body: JSON.stringify({
         from: Deno.env.get("EMAIL_FROM") || "AgentPark <noreply@agentpark.am>",
         to: [reg.email],
-        subject: `Registration Confirmed: ${eventTitle}`,
+        subject,
         html: htmlBody,
       }),
     });
@@ -130,7 +184,6 @@ serve(async (req) => {
       });
     }
 
-    // Mark email as sent
     await supabase
       .from("registrations")
       .update({ email_sent: true })

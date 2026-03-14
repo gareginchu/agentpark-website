@@ -24,3 +24,5 @@ _save_overrides.js
 
 # Local settings
 .claude/
+.env
+supabase/.temp/

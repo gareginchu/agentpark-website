@@ -23,7 +23,7 @@
 
   <link rel="icon" type="image/png" sizes="32x32" href="Brand_assets/favicon-32x32.png">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="config.js"></script>
+  <script src="config.js?v=2"></script>
 <script>
 // Analytics tracking
 (function() {
@@ -485,15 +485,24 @@
       if (!ev.date) return '';
       const start = new Date(ev.date);
       const opts = withWeekday ? {weekday:'long',month:'long',day:'numeric',year:'numeric'} : {month:'long',day:'numeric',year:'numeric'};
+      let result;
       if (!ev.end_date || ev.end_date === ev.date) {
-        return start.toLocaleDateString(loc, opts);
+        result = start.toLocaleDateString(loc, opts);
+      } else {
+        const end = new Date(ev.end_date);
+        const startShort = withWeekday ? {weekday:'long',month:'long',day:'numeric'} : {month:'long',day:'numeric'};
+        if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+          result = start.toLocaleDateString(loc, startShort) + '–' + end.getDate() + ', ' + end.getFullYear();
+        } else {
+          result = start.toLocaleDateString(loc, startShort) + ' – ' + end.toLocaleDateString(loc, opts);
+        }
       }
-      const end = new Date(ev.end_date);
-      const startShort = withWeekday ? {weekday:'long',month:'long',day:'numeric'} : {month:'long',day:'numeric'};
-      if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
-        return start.toLocaleDateString(loc, startShort) + '–' + end.getDate() + ', ' + end.getFullYear();
+      // Append time if available
+      if (ev.start_time) {
+        const timePart = ev.end_time ? ev.start_time + '–' + ev.end_time : ev.start_time;
+        result += ', ' + timePart;
       }
-      return start.toLocaleDateString(loc, startShort) + ' – ' + end.toLocaleDateString(loc, opts);
+      return result;
     }
 
     async function init() {
@@ -517,6 +526,7 @@
 
     function renderEvent(ev) {
       const isAm = currentLang === 'am';
+      const t = TRANS[currentLang] || TRANS.en;
       const evTitle = (isAm && ev.title_am) ? ev.title_am : ev.title;
       const evDesc = (isAm && ev.description_am) ? ev.description_am : ev.description;
       const evSummary = (isAm && ev.summary_am) ? ev.summary_am : ev.summary;
@@ -673,7 +683,6 @@
 
       // Reg card meta
       const cardMeta = [];
-      const t = TRANS[currentLang] || TRANS.en;
       if (ev.date) cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-date']}</p><p class="text-sm font-semibold text-navy">${formatEventDate(ev, false)}</p></div></div>`);
       if (ev.location) cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-location']}</p><p class="text-sm font-semibold text-navy">${ev.location}</p></div></div>`);
       if (ev.capacity) cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-capacity']}</p><p class="text-sm font-semibold text-navy">${ev.capacity} ${t['attendees']}</p></div></div>`);
@@ -711,6 +720,20 @@
         'https://x.com/intent/tweet?url=' + shareUrl + '&text=' + pageTitle;
       document.getElementById('share-facebook').href =
         'https://www.facebook.com/sharer/sharer.php?u=' + shareUrl;
+
+      // Handle payment return
+      const params = new URLSearchParams(window.location.search);
+      const paymentStatus = params.get('payment');
+      if (paymentStatus === 'success') {
+        document.getElementById('reg-form-wrap').classList.add('hidden');
+        document.getElementById('reg-success').classList.remove('hidden');
+      } else if (paymentStatus === 'failed') {
+        const errEl = document.getElementById('reg-error');
+        if (errEl) {
+          errEl.textContent = t['try-again'] || 'Payment failed. Please try again.';
+          errEl.classList.remove('hidden');
+        }
+      }
 
       document.getElementById('loading').classList.add('hidden');
       document.getElementById('event-content').classList.remove('hidden');
@@ -772,7 +795,7 @@
             fetch(SUPABASE_URL + '/functions/v1/send-confirmation-email', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_KEY },
-              body: JSON.stringify({ registration_id: regData[0].id }),
+              body: JSON.stringify({ registration_id: regData[0].id, lang: currentLang }),
             });
           }
         } catch(_) {}
