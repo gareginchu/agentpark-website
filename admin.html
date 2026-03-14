@@ -6,6 +6,7 @@
   <title>AgentPark Admin</title>
   <link rel="icon" type="image/png" sizes="32x32" href="Brand_assets/favicon-32x32.png">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="config.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
@@ -310,8 +311,8 @@
 
         <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
           <div>
-            <label class="block text-xs font-medium text-gold-tint/70 tracking-wide uppercase mb-2" data-i18n="username">Username</label>
-            <input id="login-user" type="text" placeholder="admin" class="admin-input bg-white/10 border-white/15 text-white placeholder-white/30" style="color:white;background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);" autocomplete="username">
+            <label class="block text-xs font-medium text-gold-tint/70 tracking-wide uppercase mb-2" data-i18n="email-label">Email</label>
+            <input id="login-user" type="email" placeholder="admin@agentpark.am" class="admin-input bg-white/10 border-white/15 text-white placeholder-white/30" style="color:white;background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);" autocomplete="email">
           </div>
           <div>
             <label class="block text-xs font-medium text-gold-tint/70 tracking-wide uppercase mb-2" data-i18n="password">Password</label>
@@ -323,7 +324,7 @@
           </button>
         </form>
 
-        <p class="text-xs text-white/30 text-center mt-6" data-i18n="login-hint">Default: admin / agentpark2025</p>
+        <p class="text-xs text-white/30 text-center mt-6">Secured with Supabase Auth</p>
       </div>
     </div>
   </div>
@@ -1028,6 +1029,26 @@
                 <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-capacity">Capacity</label>
                 <input id="ev-capacity" type="number" class="admin-input" placeholder="e.g. 100" data-i18n-placeholder="ph-ev-capacity">
               </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-price">Price <span class="text-navy/30 normal-case">(0 = free)</span></label>
+                <input id="ev-price" type="number" min="0" class="admin-input" placeholder="e.g. 5000" data-i18n-placeholder="ph-ev-price">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-currency">Currency</label>
+                <select id="ev-currency" class="admin-input">
+                  <option value="AMD">AMD (Armenian Dram)</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-price-display">Price Display</label>
+                <select id="ev-price-display" class="admin-input">
+                  <option value="hide">Hide price (free events)</option>
+                  <option value="show">Show price on cards</option>
+                  <option value="contact">Show "Contact us for pricing"</option>
+                </select>
+              </div>
               <div class="sm:col-span-2">
                 <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">Cover Image <span class="text-navy/30 normal-case">(shown on event cards)</span></label>
                 <div class="flex gap-2">
@@ -1161,29 +1182,43 @@
 
   <script>
     // ============================================================
-    // AUTH
+    // AUTH (Supabase Auth)
     // ============================================================
-    const CREDS = { user: 'admin', pass: 'agentpark2025' };
+    const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    function handleLogin(e) {
+    function showAdminShell() {
+      document.getElementById('login-screen').style.opacity = '0';
+      setTimeout(() => {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('admin-shell').classList.remove('hidden');
+        document.getElementById('admin-shell').classList.add('flex');
+      }, 300);
+      initRichEditors();
+      loadSaved();
+      initAutoExpand();
+    }
+
+    // Check for existing session on page load
+    (async function checkSession() {
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (session) showAdminShell();
+    })();
+
+    async function handleLogin(e) {
       e.preventDefault();
-      const u = document.getElementById('login-user').value.trim();
-      const p = document.getElementById('login-pass').value;
-      if (u === CREDS.user && p === CREDS.pass) {
-        document.getElementById('login-screen').style.opacity = '0';
-        setTimeout(() => {
-          document.getElementById('login-screen').classList.add('hidden');
-          document.getElementById('admin-shell').classList.remove('hidden');
-          document.getElementById('admin-shell').classList.add('flex');
-        }, 300);
-        initRichEditors();
-        loadSaved();
-        initAutoExpand();
-      } else {
-        const err = document.getElementById('login-error');
+      const email = document.getElementById('login-user').value.trim();
+      const password = document.getElementById('login-pass').value;
+      const err = document.getElementById('login-error');
+      err.classList.add('hidden');
+
+      const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        err.textContent = error.message;
         err.classList.remove('hidden');
-        setTimeout(() => err.classList.add('hidden'), 3000);
+        setTimeout(() => err.classList.add('hidden'), 4000);
+        return;
       }
+      showAdminShell();
     }
 
     function toggleSidebar() {
@@ -1195,7 +1230,8 @@
       document.body.classList.toggle('overflow-hidden', !isOpen);
     }
 
-    function handleLogout() {
+    async function handleLogout() {
+      await _supabase.auth.signOut();
       document.getElementById('admin-shell').classList.add('hidden');
       document.getElementById('admin-shell').classList.remove('flex');
       const ls = document.getElementById('login-screen');
@@ -2507,6 +2543,7 @@
                 ${ev.date ? `<span class="text-xs text-navy/50">\u{1F4C5} ${ev.date}</span>` : ''}
                 ${ev.location ? `<span class="text-xs text-navy/50">\u{1F4CD} ${ev.location}</span>` : ''}
                 ${ev.capacity ? `<span class="text-xs text-navy/50">\u{1F465} ${tr("capacity-label")}: ${ev.capacity}</span>` : ''}
+                ${ev.price && ev.price > 0 ? `<span class="text-xs text-gold font-semibold">\u{1F4B0} ${ev.price.toLocaleString()} ${ev.currency || 'AMD'}</span>` : `<span class="text-xs text-green-500">${tr('ev-free-badge')}</span>`}
                 ${ev.images && ev.images.length ? `<span class="text-xs text-navy/50">\u{1F5BC}\u{FE0F} ${ev.images.length} ${ev.images.length > 1 ? tr("images-plural") : tr("image-singular")}</span>` : ''}
                 ${ev.summary ? '<span class="text-xs text-gold">\u{270F}\u{FE0F} ' + tr('has-summary') + '</span>' : ''}
               </div>
@@ -2546,6 +2583,9 @@
             end_date: document.getElementById('ev-end-date').value || null,
             location: document.getElementById('ev-location').value || null,
             capacity: parseInt(document.getElementById('ev-capacity').value) || null,
+            price: parseInt(document.getElementById('ev-price').value) || 0,
+            currency: document.getElementById('ev-currency').value || 'AMD',
+            price_display: document.getElementById('ev-price-display').value || 'hide',
             description: document.getElementById('ev-desc').value || null,
             description_am: document.getElementById('ev-desc-am').value || null,
             summary: document.getElementById('ev-summary').value || null,
@@ -2556,7 +2596,9 @@
             organizers: _organizers.length ? _organizers : null,
           }),
         });
-        ['ev-title','ev-title-am','ev-date','ev-end-date','ev-location','ev-capacity','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
+        ['ev-title','ev-title-am','ev-date','ev-end-date','ev-location','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('ev-currency').value = 'AMD';
+        document.getElementById('ev-price-display').value = 'hide';
         document.getElementById('ev-cover-preview').classList.add('hidden');
         document.getElementById('ev-images-preview').innerHTML = '';
         document.getElementById('ev-video-preview').classList.add('hidden');
@@ -2593,6 +2635,9 @@
       document.getElementById('ev-end-date').value = ev.end_date || '';
       document.getElementById('ev-location').value = ev.location || '';
       document.getElementById('ev-capacity').value = ev.capacity || '';
+      document.getElementById('ev-price').value = ev.price || 0;
+      document.getElementById('ev-currency').value = ev.currency || 'AMD';
+      document.getElementById('ev-price-display').value = ev.price_display || 'hide';
       document.getElementById('ev-desc').value = ev.description || '';
       document.getElementById('ev-desc-am').value = ev.description_am || '';
       document.getElementById('ev-summary').value = ev.summary || '';
@@ -2640,6 +2685,9 @@
             end_date: document.getElementById('ev-end-date').value || null,
             location: document.getElementById('ev-location').value || null,
             capacity: parseInt(document.getElementById('ev-capacity').value) || null,
+            price: parseInt(document.getElementById('ev-price').value) || 0,
+            currency: document.getElementById('ev-currency').value || 'AMD',
+            price_display: document.getElementById('ev-price-display').value || 'hide',
             description: document.getElementById('ev-desc').value || null,
             description_am: document.getElementById('ev-desc-am').value || null,
             summary: document.getElementById('ev-summary').value || null,
@@ -2662,7 +2710,8 @@
 
     function cancelEditEvent() {
       _editingEventId = null;
-      ['ev-title','ev-title-am','ev-date','ev-end-date','ev-location','ev-capacity','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
+      ['ev-title','ev-title-am','ev-date','ev-end-date','ev-location','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('ev-currency').value = 'AMD';
       document.getElementById('ev-cover-preview').classList.add('hidden');
       document.getElementById('ev-images-preview').innerHTML = '';
       document.getElementById('ev-video-preview').classList.add('hidden');
@@ -2689,21 +2738,39 @@
           list.innerHTML = '<div class="text-center py-8 text-navy/40 text-sm">' + tr('no-registrations') + '</div>';
           return;
         }
+        const paidCount = regs.filter(r => r.payment_status === 'paid').length;
+        const totalRevenue = regs.reduce((sum, r) => sum + (r.payment_status === 'paid' ? (r.payment_amount || 0) : 0), 0);
+        const pendingCount = regs.filter(r => r.payment_status === 'pending').length;
+        window._currentRegs = regs;
         list.innerHTML = `
-          <div class="mb-3 flex items-center justify-between">
-            <span class="text-xs text-navy/50">${regs.length} registration${regs.length !== 1 ? 's' : ''}</span>
-            <button onclick="exportCSV(${JSON.stringify(regs).replace(/"/g,'&quot;')})" class="text-xs text-gold hover:text-gold/70 transition-opacity duration-150">' + tr('export-csv') + '</button>
+          <div class="mb-3 flex items-center justify-between flex-wrap gap-2">
+            <span class="text-xs text-navy/50">${regs.length} registration${regs.length !== 1 ? 's' : ''}${paidCount ? ` · ${paidCount} paid` : ''}${pendingCount ? ` · ${pendingCount} pending` : ''}${totalRevenue ? ` · Revenue: ${totalRevenue.toLocaleString()} AMD` : ''}</span>
+            <button onclick="exportCSV(window._currentRegs)" class="text-xs text-gold hover:text-gold/70 transition-opacity duration-150">${tr('export-csv')}</button>
           </div>
           <div class="space-y-2">
-            ${regs.map(r => `
+            ${regs.map(r => {
+              const statusBadge = r.payment_status === 'paid'
+                ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-green-50 text-green-600 font-medium">Paid</span>'
+                : r.payment_status === 'pending'
+                ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-600 font-medium">Pending</span>'
+                : r.payment_status === 'failed'
+                ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-red-50 text-red-500 font-medium">Failed</span>'
+                : '<span class="text-[10px] px-2 py-0.5 rounded-full bg-navy/8 text-navy/40 font-medium">Free</span>';
+              const paymentInfo = r.payment_amount && r.payment_amount > 0
+                ? `<span class="text-[10px] text-navy/40 ml-2">${r.payment_amount.toLocaleString()} ${r.payment_currency || 'AMD'}</span>`
+                : '';
+              return `
               <div class="flex items-center justify-between py-2.5 px-4 rounded-xl bg-warm-gray">
                 <div>
                   <p class="text-sm font-medium text-navy">${r.name}</p>
                   <p class="text-xs text-navy/50">${r.email}</p>
                 </div>
-                <span class="text-[10px] text-navy/40">${new Date(r.created_at).toLocaleDateString()}</span>
-              </div>
-            `).join('')}
+                <div class="flex items-center gap-2 flex-shrink-0">
+                  ${statusBadge}${paymentInfo}
+                  <span class="text-[10px] text-navy/40">${new Date(r.created_at).toLocaleDateString()}</span>
+                </div>
+              </div>`;
+            }).join('')}
           </div>
         `;
       } catch(e) {
@@ -2712,8 +2779,8 @@
     }
 
     function exportCSV(regs) {
-      const rows = [[tr('csv-name'), tr('csv-email'), tr('csv-registered-at')], ...regs.map(r => [r.name, r.email, r.created_at])];
-      const csv = rows.map(r => r.join(',')).join('\n');
+      const rows = [[tr('csv-name'), tr('csv-email'), tr('csv-registered-at'), 'Payment Status', 'Amount', 'Currency', 'Paid At', 'Transaction ID'], ...regs.map(r => [r.name, r.email, r.created_at, r.payment_status || 'free', r.payment_amount || 0, r.payment_currency || '', r.paid_at || '', r.payment_txn_id || ''])];
+      const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
       const a = document.createElement('a');
       a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
       a.download = 'registrations.csv';
@@ -2833,6 +2900,9 @@
         // Events
         'add-new-event': 'Add New Event', 'label-event-title': 'Event Title *',
         'label-date': 'Date', 'label-location': 'Location', 'label-capacity': 'Capacity',
+        'label-price': 'Price', 'label-currency': 'Currency', 'label-price-display': 'Price Display',
+        'ph-ev-price': 'e.g. 5000',
+        'ev-free-badge': 'Free',
         'label-ev-description': 'Description', 'add-event-btn': 'Add Event', 'saving': 'Saving...',
         'all-events': 'All Events', 'refresh-events': 'Refresh',
         'registrations': 'Registrations', 'close-btn': 'Close',

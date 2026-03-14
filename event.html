@@ -4,6 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Event — AgentPark</title>
+  <meta name="description" content="View event details and register — AgentPark AI Innovation Hub, Yerevan, Armenia.">
+  <link rel="canonical" href="https://agentpark.am/event.html">
+
+  <!-- Open Graph (defaults, updated dynamically per event) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="AgentPark">
+  <meta property="og:title" id="og-title" content="Event — AgentPark">
+  <meta property="og:description" id="og-description" content="View event details and register — AgentPark AI Innovation Hub.">
+  <meta property="og:image" id="og-image" content="https://agentpark.am/Brand_assets/AgentPark_logo@2x.png">
+  <meta property="og:url" id="og-url" content="https://agentpark.am/event.html">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" id="tw-title" content="Event — AgentPark">
+  <meta name="twitter:description" id="tw-description" content="View event details and register — AgentPark AI Innovation Hub.">
+  <meta name="twitter:image" id="tw-image" content="https://agentpark.am/Brand_assets/AgentPark_logo@2x.png">
+
   <link rel="icon" type="image/png" sizes="32x32" href="Brand_assets/favicon-32x32.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="config.js"></script>
@@ -386,7 +403,8 @@
         'reg-email-notice': "We'll send details to your email before the event.",
         'share-event': 'Share this Event',
         'link-copied': 'Link copied!',
-        'meta-date': 'Date', 'meta-location': 'Location', 'meta-capacity': 'Capacity',
+        'meta-date': 'Date', 'meta-location': 'Location', 'meta-capacity': 'Capacity', 'meta-price': 'Price',
+        'contact-pricing': 'Contact us for pricing',
         'spots-available': 'spots available', 'attendees': 'attendees',
         'no-description': 'No description provided.',
         'registering': 'Registering...', 'try-again': 'Something went wrong. Please try again.',
@@ -416,7 +434,8 @@
         'reg-email-notice': 'Մենք կուղարկենք մանրամասները ձեր էլ. հասցեին:',
         'share-event': 'Կիսվել միջոցառմամբ',
         'link-copied': 'Հղումը պատճենված է:',
-        'meta-date': 'Ամսաթիվ', 'meta-location': 'Վայր', 'meta-capacity': 'Հզորություն',
+        'meta-date': 'Ամսաթիվ', 'meta-location': 'Վայր', 'meta-capacity': 'Հզորություն', 'meta-price': 'Գին',
+        'contact-pricing': 'Կապվել մեզ գների համար',
         'spots-available': 'տեղ հասանելի', 'attendees': 'մասնակից',
         'no-description': 'Նկարագրություն չի տրամադրվել:',
         'registering': 'Գրանցվում է...', 'try-again': 'Ինչ-որ բան սխալ գնաց: Խնդրում ենք կրկին փորձել:',
@@ -503,6 +522,42 @@
       const evSummary = (isAm && ev.summary_am) ? ev.summary_am : ev.summary;
       document.title = evTitle + ' — AgentPark';
 
+      // Update OG meta tags dynamically
+      const pageUrl = window.location.href;
+      const ogDesc = evDesc ? evDesc.slice(0, 200).replace(/\n/g, ' ') : 'Event at AgentPark';
+      const ogImg = (ev.images && ev.images.length) ? (typeof ev.images[0] === 'string' ? ev.images[0] : ev.images[0].url) : 'https://agentpark.am/Brand_assets/AgentPark_logo@2x.png';
+      document.getElementById('og-title').setAttribute('content', evTitle + ' — AgentPark');
+      document.getElementById('og-description').setAttribute('content', ogDesc);
+      document.getElementById('og-image').setAttribute('content', ogImg);
+      document.getElementById('og-url').setAttribute('content', pageUrl);
+      document.getElementById('tw-title').setAttribute('content', evTitle + ' — AgentPark');
+      document.getElementById('tw-description').setAttribute('content', ogDesc);
+      document.getElementById('tw-image').setAttribute('content', ogImg);
+      document.querySelector('link[rel="canonical"]').setAttribute('href', pageUrl);
+
+      // JSON-LD structured data for event
+      const ldJson = {
+        '@context': 'https://schema.org',
+        '@type': 'Event',
+        'name': ev.title,
+        'description': ev.description ? ev.description.slice(0, 300) : '',
+        'startDate': ev.date || '',
+        'endDate': ev.end_date || ev.date || '',
+        'location': { '@type': 'Place', 'name': ev.location || 'TBD' },
+        'organizer': { '@type': 'Organization', 'name': 'AgentPark', 'url': 'https://agentpark.am' },
+        'image': ogImg,
+        'url': pageUrl
+      };
+      if (ev.capacity) ldJson.maximumAttendeeCapacity = ev.capacity;
+      let ldScript = document.getElementById('event-jsonld');
+      if (!ldScript) {
+        ldScript = document.createElement('script');
+        ldScript.type = 'application/ld+json';
+        ldScript.id = 'event-jsonld';
+        document.head.appendChild(ldScript);
+      }
+      ldScript.textContent = JSON.stringify(ldJson);
+
       // Determine if past event
       const now = new Date(); now.setHours(0,0,0,0);
       const isPast = ev.date && new Date(ev.end_date || ev.date) < now;
@@ -517,6 +572,25 @@
         // Show closed, hide form
         document.getElementById('reg-form-wrap').classList.add('hidden');
         document.getElementById('reg-closed-wrap').classList.remove('hidden');
+      } else {
+        // Update registration button for paid events
+        const regBtn = document.getElementById('reg-btn');
+        if (ev.price_display === 'show' && ev.price > 0 && typeof formatPrice === 'function') {
+          regBtn.textContent = t['modal-confirm'] + ' — ' + formatPrice(ev.price, ev.currency);
+        } else if (ev.price_display === 'contact') {
+          // For "contact" mode, replace form with a contact message
+          document.getElementById('reg-form-wrap').innerHTML = `
+            <div class="text-center py-6">
+              <div class="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-3">
+                <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              </div>
+              <p class="text-sm font-bold text-navy mb-1">${t['contact-pricing']}</p>
+              <a href="mailto:info@agentpark.am" class="inline-flex items-center gap-1.5 mt-3 px-5 py-2.5 bg-navy text-white text-sm font-semibold rounded-lg hover:bg-navy-light transition-colors duration-150">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                info@agentpark.am
+              </a>
+            </div>`;
+        }
       }
 
       // Event video
@@ -603,6 +677,12 @@
       if (ev.date) cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-date']}</p><p class="text-sm font-semibold text-navy">${formatEventDate(ev, false)}</p></div></div>`);
       if (ev.location) cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-location']}</p><p class="text-sm font-semibold text-navy">${ev.location}</p></div></div>`);
       if (ev.capacity) cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-capacity']}</p><p class="text-sm font-semibold text-navy">${ev.capacity} ${t['attendees']}</p></div></div>`);
+      // Price display in sidebar
+      if (ev.price_display === 'show' && ev.price > 0) {
+        cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-price']}</p><p class="text-sm font-bold text-gold">${formatPrice(ev.price, ev.currency)}</p></div></div>`);
+      } else if (ev.price_display === 'contact') {
+        cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-navy/5 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-navy/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-price']}</p><p class="text-xs font-medium text-navy/60">${t['contact-pricing']}</p></div></div>`);
+      }
       document.getElementById('reg-card-meta').innerHTML = cardMeta.join('');
 
       // Organizers
@@ -623,14 +703,14 @@
       // else keep the default AgentPark logo
 
       // Share links
-      const pageUrl = encodeURIComponent(window.location.href);
+      const shareUrl = encodeURIComponent(window.location.href);
       const pageTitle = encodeURIComponent(ev.title);
       document.getElementById('share-linkedin').href =
-        'https://www.linkedin.com/sharing/share-offsite/?url=' + pageUrl;
+        'https://www.linkedin.com/sharing/share-offsite/?url=' + shareUrl;
       document.getElementById('share-x').href =
-        'https://x.com/intent/tweet?url=' + pageUrl + '&text=' + pageTitle;
+        'https://x.com/intent/tweet?url=' + shareUrl + '&text=' + pageTitle;
       document.getElementById('share-facebook').href =
-        'https://www.facebook.com/sharer/sharer.php?u=' + pageUrl;
+        'https://www.facebook.com/sharer/sharer.php?u=' + shareUrl;
 
       document.getElementById('loading').classList.add('hidden');
       document.getElementById('event-content').classList.remove('hidden');
@@ -647,9 +727,30 @@
       const email = document.getElementById('reg-email').value.trim();
       const btn = document.getElementById('reg-btn');
       const errEl = document.getElementById('reg-error');
-      btn.textContent = (TRANS[currentLang]||TRANS.en)['registering'];
+      const t = TRANS[currentLang] || TRANS.en;
+      btn.textContent = t['registering'];
       btn.disabled = true;
       errEl.classList.add('hidden');
+
+      const ev = window._currentEvent;
+      // Paid event flow
+      if (ev && ev.price > 0 && ev.price_display === 'show') {
+        try {
+          const result = await createPaymentOrder(eventId, name, email, ev);
+          if (result.payment_url) {
+            window.location.href = result.payment_url;
+            return;
+          }
+        } catch(err) {
+          errEl.textContent = t['try-again'];
+          errEl.classList.remove('hidden');
+          btn.textContent = t['modal-confirm'];
+          btn.disabled = false;
+          return;
+        }
+      }
+
+      // Free event flow
       try {
         const res = await fetch(SUPABASE_URL + '/rest/v1/registrations', {
           method: 'POST',
@@ -657,13 +758,24 @@
             'apikey': SUPABASE_KEY,
             'Authorization': 'Bearer ' + SUPABASE_KEY,
             'Content-Type': 'application/json',
-            'Prefer': 'return=minimal',
+            'Prefer': 'return=representation',
           },
           body: JSON.stringify({ event_id: eventId, name, email }),
         });
         if (!res.ok) throw new Error(await res.text());
         document.getElementById('reg-form-wrap').classList.add('hidden');
         document.getElementById('reg-success').classList.remove('hidden');
+        // Send confirmation email (fire-and-forget)
+        try {
+          const regData = await res.json();
+          if (regData && regData[0]) {
+            fetch(SUPABASE_URL + '/functions/v1/send-confirmation-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_KEY },
+              body: JSON.stringify({ registration_id: regData[0].id }),
+            });
+          }
+        } catch(_) {}
       } catch(err) {
         errEl.textContent = (TRANS[currentLang]||TRANS.en)['try-again'];
         errEl.classList.remove('hidden');

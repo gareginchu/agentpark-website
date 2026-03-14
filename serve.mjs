@@ -95,6 +95,64 @@ const server = createServer(async (req, res) => {
     return;
   }
 
+  // POST /api/apply-overrides — bake localStorage overrides into index.html TRANS.am
+  if (req.method === 'POST' && urlPath === '/api/apply-overrides') {
+    try {
+      const body = await readBody(req);
+      const overrides = JSON.parse(body);
+      const keys = Object.keys(overrides);
+      if (!keys.length) return json(res, { error: 'No overrides provided' }, 400);
+
+      // Read current index.html
+      const htmlPath = join(__dirname, 'index.html');
+      let html = await readFile(htmlPath, 'utf8');
+
+      // Find TRANS.am block
+      const startMarker = 'TRANS.am = {';
+      const startIdx = html.indexOf(startMarker);
+      if (startIdx === -1) return json(res, { error: 'TRANS.am not found' }, 500);
+
+      // Find closing brace
+      let braceCount = 0, endIdx = -1;
+      for (let i = startIdx + startMarker.length - 1; i < html.length; i++) {
+        if (html[i] === '{') braceCount++;
+        if (html[i] === '}') { braceCount--; if (braceCount === 0) { endIdx = i + 1; break; } }
+      }
+
+      const oldBlock = html.substring(startIdx, endIdx);
+      const lines = oldBlock.split('\n');
+      const newLines = [lines[0]];
+      let changed = 0;
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        const m = line.match(/^(\s*)'([^']+)':\s*'(.*)'(,?)$/);
+        if (m) {
+          const [, indent, key, oldVal, comma] = m;
+          if (overrides[key] !== undefined) {
+            const newVal = overrides[key].replace(/'/g, "\\'");
+            if (newVal !== oldVal) {
+              newLines.push(indent + "'" + key + "': '" + newVal + "'" + comma);
+              changed++;
+              continue;
+            }
+          }
+        }
+        newLines.push(line);
+      }
+
+      const newBlock = newLines.join('\n');
+      html = html.substring(0, startIdx) + newBlock + html.substring(endIdx);
+      await writeFile(htmlPath, html, 'utf8');
+
+      console.log(`[apply-overrides] Updated ${changed} of ${keys.length} keys`);
+      json(res, { ok: true, changed, total: keys.length });
+    } catch (e) {
+      json(res, { error: e.message }, 500);
+    }
+    return;
+  }
+
   // Static file serving
   let filePath = decodeURIComponent(urlPath === '/' ? '/index.html' : urlPath);
   filePath = join(__dirname, filePath);
