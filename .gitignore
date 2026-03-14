@@ -3,3 +3,24 @@ temporary screenshots/
 uploads/
 public/
 *.jsonl
+
+# Temp utility scripts
+_apply_corrections.js
+_apply_overrides.js
+_compare_events.js
+_debug_scroll.js
+_docx_content.xml
+_docx_text.txt
+_extract_overrides.js
+_overrides.json
+_parse_docx.js
+_read_docx.js
+_read_docx.ps1
+_save_overrides.js
+
+# Translation source docs
+*.docx
+*.doc
+
+# Local settings
+.claude/
