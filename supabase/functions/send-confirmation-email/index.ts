@@ -90,6 +90,7 @@ serve(async (req) => {
     interface SectionData {
       greeting: string;
       message: string;
+      closing: string;
       title: string;
       date: string;
       dateLabel: string;
@@ -103,7 +104,11 @@ serve(async (req) => {
       return `
         <div style="${sectionStyle}">
           <p style="color: #0D2740; font-size: 14px; margin: 0 0 4px;">${t.greeting}</p>
-          <p style="color: #0D2740; font-size: 14px; margin: 0;">${t.message}</p>
+          <p style="color: #0D2740; font-size: 14px; margin: 0 0 12px;">${t.message}</p>
+          <p style="color: #0D2740; font-size: 14px; margin: 0;">${t.closing}</p>
+          <div style="text-align: center; margin-top: 12px;">
+            <img src="https://agentpark-website.pages.dev/Brand_assets/AgentPark_logo@2x.png" alt="AgentPark" style="height: 24px; width: auto;">
+          </div>
         </div>
         <div style="${cardStyle}">
           <h2 style="color: #0D2740; font-size: 18px; margin: 0 0 16px;">${t.title}</h2>
@@ -132,10 +137,11 @@ serve(async (req) => {
     }
 
     const enSection = buildSection({
-      greeting: `Hello <strong>${reg.name}</strong>,`,
+      greeting: `Dear <strong>${reg.name}</strong>,`,
       message: isPaid
         ? "Your payment has been received and your registration is confirmed!"
         : "Your registration is confirmed!",
+      closing: "See you soon at the event!<br><strong>AgentPark Team</strong>",
       title: titleEn,
       date: dateEn,
       dateLabel: "Date",
@@ -159,27 +165,25 @@ serve(async (req) => {
       joinBtnLabel: "\u{1F4F9} \u0544\u056B\u0561\u0576\u0561\u056C \u0570\u0561\u0576\u0564\u056B\u057A\u0574\u0561\u0576\u056B\u0576",
     });
 
-    const primarySection = isAm ? amSection : enSection;
-    const secondarySection = isAm ? enSection : amSection;
-
+    // Armenian always first
     const htmlBody = `
       <div style="font-family: 'Inter', Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; background: #ffffff;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="color: #0D2740; font-size: 24px; margin: 0;">AgentPark</h1>
           <p style="color: #CBA14B; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px;">
-            ${isAm ? "\u0544\u056B\u057B\u0578\u0581\u0561\u057C\u0574\u0561\u0576 \u0563\u0580\u0561\u0576\u0581\u0578\u0582\u0574" : "Event Registration"} / ${isAm ? "Event Registration" : "\u0544\u056B\u057B\u0578\u0581\u0561\u057C\u0574\u0561\u0576 \u0563\u0580\u0561\u0576\u0581\u0578\u0582\u0574"}
+            \u0544\u056B\u057B\u0578\u0581\u0561\u057C\u0574\u0561\u0576 \u0563\u0580\u0561\u0576\u0581\u0578\u0582\u0574 / Event Registration
           </p>
         </div>
 
-        ${primarySection}
+        ${amSection}
 
         <div style="border-top: 1px dashed #d1d5db; margin: 8px 0 24px; position: relative;">
           <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 12px; color: #9ca3af; font-size: 11px;">
-            ${isAm ? "English" : "\u0540\u0561\u0575\u0565\u0580\u0565\u0576"}
+            English
           </span>
         </div>
 
-        ${secondarySection}
+        ${enSection}
 
         <p style="color: #6c757d; font-size: 12px; text-align: center; margin-top: 32px;">
           &copy; 2026 AgentPark Ltd. &bull; Yerevan, Armenia
