@@ -26,3 +26,5 @@ _save_overrides.js
 .claude/
 .env
 supabase/.temp/
+_cert_template*.pdf
+package-lock.json

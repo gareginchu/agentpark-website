@@ -12,6 +12,8 @@
   "dependencies": {
     "docx": "^9.6.1",
     "jszip": "^3.10.1",
-    "puppeteer": "^24.37.5"
+    "pdf-lib": "^1.17.1",
+    "puppeteer": "^24.37.5",
+    "xlsx": "^0.18.5"
   }
 }
