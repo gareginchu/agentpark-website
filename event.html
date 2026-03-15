@@ -548,13 +548,22 @@
       eventId = id;
 
       try {
-        const res = await fetch(SUPABASE_URL + '/rest/v1/events?id=eq.' + id + '&select=*', {
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-        });
-        const data = await res.json();
+        const [evRes, regCountRes] = await Promise.all([
+          fetch(SUPABASE_URL + '/rest/v1/events?id=eq.' + id + '&select=*', {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+          }),
+          fetch(SUPABASE_URL + '/rest/v1/registrations?event_id=eq.' + id + '&select=id', {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Prefer': 'count=exact' }
+          })
+        ]);
+        const data = await evRes.json();
+        const regs = await regCountRes.json();
         if (!data.length) { showError(); return; }
-        window._currentEvent = data[0];
-        renderEvent(data[0]);
+        const ev = data[0];
+        ev._reg_count = regs.length;
+        ev._spots_remaining = ev.capacity ? Math.max(0, ev.capacity - ev._reg_count) : null;
+        window._currentEvent = ev;
+        renderEvent(ev);
       } catch(e) {
         showError();
       }
@@ -714,7 +723,7 @@
       </span>`);
       if (ev.capacity) metas.push(`<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-xs font-medium text-white/80">
         <svg class="w-3.5 h-3.5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        ${ev.capacity} ${(TRANS[currentLang]||TRANS.en)['spots-available']}
+        ${ev._spots_remaining != null ? ev._spots_remaining : ev.capacity} ${(TRANS[currentLang]||TRANS.en)['spots-available']}
       </span>`);
       metaEl.innerHTML = metas.join('');
 
@@ -730,7 +739,7 @@
       const cardMeta = [];
       if (ev.date) cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-date']}</p><p class="text-sm font-semibold text-navy">${formatEventDate(ev, false)}</p></div></div>`);
       if (ev.location) cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-location']}</p><p class="text-sm font-semibold text-navy">${ev.location}</p></div></div>`);
-      if (ev.capacity) cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-capacity']}</p><p class="text-sm font-semibold text-navy">${ev.capacity} ${t['attendees']}</p></div></div>`);
+      if (ev.capacity) cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-capacity']}</p><p class="text-sm font-semibold text-navy">${ev._spots_remaining != null ? ev._spots_remaining + ' ' + t['spots-available'] : ev.capacity + ' ' + t['attendees']}</p></div></div>`);
       // Price display in sidebar
       if (ev.price_display === 'show' && ev.price > 0) {
         cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-price']}</p><p class="text-sm font-bold text-gold">${formatPrice(ev.price, ev.currency)}</p></div></div>`);
@@ -859,7 +868,7 @@
         ctx.fillStyle = '#0D2740';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(fullName, canvas.width / 2, canvas.height * 0.38);
+        ctx.fillText(fullName, canvas.width / 2, canvas.height * 0.42);
 
         // Download as PNG
         const dataUrl = canvas.toDataURL('image/png');
