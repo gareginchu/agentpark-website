@@ -138,25 +138,29 @@ serve(async (req) => {
     const base64Pdf = btoa(binary);
 
     // 7. Send email with attachment via Resend
-    const eventTitle = event.title || "AgentPark Event";
+    const eventTitleEn = event.title || "AgentPark Event";
+    const eventTitleAm = event.title_am || eventTitleEn;
     const emailFrom = Deno.env.get("EMAIL_FROM") || "AgentPark <noreply@agentpark.am>";
 
     const htmlBody = `
-      <div style="font-family: 'Inter', Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px;">
+      <div style="font-family: 'Inter', Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; background: #ffffff;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="color: #0D2740; font-size: 24px; margin: 0;">AgentPark</h1>
-          <p style="color: #CBA14B; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px;">Certificate of Participation</p>
+          <p style="color: #CBA14B; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px;">Certificate of Participation / \u0544\u0561\u057D\u0576\u0561\u056F\u0581\u0578\u0582\u0569\u0575\u0561\u0576 \u057E\u056F\u0561\u0575\u0561\u0563\u056B\u0580</p>
         </div>
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+        <div style="background: #f8f9fa; border-radius: 16px; padding: 24px; margin-bottom: 16px;">
           <p style="color: #0D2740; font-size: 14px; margin: 0 0 8px;">Dear <strong>${fullName}</strong>,</p>
           <p style="color: #0D2740; font-size: 14px; margin: 0;">
-            Thank you for participating in <strong>${eventTitle}</strong>. Your certificate of participation is attached to this email.
+            Thank you for participating in <strong>${eventTitleEn}</strong>. Your certificate of participation is attached to this email.
           </p>
+        </div>
+        <div style="border-top: 1px dashed #d1d5db; margin: 8px 0 16px; position: relative;">
+          <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 12px; color: #9ca3af; font-size: 11px;">\u0540\u0561\u0575\u0565\u0580\u0565\u0576</span>
         </div>
         <div style="background: #f8f9fa; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
           <p style="color: #0D2740; font-size: 14px; margin: 0 0 8px;">\u0540\u0561\u0580\u0563\u0565\u056c\u056b <strong>${fullName}</strong>,</p>
           <p style="color: #0D2740; font-size: 14px; margin: 0;">
-            \u0547\u0576\u0578\u0580\u0570\u0561\u056F\u0561\u056C\u0578\u0582\u0569\u0575\u0578\u0582\u0576 <strong>${eventTitle}</strong> \u0574\u056B\u057B\u0578\u0581\u0561\u057C\u0574\u0561\u0576\u0568 \u0574\u0561\u057D\u0576\u0561\u056F\u0581\u0565\u056C\u0578\u0582 \u0570\u0561\u0574\u0561\u0580\u0589 \u0541\u0565\u0580 \u0574\u0561\u057D\u0576\u0561\u056F\u0581\u0578\u0582\u0569\u0575\u0561\u0576 \u057E\u056F\u0561\u0575\u0561\u0563\u056B\u0580\u0568 \u056F\u0581\u057E\u0561\u056E \u0567 \u0561\u0575\u057D \u0576\u0561\u0574\u0561\u056F\u056B\u0576\u0589
+            \u0547\u0576\u0578\u0580\u0570\u0561\u056F\u0561\u056C\u0578\u0582\u0569\u0575\u0578\u0582\u0576 <strong>${eventTitleAm}</strong> \u0574\u056B\u057B\u0578\u0581\u0561\u057C\u0574\u0561\u0576\u0568 \u0574\u0561\u057D\u0576\u0561\u056F\u0581\u0565\u056C\u0578\u0582 \u0570\u0561\u0574\u0561\u0580\u0589 \u0541\u0565\u0580 \u0574\u0561\u057D\u0576\u0561\u056F\u0581\u0578\u0582\u0569\u0575\u0561\u0576 \u057E\u056F\u0561\u0575\u0561\u0563\u056B\u0580\u0568 \u056F\u0581\u057E\u0561\u056E \u0567 \u0561\u0575\u057D \u0576\u0561\u0574\u0561\u056F\u056B\u0576\u0589
           </p>
         </div>
         <p style="color: #6c757d; font-size: 12px; text-align: center; margin-top: 32px;">
@@ -174,7 +178,7 @@ serve(async (req) => {
       body: JSON.stringify({
         from: emailFrom,
         to: [email],
-        subject: `Your Certificate: ${eventTitle}`,
+        subject: `Your Certificate: ${eventTitleEn}`,
         html: htmlBody,
         attachments: [
           {
