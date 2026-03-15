@@ -886,6 +886,13 @@
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
+        // Log certificate download
+        fetch(SUPABASE_URL + '/rest/v1/certificate_downloads', {
+          method: 'POST',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ event_id: eventId, registration_id: match.id, name: fullName, email: email }),
+        }).catch(() => {});
+
         // Send certificate via email (fire-and-forget)
         fetch(SUPABASE_URL + '/functions/v1/send-certificate-email', {
           method: 'POST',
