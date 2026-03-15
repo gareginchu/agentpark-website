@@ -60,17 +60,29 @@ serve(async (req) => {
     const titleAm = event?.title_am || titleEn;
 
     // Format date with optional time
-    function formatDate(locale: string, fallback: string): string {
-      if (!event?.date) return fallback;
-      let d = new Date(event.date).toLocaleDateString(locale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+    function formatDateEn(): string {
+      if (!event?.date) return "TBD";
+      let d = new Date(event.date).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
       if (event.start_time) {
         d += ", " + event.start_time + (event.end_time ? "\u2013" + event.end_time : "");
       }
       return d;
     }
 
-    const dateEn = formatDate("en-US", "TBD");
-    const dateAm = formatDate("hy-AM", "\u0549\u056B \u0576\u0577\u057E\u0561\u056E");
+    function formatDateAm(): string {
+      if (!event?.date) return "\u0549\u056B \u0576\u0577\u057E\u0561\u056E";
+      const dt = new Date(event.date);
+      const amMonths = ["\u0570\u0578\u0582\u0576\u057E\u0561\u0580\u056B", "\u0583\u0565\u057F\u0580\u057E\u0561\u0580\u056B", "\u0574\u0561\u0580\u057F\u056B", "\u0561\u057A\u0580\u056B\u056C\u056B", "\u0574\u0561\u0575\u056B\u057D\u056B", "\u0570\u0578\u0582\u0576\u056B\u057D\u056B", "\u0570\u0578\u0582\u056C\u056B\u057D\u056B", "\u0585\u0563\u0578\u057D\u057F\u0578\u057D\u056B", "\u057D\u0565\u057A\u057F\u0565\u0574\u0562\u0565\u0580\u056B", "\u0570\u0578\u056F\u057F\u0565\u0574\u0562\u0565\u0580\u056B", "\u0576\u0578\u0575\u0565\u0574\u0562\u0565\u0580\u056B", "\u0564\u0565\u056F\u057F\u0565\u0574\u0562\u0565\u0580\u056B"];
+      const amDays = ["\u056F\u056B\u0580\u0561\u056F\u056B", "\u0565\u0580\u056F\u0578\u0582\u0577\u0561\u0562\u0569\u056B", "\u0565\u0580\u0565\u0584\u0577\u0561\u0562\u0569\u056B", "\u0579\u0578\u0580\u0565\u0584\u0577\u0561\u0562\u0569\u056B", "\u0570\u056B\u0576\u0563\u0577\u0561\u0562\u0569\u056B", "\u0578\u0582\u0580\u0562\u0561\u0569", "\u0577\u0561\u0562\u0561\u0569"];
+      let d = amDays[dt.getDay()] + ", " + dt.getDate() + " " + amMonths[dt.getMonth()] + " " + dt.getFullYear() + "\u0569.";
+      if (event.start_time) {
+        d += ", " + event.start_time + (event.end_time ? "\u2013" + event.end_time : "");
+      }
+      return d;
+    }
+
+    const dateEn = formatDateEn();
+    const dateAm = formatDateAm();
     const location = event?.location || "TBD";
     const meetingUrl = event?.meeting_url || "";
     const isPaid = reg.payment_status === "paid" && reg.payment_amount > 0;
@@ -109,7 +121,7 @@ serve(async (req) => {
           <p style="color: #0D2740; font-size: 14px; margin: 0 0 12px;">${t.message}</p>
           <p style="color: #0D2740; font-size: 14px; margin: 0;">${t.closing}</p>
           <div style="text-align: center; margin-top: 12px;">
-            <img src="https://agentpark-website.pages.dev/Brand_assets/AgentPark_logo@2x.png" alt="AgentPark" style="height: 24px; width: auto;">
+            <img src="https://agentpark-website.pages.dev/Brand_assets/AgentPark_logo_email.jpg" alt="AgentPark" width="120" height="24" style="height: 24px; width: 120px;">
           </div>
         </div>
         <div style="${cardStyle}">

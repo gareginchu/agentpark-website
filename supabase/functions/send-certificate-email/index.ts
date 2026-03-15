@@ -69,7 +69,7 @@ serve(async (req) => {
           </p>
           <p style="color: #0D2740; font-size: 14px; margin: 0;">\u0570\u0561\u0580\u0563\u0561\u0576\u0584\u0576\u0565\u0580\u0578\u057E,<br><strong>AgentPark \u0569\u056B\u0574</strong></p>
           <div style="text-align: center; margin-top: 16px;">
-            <img src="https://agentpark-website.pages.dev/Brand_assets/AgentPark_logo@2x.png" alt="AgentPark" style="height: 24px; width: auto;">
+            <img src="https://agentpark-website.pages.dev/Brand_assets/AgentPark_logo_email.jpg" alt="AgentPark" width="120" height="24" style="height: 24px; width: 120px;">
           </div>
         </div>
         <div style="border-top: 1px dashed #d1d5db; margin: 8px 0 16px; position: relative;">
@@ -82,7 +82,7 @@ serve(async (req) => {
           </p>
           <p style="color: #0D2740; font-size: 14px; margin: 16px 0 0;">With best regards,<br><strong>AgentPark Team</strong></p>
           <div style="text-align: center; margin-top: 16px;">
-            <img src="https://agentpark-website.pages.dev/Brand_assets/AgentPark_logo@2x.png" alt="AgentPark" style="height: 24px; width: auto;">
+            <img src="https://agentpark-website.pages.dev/Brand_assets/AgentPark_logo_email.jpg" alt="AgentPark" width="120" height="24" style="height: 24px; width: 120px;">
           </div>
         </div>
         <p style="color: #6c757d; font-size: 12px; text-align: center; margin-top: 32px;">
