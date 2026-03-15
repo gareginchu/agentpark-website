@@ -757,11 +757,11 @@
       if (!isPast) {
         // FEATURED upcoming event card
         const coverImg = coverSrc ? `
-          <div class="lg:w-2/5 relative overflow-hidden rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none min-h-[200px] lg:min-h-[300px]">
+          <a href="/event.html?id=${ev.id}" class="lg:w-2/5 relative overflow-hidden rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none min-h-[200px] lg:min-h-[300px] block cursor-pointer">
             <img src="${coverSrc}" alt="${evTitle}" class="w-full h-full object-cover absolute inset-0">
             <div class="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-black/50 to-transparent"></div>
             ${daysUntil ? `<div class="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gold text-deep-ink text-xs font-bold shadow-elevated"><span class="w-1.5 h-1.5 rounded-full bg-deep-ink/60 animate-pulse"></span>${daysUntil}</div>` : ''}
-          </div>` : '';
+          </a>` : '';
         return `
           <div class="bg-white rounded-2xl shadow-floating border border-gold/30 flex flex-col lg:flex-row overflow-hidden hover:shadow-[0_4px_8px_rgba(203,161,75,0.1),0_16px_32px_rgba(203,161,75,0.15)] transition-shadow duration-300">
             ${coverImg}
@@ -772,7 +772,7 @@
                 </div>
                 ${ev.date ? `<span class="text-sm font-medium text-navy/50">${formatEventDate(ev)}</span>` : ''}
               </div>
-              <h3 class="text-xl lg:text-2xl font-bold text-navy heading-tight mb-3">${evTitle}</h3>
+              <a href="/event.html?id=${ev.id}" class="block"><h3 class="text-xl lg:text-2xl font-bold text-navy heading-tight mb-3 hover:text-gold transition-colors duration-150">${evTitle}</h3></a>
               ${evDesc ? `<p class="text-sm text-navy/65 body-relaxed mb-6">${evDesc.length > 200 ? evDesc.slice(0, 200) + '...' : evDesc}</p>` : ''}
               <div class="flex items-center gap-3 text-xs text-navy/40 mb-4">
                 ${ev.location ? `<span>\u{1F4CD} ${ev.location}</span>` : ''}
@@ -799,10 +799,10 @@
 
       // PAST event card (compact)
       const coverImg = coverSrc ? `
-          <div class="relative -mx-6 -mt-6 mb-4 overflow-hidden rounded-t-2xl">
+          <a href="/event.html?id=${ev.id}" class="relative -mx-6 -mt-6 mb-4 overflow-hidden rounded-t-2xl block cursor-pointer">
             <img src="${coverSrc}" alt="${evTitle}" class="w-full h-48 object-cover" onerror="this.parentNode.remove()">
             <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-          </div>` : '';
+          </a>` : '';
       return `
         <div class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30 flex flex-col hover:shadow-floating hover:-translate-y-1 transition-all duration-300" style="transition-property: transform, box-shadow;">
           ${coverImg}
@@ -812,7 +812,7 @@
             </div>
             ${ev.date ? `<span class="text-xs font-medium text-navy/50">${formatEventDate(ev)}</span>` : ''}
           </div>
-          <h3 class="text-base font-bold text-navy heading-tight mb-2">${evTitle}</h3>
+          <a href="/event.html?id=${ev.id}" class="block"><h3 class="text-base font-bold text-navy heading-tight mb-2 hover:text-gold transition-colors duration-150">${evTitle}</h3></a>
           ${evDesc ? `<p class="text-sm text-navy/60 body-relaxed flex-1 mb-4">${evDesc.length > 120 ? evDesc.slice(0, 120) + '... ' : evDesc}<a href="/event.html?id=${ev.id}" class="text-gold font-medium hover:underline">${t['ev-more']}</a></p>` : '<div class="flex-1"></div>'}
           <div class="flex items-center justify-between mt-2">
             ${ev.location ? `<span class="text-xs text-navy/40">\u{1F4CD} ${ev.location}</span>` : '<span></span>'}
