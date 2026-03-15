@@ -74,7 +74,8 @@ serve(async (req) => {
           </p>
           <p style="color: #0D2740; font-size: 14px; margin: 0;">\u0570\u0561\u0580\u0563\u0561\u0576\u0584\u0576\u0565\u0580\u0578\u057E,<br><strong>AgentPark \u0569\u056B\u0574</strong></p>
           <div style="text-align: center; margin-top: 16px;">
-            <img src="https://agentpark-website.pages.dev/Brand_assets/AgentPark_logo_email.jpg" alt="AgentPark" width="100" height="55" style="height: 55px; width: 100px;">
+            <a href="https://agentpark-website.pages.dev" style="color: #CBA14B; font-size: 12px; text-decoration: none;">agentpark-website.pages.dev</a><br>
+            <img src="https://agentpark-website.pages.dev/Brand_assets/AgentPark_logo_email.jpg" alt="AgentPark" width="130" height="72" style="height: 72px; width: 130px; margin-top: 8px;">
           </div>
         </div>
         <div style="border-top: 1px dashed #d1d5db; margin: 8px 0 16px; position: relative;">
@@ -87,7 +88,8 @@ serve(async (req) => {
           </p>
           <p style="color: #0D2740; font-size: 14px; margin: 16px 0 0;">With best regards,<br><strong>AgentPark Team</strong></p>
           <div style="text-align: center; margin-top: 16px;">
-            <img src="https://agentpark-website.pages.dev/Brand_assets/AgentPark_logo_email.jpg" alt="AgentPark" width="100" height="55" style="height: 55px; width: 100px;">
+            <a href="https://agentpark-website.pages.dev" style="color: #CBA14B; font-size: 12px; text-decoration: none;">agentpark-website.pages.dev</a><br>
+            <img src="https://agentpark-website.pages.dev/Brand_assets/AgentPark_logo_email.jpg" alt="AgentPark" width="130" height="72" style="height: 72px; width: 130px; margin-top: 8px;">
           </div>
         </div>
         <p style="color: #6c757d; font-size: 12px; text-align: center; margin-top: 32px;">
