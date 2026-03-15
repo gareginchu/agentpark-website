@@ -122,7 +122,7 @@ serve(async (req) => {
           <p style="color: #0D2740; font-size: 14px; margin: 0;">${t.closing}</p>
           <div style="text-align: center; margin-top: 16px;">
             <a href="https://agentpark-website.pages.dev" style="color: #CBA14B; font-size: 12px; text-decoration: none;">agentpark-website.pages.dev</a><br>
-            <img src="https://agentpark-website.pages.dev/Brand_assets/AgentPark_logo_email.jpg" alt="AgentPark" width="130" height="72" style="height: 72px; width: 130px; margin-top: 8px;">
+            <a href="https://agentpark-website.pages.dev"><img src="https://agentpark-website.pages.dev/Brand_assets/AgentPark_logo_email.jpg" alt="AgentPark" width="130" height="72" style="height: 72px; width: 130px; margin-top: 8px; border: 0;"></a>
           </div>
         </div>
         <div style="${cardStyle}">
