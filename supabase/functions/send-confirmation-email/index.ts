@@ -44,7 +44,7 @@ serve(async (req) => {
 
     const { data: event } = await supabase
       .from("events")
-      .select("title, title_am, date, end_date, start_time, end_time, location, meeting_url")
+      .select("title, title_am, date, end_date, start_time, end_time, location, meeting_url, description, description_am")
       .eq("id", reg.event_id)
       .single();
 
@@ -95,7 +95,9 @@ serve(async (req) => {
       date: string;
       dateLabel: string;
       locationLabel: string;
+      locationValue: string;
       paidLabel: string;
+      description: string;
       meetingLabel: string;
       joinBtnLabel: string;
     }
@@ -119,7 +121,7 @@ serve(async (req) => {
             </tr>
             <tr>
               <td style="${labelStyle}">${t.locationLabel}</td>
-              <td style="${valueStyle}">${location}</td>
+              <td style="${valueStyle}">${t.locationValue}</td>
             </tr>
             ${isPaid ? `
             <tr style="${paidRowStyle}">
@@ -127,6 +129,10 @@ serve(async (req) => {
               <td style="${paidValueStyle}">${amountDisplay}</td>
             </tr>` : ""}
           </table>
+          ${t.description ? `
+          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e9ecef;">
+            <p style="color: #6c757d; font-size: 12px; line-height: 1.6; margin: 0;">${t.description.replace(/\n/g, "<br>")}</p>
+          </div>` : ""}
           ${meetingUrl ? `
           <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e9ecef; text-align: center;">
             <p style="color: #6c757d; font-size: 12px; margin: 0 0 10px;">${t.meetingLabel}</p>
@@ -146,7 +152,9 @@ serve(async (req) => {
       date: dateEn,
       dateLabel: "Date",
       locationLabel: "Location",
+      locationValue: location,
       paidLabel: "Amount Paid",
+      description: event?.description || "",
       meetingLabel: "Join the event online:",
       joinBtnLabel: "\u{1F4F9} Join Meeting",
     });
@@ -160,9 +168,12 @@ serve(async (req) => {
       date: dateAm,
       dateLabel: "\u0531\u0574\u057D\u0561\u0569\u056B\u057E",
       locationLabel: "\u054E\u0561\u0575\u0580",
+      locationValue: location.replace(/Online/gi, "\u0531\u057C\u0581\u0561\u0576\u0581").replace(/Zoom Webinar/gi, "Zoom \u057E\u0565\u0562\u056B\u0576\u0561\u0580"),
       paidLabel: "\u054E\u0573\u0561\u0580\u057E\u0561\u056E \u0563\u0578\u0582\u0574\u0561\u0580",
+      description: event?.description_am || event?.description || "",
       meetingLabel: "\u0544\u056B\u0561\u0576\u0561\u056C \u0574\u056B\u057B\u0578\u0581\u0561\u057C\u0574\u0561\u0576\u0568 \u0561\u057C\u0581\u0561\u0576\u0581\u056D",
       joinBtnLabel: "\u{1F4F9} \u0544\u056B\u0561\u0576\u0561\u056C \u0574\u056B\u057B\u0578\u0581\u0561\u057C\u0574\u0561\u0576\u0568",
+      closing: "\u053F\u057F\u0565\u057D\u0576\u0565\u0576\u0584 \u0571\u0565\u0566 \u0577\u0578\u0582\u057F\u0578\u057E \u0574\u056B\u057B\u0578\u0581\u0561\u057C\u0574\u0561\u0576\u056B\u0576!<br><strong>AgentPark \u0569\u056B\u0574</strong>",
     });
 
     // Armenian always first
