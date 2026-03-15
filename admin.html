@@ -2659,6 +2659,7 @@
         document.getElementById('ev-images-preview').innerHTML = '';
         document.getElementById('ev-video-preview').classList.add('hidden');
         document.getElementById('ev-video-preview').innerHTML = '';
+        document.getElementById('ev-cert-preview').classList.add('hidden');
         _organizers = []; renderOrganizers();
         showToast(tr('event-added'));
         loadEvents();
@@ -2712,7 +2713,7 @@
       }
       document.getElementById('ev-video-url').value = ev.video_url || '';
       document.getElementById('ev-certificate-template').value = ev.certificate_template || '';
-      if (ev.certificate_template && !ev.certificate_template.endsWith('.pdf')) { document.getElementById('ev-cert-preview-img').src = ev.certificate_template; document.getElementById('ev-cert-preview').classList.remove('hidden'); }
+      if (ev.certificate_template && !ev.certificate_template.endsWith('.pdf')) { document.getElementById('ev-cert-preview-img').src = ev.certificate_template; document.getElementById('ev-cert-preview').classList.remove('hidden'); } else { document.getElementById('ev-cert-preview').classList.add('hidden'); }
       renderVideoPreview();
       _organizers = Array.isArray(ev.organizers) ? ev.organizers.map(o => ({name: o.name, logo_url: o.logo_url || null})) : [];
       renderOrganizers();
@@ -2781,6 +2782,7 @@
       document.getElementById('ev-images-preview').innerHTML = '';
       document.getElementById('ev-video-preview').classList.add('hidden');
       document.getElementById('ev-video-preview').innerHTML = '';
+      document.getElementById('ev-cert-preview').classList.add('hidden');
       _organizers = []; renderOrganizers();
       const lang = localStorage.getItem('agentpark-lang') || 'en';
       const t = ADMIN_TRANS[lang] || ADMIN_TRANS.en;

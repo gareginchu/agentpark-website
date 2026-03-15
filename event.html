@@ -441,7 +441,7 @@
         'registering': 'Registering...', 'try-again': 'Something went wrong. Please try again.',
         'cert-claim-title': 'Get Your Certificate', 'cert-claim-desc': 'Enter your details to download your certificate of participation.',
         'cert-first-name': 'First Name *', 'cert-last-name': 'Last Name *',
-        'cert-download-btn': 'Download Certificate', 'cert-not-found': 'We could not find a registration with that name and email.', 'cert-generating': 'Generating certificate...',
+        'cert-download-btn': 'Download Certificate', 'cert-not-found': 'We could not find your name in the participants list.', 'cert-invalid-email': 'Please enter a valid email address.', 'cert-generating': 'Generating certificate...', 'cert-sent': 'Certificate sent to your email!',
       },
       am: {
         'all-events': 'Բոլոր միջոցառումները',
@@ -475,7 +475,7 @@
         'registering': 'Գրանցվում է...', 'try-again': 'Ինչ-որ բան սխալ գնաց: Խնդրում ենք կրկին փորձել:',
         'cert-claim-title': 'Ստանալ վկայագիր', 'cert-claim-desc': 'Մուտքագրեք ձեր տվյալները՝ մասնակցության վկայագիրը ներբեռնելու համար:',
         'cert-first-name': 'Անուն *', 'cert-last-name': 'Ազգանուն *',
-        'cert-download-btn': 'Ներբեռնել վկայագիրը', 'cert-not-found': 'Մենք չկարողացանք գտնել գրանցում այդ անունով և էլ. հասցեով:', 'cert-generating': 'Վկայագիրը ստեղծվում է...',
+        'cert-download-btn': 'Ներբեռնել վկայագիրը', 'cert-not-found': 'Մենք չկարողացանք գտնել ձեր անունը մասնակիցների ցանկում:', 'cert-invalid-email': 'Խնդրում ենք մուտքագրեք վավեր էլ. հասցե:', 'cert-generating': 'Վկայագիրը ստեղծվում է...', 'cert-sent': 'Վկայագիրը ուղարկվել է ձեր էլ. հասցեին:',
       }
     };
     var currentLang = 'en';
@@ -804,18 +804,28 @@
       btn.disabled = true;
 
       try {
-        // Verify registration exists
-        const res = await fetch(SUPABASE_URL + '/rest/v1/registrations?event_id=eq.' + eventId + '&email=eq.' + encodeURIComponent(email) + '&select=id,name', {
+        // 1. Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          errEl.textContent = t['cert-invalid-email'] || 'Please enter a valid email address.';
+          errEl.classList.remove('hidden');
+          btn.textContent = t['cert-download-btn'] || 'Download Certificate';
+          btn.disabled = false;
+          return;
+        }
+
+        // 2. Check if name exists in participants list
+        const res = await fetch(SUPABASE_URL + '/rest/v1/registrations?event_id=eq.' + eventId + '&select=id,name', {
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
         });
         const regs = await res.json();
-        // Check if any registration matches (case-insensitive name check)
         const match = regs.find(r => {
-          const regName = (r.name || '').toLowerCase();
-          return regName.includes(fname.toLowerCase()) && regName.includes(lname.toLowerCase());
+          const regName = (r.name || '').toLowerCase().trim();
+          const inputName = fullName.toLowerCase().trim();
+          return regName === inputName || (regName.includes(fname.toLowerCase()) && regName.includes(lname.toLowerCase()));
         });
         if (!match) {
-          errEl.textContent = t['cert-not-found'] || 'We could not find a registration with that name and email.';
+          errEl.textContent = t['cert-not-found'] || 'We could not find your name in the participants list.';
           errEl.classList.remove('hidden');
           btn.textContent = t['cert-download-btn'] || 'Download Certificate';
           btn.disabled = false;
@@ -825,16 +835,22 @@
         // Generate PDF with pdf-lib
         const { PDFDocument, rgb, StandardFonts } = PDFLib;
         const templateUrl = window._certTemplateUrl;
-        const templateBytes = await fetch(templateUrl).then(r => r.arrayBuffer());
+        const templateRes = await fetch(templateUrl);
+        const contentType = templateRes.headers.get('content-type') || '';
+        const templateBytes = await templateRes.arrayBuffer();
 
         let pdfDoc, page;
-        if (templateUrl.toLowerCase().endsWith('.pdf')) {
+        const urlLower = templateUrl.toLowerCase();
+        const isPdf = urlLower.includes('.pdf') || contentType.includes('pdf');
+        const isPng = urlLower.includes('.png') || contentType.includes('png');
+
+        if (isPdf) {
           pdfDoc = await PDFDocument.load(templateBytes);
           page = pdfDoc.getPages()[0];
         } else {
           pdfDoc = await PDFDocument.create();
           let img;
-          if (templateUrl.toLowerCase().endsWith('.png')) {
+          if (isPng) {
             img = await pdfDoc.embedPng(templateBytes);
           } else {
             img = await pdfDoc.embedJpg(templateBytes);
@@ -843,19 +859,19 @@
           page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
         }
 
-        // Overlay name centered
-        const font = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
-        let fontSize = 48;
+        // Overlay name centered, above the line
+        const font = await pdfDoc.embedFont(StandardFonts.TimesRomanBoldItalic);
+        let fontSize = 96;
         const pageWidth = page.getWidth();
         const pageHeight = page.getHeight();
         // Scale font if name is too wide
         let textWidth = font.widthOfTextAtSize(fullName, fontSize);
-        while (textWidth > pageWidth * 0.75 && fontSize > 16) {
-          fontSize -= 2;
+        while (textWidth > pageWidth * 0.5 && fontSize > 14) {
+          fontSize -= 1;
           textWidth = font.widthOfTextAtSize(fullName, fontSize);
         }
         const x = (pageWidth - textWidth) / 2;
-        const y = pageHeight * 0.45; // slightly above center
+        const y = pageHeight * 0.54; // centered between "awarded to" and the line
         page.drawText(fullName, { x, y, size: fontSize, font, color: rgb(0.05, 0.15, 0.25) });
 
         // Download
@@ -870,8 +886,16 @@
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        btn.textContent = t['cert-download-btn'] || 'Download Certificate';
+        // Send certificate via email (fire-and-forget)
+        fetch(SUPABASE_URL + '/functions/v1/send-certificate-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_KEY },
+          body: JSON.stringify({ event_id: eventId, first_name: fname, last_name: lname, email: email }),
+        }).catch(() => {});
+
+        btn.textContent = t['cert-sent'] || 'Certificate sent to your email!';
         btn.disabled = false;
+        setTimeout(() => { btn.textContent = t['cert-download-btn'] || 'Download Certificate'; }, 4000);
       } catch(err) {
         console.error('Certificate error:', err);
         errEl.textContent = t['try-again'] || 'Something went wrong. Please try again.';
