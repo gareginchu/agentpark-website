@@ -151,7 +151,7 @@ serve(async (req) => {
         <div style="background: #f8f9fa; border-radius: 16px; padding: 24px; margin-bottom: 16px;">
           <p style="color: #0D2740; font-size: 14px; margin: 0 0 8px;">Dear <strong>${fullName}</strong>,</p>
           <p style="color: #0D2740; font-size: 14px; margin: 0;">
-            Thank you for participating in <strong>${eventTitleEn}</strong>. Your certificate of participation is attached to this email.
+            Thank you for participating in the <strong>${eventTitleEn}</strong> seminar. Your certificate of participation is attached to this email.
           </p>
         </div>
         <div style="border-top: 1px dashed #d1d5db; margin: 8px 0 16px; position: relative;">
