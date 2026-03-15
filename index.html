@@ -856,9 +856,17 @@
       const pastGrid = document.getElementById('past-events-grid');
       if (past.length) {
         pastSection.classList.remove('hidden');
-        // Past events collapsed by default
-        pastGrid.classList.add('hidden');
+        // Past events visible by default
+        pastGrid.classList.remove('hidden');
         pastGrid.innerHTML = past.map(ev => buildCardHTML(ev, true)).join('');
+        // Update toggle button text
+        const icon = document.getElementById('past-toggle-icon');
+        const toggleBtn = document.getElementById('past-toggle-btn');
+        if (icon) icon.style.transform = 'rotate(180deg)';
+        if (toggleBtn) {
+          const tg = TRANS[currentLang] || TRANS.en;
+          toggleBtn.querySelector('[data-i18n="ev-show-past"]').textContent = tg['ev-hide-past'] || 'Hide past events';
+        }
       }
 
       if (!upcoming.length && !past.length) {
