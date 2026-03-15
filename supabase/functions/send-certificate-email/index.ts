@@ -150,9 +150,10 @@ serve(async (req) => {
         </div>
         <div style="background: #f8f9fa; border-radius: 16px; padding: 24px; margin-bottom: 16px;">
           <p style="color: #0D2740; font-size: 14px; margin: 0 0 8px;">Dear <strong>${fullName}</strong>,</p>
-          <p style="color: #0D2740; font-size: 14px; margin: 0;">
+          <p style="color: #0D2740; font-size: 14px; margin: 0 0 16px;">
             Thank you for participating in the <strong>${eventTitleEn}</strong> seminar. Your certificate of participation is attached to this email.
           </p>
+          <p style="color: #0D2740; font-size: 14px; margin: 0;">With best regards,<br><strong>AgentPark Team</strong></p>
         </div>
         <div style="border-top: 1px dashed #d1d5db; margin: 8px 0 16px; position: relative;">
           <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 12px; color: #9ca3af; font-size: 11px;">\u0540\u0561\u0575\u0565\u0580\u0565\u0576</span>
