@@ -23,7 +23,6 @@
 
   <link rel="icon" type="image/png" sizes="32x32" href="Brand_assets/favicon-32x32.png">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <script src="config.js?v=2"></script>
 <script>
 // Analytics tracking
@@ -832,59 +831,44 @@
           return;
         }
 
-        // Generate PDF with pdf-lib
-        const { PDFDocument, rgb, StandardFonts } = PDFLib;
+        // Generate PNG certificate using Canvas
         const templateUrl = window._certTemplateUrl;
-        const templateRes = await fetch(templateUrl);
-        const contentType = templateRes.headers.get('content-type') || '';
-        const templateBytes = await templateRes.arrayBuffer();
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = templateUrl;
+        });
 
-        let pdfDoc, page;
-        const urlLower = templateUrl.toLowerCase();
-        const isPdf = urlLower.includes('.pdf') || contentType.includes('pdf');
-        const isPng = urlLower.includes('.png') || contentType.includes('png');
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
 
-        if (isPdf) {
-          pdfDoc = await PDFDocument.load(templateBytes);
-          page = pdfDoc.getPages()[0];
-        } else {
-          pdfDoc = await PDFDocument.create();
-          let img;
-          if (isPng) {
-            img = await pdfDoc.embedPng(templateBytes);
-          } else {
-            img = await pdfDoc.embedJpg(templateBytes);
-          }
-          page = pdfDoc.addPage([img.width, img.height]);
-          page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
-        }
-
-        // Overlay name centered, above the line
-        const font = await pdfDoc.embedFont(StandardFonts.TimesRomanBoldItalic);
+        // Overlay name centered
         let fontSize = 96;
-        const pageWidth = page.getWidth();
-        const pageHeight = page.getHeight();
-        // Scale font if name is too wide
-        let textWidth = font.widthOfTextAtSize(fullName, fontSize);
-        while (textWidth > pageWidth * 0.5 && fontSize > 14) {
+        ctx.font = 'bold italic ' + fontSize + 'px "Times New Roman", Times, serif';
+        let textWidth = ctx.measureText(fullName).width;
+        while (textWidth > canvas.width * 0.5 && fontSize > 14) {
           fontSize -= 1;
-          textWidth = font.widthOfTextAtSize(fullName, fontSize);
+          ctx.font = 'bold italic ' + fontSize + 'px "Times New Roman", Times, serif';
+          textWidth = ctx.measureText(fullName).width;
         }
-        const x = (pageWidth - textWidth) / 2;
-        const y = pageHeight * 0.54; // centered between "awarded to" and the line
-        page.drawText(fullName, { x, y, size: fontSize, font, color: rgb(0.05, 0.15, 0.25) });
+        ctx.fillStyle = '#0D2740';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(fullName, canvas.width / 2, canvas.height * 0.46);
 
-        // Download
-        const pdfBytes = await pdfDoc.save();
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
+        // Download as PNG
+        const dataUrl = canvas.toDataURL('image/png');
         const a = document.createElement('a');
-        a.href = url;
-        a.download = 'Certificate-' + fullName.replace(/\s+/g, '-') + '.pdf';
+        a.href = dataUrl;
+        a.download = 'Certificate-' + fullName.replace(/\s+/g, '-') + '.png';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        URL.revokeObjectURL(url);
 
         // Log certificate download
         fetch(SUPABASE_URL + '/rest/v1/certificate_downloads', {
@@ -893,11 +877,12 @@
           body: JSON.stringify({ event_id: eventId, registration_id: match.id, name: fullName, email: email }),
         }).catch(() => {});
 
-        // Send certificate via email (fire-and-forget)
+        // Send certificate via email with the generated PNG attached
+        const pngBase64 = dataUrl.split(',')[1];
         fetch(SUPABASE_URL + '/functions/v1/send-certificate-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_KEY },
-          body: JSON.stringify({ event_id: eventId, first_name: fname, last_name: lname, email: email }),
+          body: JSON.stringify({ event_id: eventId, first_name: fname, last_name: lname, email: email, certificate_png: pngBase64 }),
         }).catch(() => {});
 
         btn.textContent = t['cert-sent'] || 'Certificate sent to your email!';
