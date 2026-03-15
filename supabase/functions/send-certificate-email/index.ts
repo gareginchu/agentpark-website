@@ -107,7 +107,7 @@ serve(async (req) => {
       body: JSON.stringify({
         from: emailFrom,
         to: [email],
-        subject: `Your Certificate: ${eventTitleEn}`,
+        subject: `\u0541\u0565\u0580 \u057E\u056F\u0561\u0575\u0561\u0563\u056B\u0580\u0568 / Your Certificate: ${eventTitleEn}`,
         html: htmlBody,
         attachments: [
           {

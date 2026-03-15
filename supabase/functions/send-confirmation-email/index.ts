@@ -215,9 +215,7 @@ serve(async (req) => {
       </div>
     `;
 
-    const subject = isAm
-      ? `\u0533\u0580\u0561\u0576\u0581\u0578\u0582\u0574\u0568 \u0570\u0561\u057D\u057F\u0561\u057F\u057E\u0561\u056E \u0567\u0589 ${titleAm}`
-      : `Registration Confirmed: ${titleEn}`;
+    const subject = `\u0533\u0580\u0561\u0576\u0581\u0578\u0582\u0574\u0568 \u0570\u0561\u057D\u057F\u0561\u057F\u057E\u0561\u056E \u0567 / Registration Confirmed: ${titleEn}`;
 
     const emailRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
