@@ -121,7 +121,7 @@ serve(async (req) => {
           <p style="color: #0D2740; font-size: 14px; margin: 0 0 12px;">${t.message}</p>
           <p style="color: #0D2740; font-size: 14px; margin: 0;">${t.closing}</p>
           <div style="text-align: center; margin-top: 12px;">
-            <img src="https://agentpark-website.pages.dev/Brand_assets/AgentPark_logo_email.jpg" alt="AgentPark" width="120" height="24" style="height: 24px; width: 120px;">
+            <img src="https://agentpark-website.pages.dev/Brand_assets/AgentPark_logo_email.jpg" alt="AgentPark" width="100" height="55" style="height: 55px; width: 100px;">
           </div>
         </div>
         <div style="${cardStyle}">
