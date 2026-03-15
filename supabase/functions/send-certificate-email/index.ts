@@ -128,7 +128,14 @@ serve(async (req) => {
     const pdfBytes = await pdfDoc.save();
 
     // 6. Convert to base64 for email attachment
-    const base64Pdf = btoa(String.fromCharCode(...pdfBytes));
+    // Convert to base64 in chunks to avoid stack overflow
+    let binary = "";
+    const chunkSize = 8192;
+    for (let i = 0; i < pdfBytes.length; i += chunkSize) {
+      const chunk = pdfBytes.slice(i, i + chunkSize);
+      binary += String.fromCharCode(...chunk);
+    }
+    const base64Pdf = btoa(binary);
 
     // 7. Send email with attachment via Resend
     const eventTitle = event.title || "AgentPark Event";
