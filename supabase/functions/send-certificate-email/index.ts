@@ -140,6 +140,12 @@ serve(async (req) => {
     // 7. Send email with attachment via Resend
     const eventTitleEn = event.title || "AgentPark Event";
     const eventTitleAm = event.title_am || eventTitleEn;
+    const eventDateEn = event.date
+      ? new Date(event.date).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
+      : "";
+    const eventDateAm = event.date
+      ? new Date(event.date).toLocaleDateString("hy-AM", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
+      : "";
     const emailFrom = Deno.env.get("EMAIL_FROM") || "AgentPark <noreply@agentpark.am>";
 
     const htmlBody = `
@@ -151,7 +157,7 @@ serve(async (req) => {
         <div style="background: #f8f9fa; border-radius: 16px; padding: 24px; margin-bottom: 16px;">
           <p style="color: #0D2740; font-size: 14px; margin: 0 0 8px;">Dear <strong>${fullName}</strong>,</p>
           <p style="color: #0D2740; font-size: 14px; margin: 0 0 16px;">
-            Thank you for participating in the <strong>${eventTitleEn}</strong> seminar. Your certificate of participation is attached to this email.
+            Thank you for participating in the <strong>${eventTitleEn}</strong> seminar${eventDateEn ? " on " + eventDateEn : ""}. Your certificate of participation is attached to this email.
           </p>
           <p style="color: #0D2740; font-size: 14px; margin: 16px 0 0;">With best regards,<br><strong>AgentPark Team</strong></p>
           <div style="text-align: center; margin-top: 16px;">
