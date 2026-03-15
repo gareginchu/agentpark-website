@@ -169,7 +169,7 @@ serve(async (req) => {
     const htmlBody = `
       <div style="font-family: 'Inter', Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; background: #ffffff;">
         <div style="text-align: center; margin-bottom: 32px;">
-          <h1 style="color: #0D2740; font-size: 24px; margin: 0;">AgentPark</h1>
+          <h1 style="color: #0D2740; font-size: 18px; margin: 0;">AgentPark</h1>
           <p style="color: #CBA14B; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px;">
             \u0544\u056B\u057B\u0578\u0581\u0561\u057C\u0574\u0561\u0576 \u0563\u0580\u0561\u0576\u0581\u0578\u0582\u0574 / Event Registration
           </p>

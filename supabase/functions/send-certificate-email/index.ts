@@ -59,7 +59,7 @@ serve(async (req) => {
     const htmlBody = `
       <div style="font-family: 'Inter', Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; background: #ffffff;">
         <div style="text-align: center; margin-bottom: 32px;">
-          <h1 style="color: #0D2740; font-size: 24px; margin: 0;">AgentPark</h1>
+          <h1 style="color: #0D2740; font-size: 18px; margin: 0;">AgentPark</h1>
           <p style="color: #CBA14B; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px;">\u0544\u0561\u057D\u0576\u0561\u056F\u0581\u0578\u0582\u0569\u0575\u0561\u0576 \u057E\u056F\u0561\u0575\u0561\u0563\u056B\u0580 / Certificate of Participation</p>
         </div>
         <div style="background: #f8f9fa; border-radius: 16px; padding: 24px; margin-bottom: 16px;">
