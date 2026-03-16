@@ -776,7 +776,7 @@
               ${evDesc ? `<p class="text-sm text-navy/65 body-relaxed mb-6">${evDesc.length > 200 ? evDesc.slice(0, 200) + '...' : evDesc}</p>` : ''}
               <div class="flex items-center gap-3 text-xs text-navy/40 mb-4">
                 ${ev.location ? `<span>\u{1F4CD} ${ev.location}</span>` : ''}
-                ${ev.capacity ? `<span class="inline-flex items-center gap-1 text-gold font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span>${ev._spots_remaining != null ? ev._spots_remaining : ev.capacity} ${t['ev-spots-left'] || 'spots remaining'}</span>` : ''}
+                ${ev.capacity ? `<span class="inline-flex items-center gap-1 text-gold font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span><span data-spots-event="${ev.id}">${ev._spots_remaining != null ? ev._spots_remaining : ev.capacity}</span> ${t['ev-spots-left'] || 'spots remaining'}</span>` : ''}
               </div>
               ${ev.price_display === 'show' && ev.price > 0 ? `<div class="mb-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gold/10 border border-gold/20"><svg class="w-3.5 h-3.5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="text-sm font-bold text-gold">${formatPrice(ev.price, ev.currency)}</span></div>` : ''}
               ${ev.price_display === 'contact' ? `<div class="mb-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-navy/5 border border-navy/10"><svg class="w-3.5 h-3.5 text-navy/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><span class="text-xs font-medium text-navy/50">${t['ev-contact-pricing']}</span></div>` : ''}
@@ -1001,6 +1001,12 @@
         if (!res.ok) throw new Error(await res.text());
         document.getElementById('reg-success').classList.remove('hidden');
         btn.classList.add('hidden');
+        // Update spots remaining on the page
+        const spotsEls = document.querySelectorAll('[data-spots-event="' + currentEventId + '"]');
+        spotsEls.forEach(function(el) {
+          const cur = parseInt(el.textContent);
+          if (!isNaN(cur) && cur > 0) el.textContent = cur - 1;
+        });
         // Send confirmation email (fire-and-forget)
         try {
           const regData = await res.json();
