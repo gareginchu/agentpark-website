@@ -365,6 +365,10 @@
             <svg class="nav-icon w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
             <span data-i18n="nav-analytics">Analytics</span>
           </button>
+          <button onclick="showSection('testimonials')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/8 transition-colors duration-150 brand-focus text-left" data-section="testimonials">
+            <svg class="nav-icon w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            <span data-i18n="nav-testimonials">Testimonials</span>
+          </button>
           <button onclick="showSection('events')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/8 transition-colors duration-150 brand-focus text-left" data-section="events">
             <svg class="nav-icon w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             <span data-i18n="nav-events">Events</span>
@@ -997,6 +1001,71 @@
         </div>
       </section>
 
+      <!-- ==================== TESTIMONIALS ==================== -->
+      <section id="section-testimonials" class="p-8 hidden">
+        <div class="max-w-4xl space-y-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-xl font-bold text-navy" data-i18n="title-testimonials">Testimonials</h2>
+              <p class="text-sm text-navy/50" data-i18n="sub-testimonials">Manage community voices shown on the landing page</p>
+            </div>
+            <label class="flex items-center gap-2 text-sm text-navy/60">
+              <input type="checkbox" id="testimonials-visible" onchange="toggleTestimonialsSection()" class="rounded border-navy/20">
+              <span data-i18n="show-on-site">Show on site</span>
+            </label>
+          </div>
+
+          <!-- Add Testimonial Form -->
+          <div class="bg-white rounded-2xl border border-navy/10 p-6 shadow-sm">
+            <h3 class="text-sm font-bold text-navy mb-4" data-i18n="add-testimonial">Add Testimonial</h3>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-name-en">Name (English)</label>
+                <input id="test-name" type="text" class="admin-input" placeholder="e.g. John Smith">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-name-am">Name (Armenian)</label>
+                <input id="test-name-am" type="text" class="admin-input" placeholder="e.g. Hovhannes Hovhannisyan">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-role-en">Role (English)</label>
+                <input id="test-role" type="text" class="admin-input" placeholder="e.g. CEO, Tech Startup">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-role-am">Role (Armenian)</label>
+                <input id="test-role-am" type="text" class="admin-input" placeholder="e.g. CEO, Tech Startup">
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-quote-en">Quote (English) *</label>
+                <textarea id="test-quote" rows="3" class="admin-input" placeholder="What the attendee said..."></textarea>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-quote-am">Quote (Armenian)</label>
+                <textarea id="test-quote-am" rows="3" class="admin-input" placeholder="Armenian translation..."></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide" data-i18n="label-rating">Rating (1-5)</label>
+                <select id="test-rating" class="admin-input">
+                  <option value="5">5 Stars</option>
+                  <option value="4">4 Stars</option>
+                  <option value="3">3 Stars</option>
+                </select>
+              </div>
+            </div>
+            <div class="mt-4 flex gap-3">
+              <button id="test-add-btn" onclick="addTestimonial()" class="px-5 py-2.5 bg-gold text-deep-ink text-sm font-bold rounded-xl hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-elevated" data-i18n="add-testimonial-btn">Add Testimonial</button>
+              <button id="test-update-btn" onclick="updateTestimonial()" class="hidden px-5 py-2.5 bg-gold text-deep-ink text-sm font-bold rounded-xl hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-elevated" data-i18n="save-changes">Save Changes</button>
+              <button id="test-cancel-btn" onclick="cancelEditTestimonial()" class="hidden px-4 py-2.5 text-sm font-medium text-navy/50 hover:text-navy transition-colors duration-150 brand-focus" data-i18n="cancel">Cancel</button>
+            </div>
+          </div>
+
+          <!-- Testimonials List -->
+          <div id="testimonials-list" class="space-y-4">
+            <div class="text-center py-8 text-navy/40 text-sm" data-i18n="loading">Loading...</div>
+          </div>
+        </div>
+      </section>
+
       <!-- ==================== EVENTS ==================== -->
       <section id="section-events" class="p-8 hidden">
         <div class="max-w-4xl space-y-6">
@@ -1268,12 +1337,13 @@
     // ============================================================
     // SECTION NAVIGATION
     // ============================================================
-    const sections = ['dashboard', 'content', 'images', 'analytics', 'events', 'settings'];
+    const sections = ['dashboard', 'content', 'images', 'analytics', 'testimonials', 'events', 'settings'];
     const titleKeys = {
       dashboard: ['title-dashboard', 'sub-dashboard'],
       content:   ['title-content', 'sub-content'],
       images:    ['title-images', 'sub-images'],
       analytics: ['title-analytics', 'sub-analytics'],
+      testimonials: ['title-testimonials', 'sub-testimonials'],
       events:    ['title-events', 'sub-events'],
       settings:  ['title-settings', 'sub-settings'],
     };
@@ -1305,6 +1375,7 @@
       if (name === 'dashboard') loadDashboardStats();
       if (name === 'analytics') loadAnalyticsData();
       if (name === 'events') loadEvents();
+      if (name === 'testimonials') loadTestimonials();
       // Init images section
       if (name === 'images') initImagesSection();
       // Load Armenian fields when switching to Armenian tab
@@ -2862,6 +2933,155 @@
 
   <script>
     // ── Admin i18n ─────────────────────────────────────────────
+    // ============================================================
+    // TESTIMONIALS
+    // ============================================================
+    var _editingTestimonialId = null;
+    var _testimonialsSectionVisible = false;
+
+    async function loadTestimonials() {
+      const list = document.getElementById('testimonials-list');
+      if (!list) return;
+      try {
+        const data = await sbFetch('testimonials?order=sort_order.asc,created_at.desc');
+        if (!data.length) {
+          list.innerHTML = '<div class="text-center py-8 text-navy/40 text-sm">' + tr('no-testimonials') + '</div>';
+          return;
+        }
+        list.innerHTML = data.map(t => {
+          const stars = Array(t.rating || 5).fill('<svg class="w-3.5 h-3.5 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>').join('');
+          const initials = (t.name || '').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+          return '<div class="bg-white rounded-2xl border border-navy/10 p-6 shadow-sm">' +
+            '<div class="flex items-start justify-between mb-3">' +
+              '<div class="flex items-center gap-3">' +
+                '<div class="w-10 h-10 rounded-full bg-navy/10 flex items-center justify-center text-sm font-bold text-navy">' + initials + '</div>' +
+                '<div>' +
+                  '<p class="text-sm font-semibold text-navy">' + (t.name || '') + (t.name_am ? ' / ' + t.name_am : '') + '</p>' +
+                  '<p class="text-xs text-navy/50">' + (t.role || '') + (t.role_am ? ' / ' + t.role_am : '') + '</p>' +
+                '</div>' +
+              '</div>' +
+              '<div class="flex items-center gap-1">' + stars + '</div>' +
+            '</div>' +
+            '<p class="text-sm text-navy/70 mb-2">"' + (t.quote || '') + '"</p>' +
+            (t.quote_am ? '<p class="text-sm text-navy/50 italic mb-3">"' + t.quote_am + '"</p>' : '') +
+            '<div class="flex items-center gap-2 pt-3 border-t border-navy/5">' +
+              '<span class="text-xs ' + (t.visible ? 'text-green-500' : 'text-navy/30') + '">' + (t.visible ? '\u2705 Visible' : '\u{1F6AB} Hidden') + '</span>' +
+              '<span class="flex-1"></span>' +
+              '<button onclick="editTestimonial(\'' + t.id + '\')" class="text-xs text-gold hover:text-gold/80 font-medium">' + tr('edit') + '</button>' +
+              '<button onclick="toggleTestimonialVisibility(\'' + t.id + '\',' + !t.visible + ')" class="text-xs text-navy/40 hover:text-navy font-medium">' + (t.visible ? tr('hide') : tr('show')) + '</button>' +
+              '<button onclick="deleteTestimonial(\'' + t.id + '\')" class="text-xs text-red-400 hover:text-red-600 font-medium">' + tr('delete') + '</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      } catch(e) {
+        list.innerHTML = '<div class="text-center py-8 text-red-400 text-sm">Error: ' + e.message + '</div>';
+      }
+    }
+
+    async function addTestimonial() {
+      const quote = document.getElementById('test-quote').value.trim();
+      if (!quote) { showToast('Quote is required'); return; }
+      try {
+        await sbFetch('testimonials', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+          body: JSON.stringify({
+            name: document.getElementById('test-name').value.trim() || 'Anonymous',
+            name_am: document.getElementById('test-name-am').value.trim() || null,
+            role: document.getElementById('test-role').value.trim() || null,
+            role_am: document.getElementById('test-role-am').value.trim() || null,
+            quote: quote,
+            quote_am: document.getElementById('test-quote-am').value.trim() || null,
+            rating: parseInt(document.getElementById('test-rating').value) || 5,
+            visible: true,
+          }),
+        });
+        clearTestimonialForm();
+        showToast(tr('testimonial-added'));
+        loadTestimonials();
+      } catch(e) { showToast('Error: ' + e.message); }
+    }
+
+    async function editTestimonial(id) {
+      try {
+        const data = await sbFetch('testimonials?id=eq.' + id);
+        if (!data.length) return;
+        const t = data[0];
+        _editingTestimonialId = id;
+        document.getElementById('test-name').value = t.name || '';
+        document.getElementById('test-name-am').value = t.name_am || '';
+        document.getElementById('test-role').value = t.role || '';
+        document.getElementById('test-role-am').value = t.role_am || '';
+        document.getElementById('test-quote').value = t.quote || '';
+        document.getElementById('test-quote-am').value = t.quote_am || '';
+        document.getElementById('test-rating').value = t.rating || 5;
+        document.getElementById('test-add-btn').classList.add('hidden');
+        document.getElementById('test-update-btn').classList.remove('hidden');
+        document.getElementById('test-cancel-btn').classList.remove('hidden');
+      } catch(e) { showToast('Error: ' + e.message); }
+    }
+
+    async function updateTestimonial() {
+      if (!_editingTestimonialId) return;
+      try {
+        await sbFetch('testimonials?id=eq.' + _editingTestimonialId, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: document.getElementById('test-name').value.trim() || 'Anonymous',
+            name_am: document.getElementById('test-name-am').value.trim() || null,
+            role: document.getElementById('test-role').value.trim() || null,
+            role_am: document.getElementById('test-role-am').value.trim() || null,
+            quote: document.getElementById('test-quote').value.trim(),
+            quote_am: document.getElementById('test-quote-am').value.trim() || null,
+            rating: parseInt(document.getElementById('test-rating').value) || 5,
+          }),
+        });
+        cancelEditTestimonial();
+        showToast(tr('changes-saved'));
+        loadTestimonials();
+      } catch(e) { showToast('Error: ' + e.message); }
+    }
+
+    function cancelEditTestimonial() {
+      _editingTestimonialId = null;
+      clearTestimonialForm();
+      document.getElementById('test-add-btn').classList.remove('hidden');
+      document.getElementById('test-update-btn').classList.add('hidden');
+      document.getElementById('test-cancel-btn').classList.add('hidden');
+    }
+
+    function clearTestimonialForm() {
+      ['test-name','test-name-am','test-role','test-role-am','test-quote','test-quote-am'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('test-rating').value = '5';
+    }
+
+    async function toggleTestimonialVisibility(id, visible) {
+      try {
+        await sbFetch('testimonials?id=eq.' + id, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ visible }),
+        });
+        loadTestimonials();
+      } catch(e) { showToast('Error: ' + e.message); }
+    }
+
+    async function deleteTestimonial(id) {
+      if (!confirm('Delete this testimonial?')) return;
+      try {
+        await sbFetch('testimonials?id=eq.' + id, { method: 'DELETE' });
+        showToast(tr('testimonial-deleted'));
+        loadTestimonials();
+      } catch(e) { showToast('Error: ' + e.message); }
+    }
+
+    async function toggleTestimonialsSection() {
+      const visible = document.getElementById('testimonials-visible').checked;
+      // Store in localStorage for now (could be in site_settings table later)
+      localStorage.setItem('agentpark-testimonials-visible', visible ? '1' : '0');
+    }
+
     var ADMIN_TRANS = {
       en: {
         // Login
@@ -2871,7 +3091,7 @@
         // Sidebar
         'sidebar-admin-panel': 'Admin Panel',
         'nav-dashboard': 'Dashboard', 'nav-content': 'Content', 'nav-images': 'Images',
-        'nav-analytics': 'Analytics', 'nav-events': 'Events', 'nav-settings': 'Settings',
+        'nav-analytics': 'Analytics', 'nav-testimonials': 'Testimonials', 'nav-events': 'Events', 'nav-settings': 'Settings',
         'view-site': 'View Site', 'log-out': 'Log Out',
         // Top bar
         'unsaved-changes': 'Unsaved changes', 'save-changes': 'Save Changes',
@@ -2880,6 +3100,7 @@
         'title-content': 'Content Editor', 'sub-content': 'Edit your page copy',
         'title-images': 'Image Manager', 'sub-images': 'Upload and manage assets',
         'title-analytics': 'Analytics', 'sub-analytics': 'Traffic & performance overview',
+        'title-testimonials': 'Testimonials', 'sub-testimonials': 'Manage community voices on the landing page',
         'title-events': 'Events Manager', 'sub-events': 'Add, edit and view registrations',
         'title-settings': 'Settings', 'sub-settings': 'Brand, contact & site options',
         // Dashboard stat cards
@@ -3041,7 +3262,7 @@
         // Sidebar
         'sidebar-admin-panel': 'Կառավարման վահանակ',
         'nav-dashboard': 'Վահանակ', 'nav-content': 'Բովանդակություն', 'nav-images': 'Պատկերներ',
-        'nav-analytics': 'Վիճակագրություն', 'nav-events': 'Միջոցառումներ', 'nav-settings': 'Կարգավորումներ',
+        'nav-analytics': 'Վիճակագրություն', 'nav-testimonials': 'Կարծիքներ', 'nav-events': 'Միջոցառումներ', 'nav-settings': 'Կարգավորումներ',
         'view-site': 'Դիտել կայքը', 'log-out': 'Ելք',
         // Top bar
         'unsaved-changes': 'Չպահպանված փոփոխություններ', 'save-changes': 'Պահպանել փոփոխությունները',
@@ -3050,6 +3271,7 @@
         'title-content': 'Բովանդակության խմբագիր', 'sub-content': 'Խմբագրել էջի տեքստը',
         'title-images': 'պատկերների կառավարիչ', 'sub-images': 'Վերբեռնել և կառավարել նյութեր',
         'title-analytics': 'Վիճակագրություն', 'sub-analytics': 'Երթևեկություն և արդյունավետություն',
+        'title-testimonials': 'Կարծիքներ', 'sub-testimonials': 'Կառավարել համայնքի կարծիքները',
         'title-events': 'Միջոցառումների կառավարիչ', 'sub-events': 'Ավելացնել, խմբագրել և դիտել գրանցումները',
         'title-settings': 'Կարգավորումներ', 'sub-settings': 'Բրենդ, կապ և կայքի ընտրանքներ',
         // Dashboard stat cards
