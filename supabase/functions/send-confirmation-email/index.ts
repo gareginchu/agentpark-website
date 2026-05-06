@@ -31,7 +31,7 @@ serve(async (req) => {
 
     const { data: reg, error: regErr } = await supabase
       .from("registrations")
-      .select("id, name, email, payment_status, payment_amount, payment_currency, event_id")
+      .select("id, name, email, phone, payment_status, payment_amount, payment_currency, event_id, ticket_tier_id")
       .eq("id", registration_id)
       .single();
 
@@ -44,9 +44,15 @@ serve(async (req) => {
 
     const { data: event } = await supabase
       .from("events")
-      .select("title, title_am, date, end_date, start_time, end_time, location, meeting_url, description, description_am")
+      .select("title, title_am, date, end_date, start_time, end_time, location, meeting_url, description, description_am, ticket_tiers")
       .eq("id", reg.event_id)
       .single();
+
+    // Resolve selected tier (if any)
+    let selectedTier: any = null;
+    if (reg.ticket_tier_id && Array.isArray(event?.ticket_tiers)) {
+      selectedTier = event.ticket_tiers.find((tt: any) => tt && tt.id === reg.ticket_tier_id) || null;
+    }
 
     const emailApiKey = Deno.env.get("EMAIL_API_KEY");
     if (!emailApiKey) {
@@ -112,6 +118,8 @@ serve(async (req) => {
       description: string;
       meetingLabel: string;
       joinBtnLabel: string;
+      trackLabel?: string;
+      trackValue?: string;
     }
 
     function buildSection(t: SectionData): string {
@@ -128,6 +136,11 @@ serve(async (req) => {
         <div style="${cardStyle}">
           <h2 style="color: #0D2740; font-size: 18px; margin: 0 0 16px;">${t.title}</h2>
           <table style="width: 100%; border-collapse: collapse;">
+            ${t.trackLabel && t.trackValue ? `
+            <tr>
+              <td style="${labelStyle}">${t.trackLabel}</td>
+              <td style="${valueStyle}">${t.trackValue}</td>
+            </tr>` : ""}
             <tr>
               <td style="${labelStyle}">${t.dateLabel}</td>
               <td style="${valueStyle}">${t.date}</td>
@@ -155,6 +168,12 @@ serve(async (req) => {
         </div>`;
     }
 
+    const tierEn = selectedTier ? (selectedTier.label_en || "") : "";
+    const tierAm = selectedTier ? (selectedTier.label_am || selectedTier.label_en || "") : "";
+    // Override date display per tier when the tier carries its own date text
+    const tierDateEn = selectedTier && selectedTier.dates_text_en ? selectedTier.dates_text_en : dateEn;
+    const tierDateAm = selectedTier && selectedTier.dates_text_am ? selectedTier.dates_text_am : dateAm;
+
     const enSection = buildSection({
       greeting: `Dear <strong>${reg.name}</strong>,`,
       message: isPaid
@@ -162,7 +181,7 @@ serve(async (req) => {
         : "Your registration is confirmed!",
       closing: "See you soon at the event!<br><strong>AgentPark Team</strong>",
       title: titleEn,
-      date: dateEn,
+      date: tierDateEn,
       dateLabel: "Date",
       locationLabel: "Location",
       locationValue: location,
@@ -170,15 +189,17 @@ serve(async (req) => {
       description: event?.description || "",
       meetingLabel: "Join the event online:",
       joinBtnLabel: "\u{1F4F9} Join Meeting",
+      trackLabel: tierEn ? "Track" : undefined,
+      trackValue: tierEn || undefined,
     });
 
     const amSection = buildSection({
-      greeting: `\u0540\u0561\u0580\u0563\u0565\u056c\u056b <strong>${reg.name}</strong>,`,
+      greeting: `\u0540\u0561\u0580\u0563\u0565\u056C\u056B <strong>${reg.name}</strong>,`,
       message: isPaid
-        ? "\u0541\u0565\u0580 \u057E\u0573\u0561\u0580\u0578\u0582\u0574\u0568 \u057D\u057F\u0561\u0581\u057E\u0565\u056c \u0567 \u0587 \u0563\u0580\u0561\u0576\u0581\u0578\u0582\u0574\u0568 \u0570\u0561\u057D\u057F\u0561\u057F\u057E\u0561\u056E \u0567\u0589"
+        ? "\u0541\u0565\u0580 \u057E\u0573\u0561\u0580\u0578\u0582\u0574\u0568 \u057D\u057F\u0561\u0581\u057E\u0565\u056C \u0567 \u0587 \u0563\u0580\u0561\u0576\u0581\u0578\u0582\u0574\u0568 \u0570\u0561\u057D\u057F\u0561\u057F\u057E\u0561\u056E \u0567\u0589"
         : "\u0541\u0565\u0580 \u0563\u0580\u0561\u0576\u0581\u0578\u0582\u0574\u0568 \u0570\u0561\u057D\u057F\u0561\u057F\u057E\u0561\u056E \u0567\u0589",
       title: titleAm,
-      date: dateAm,
+      date: tierDateAm,
       dateLabel: "\u0531\u0574\u057D\u0561\u0569\u056B\u057E",
       locationLabel: "\u054E\u0561\u0575\u0580",
       locationValue: location.replace(/Online/gi, "\u0531\u057C\u0581\u0561\u0576\u0581").replace(/Zoom Webinar/gi, "Zoom \u057E\u0565\u0562\u056B\u0576\u0561\u0580"),
@@ -187,6 +208,8 @@ serve(async (req) => {
       meetingLabel: "\u0544\u056B\u0561\u0576\u0561\u056C \u0574\u056B\u057B\u0578\u0581\u0561\u057C\u0574\u0561\u0576\u0568",
       joinBtnLabel: "\u{1F4F9} \u0544\u056B\u0561\u0576\u0561\u056C \u0574\u056B\u057B\u0578\u0581\u0561\u057C\u0574\u0561\u0576\u0568",
       closing: "\u0544\u056B\u0576\u0579 \u0570\u0561\u0576\u0564\u056B\u057A\u0578\u0582\u0574 \u0574\u056B\u057B\u0578\u0581\u0561\u057C\u0574\u0561\u0576\u0568\u0589<br><strong>AgentPark \u0569\u056B\u0574</strong>",
+      trackLabel: tierAm ? "\u0548\u0582\u0572\u0572\u0578\u0582\u0569\u0575\u0578\u0582\u0576" : undefined,
+      trackValue: tierAm || undefined,
     });
 
     // Armenian always first

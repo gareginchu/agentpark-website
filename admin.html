@@ -1129,6 +1129,14 @@
                 </select>
               </div>
               <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">
+                  Ticket Tiers <span class="text-navy/30 normal-case">(JSON array — leave empty for single-price events)</span>
+                </label>
+                <textarea id="ev-ticket-tiers" class="admin-textarea font-mono text-[12px]" rows="8" placeholder='[{"id":"bootcamp","label_en":"...","price_amd":64500,"deadline":"2026-06-10",...}]'></textarea>
+                <p id="ev-ticket-tiers-error" class="text-red-500 text-[11px] mt-1 hidden"></p>
+                <p class="text-[11px] text-navy/40 mt-1">Per-tier fields: <code>id</code>, <code>label_en</code>, <code>label_am</code>, <code>price_amd</code>, <code>price_display</code>, <code>dates_text_en</code>, <code>dates_text_am</code>, <code>deadline</code> (YYYY-MM-DD), <code>description_en</code>, <code>description_am</code>, optional <code>hidden</code> + <code>promo_code</code>.</p>
+              </div>
+              <div class="sm:col-span-2">
                 <label class="block text-xs font-medium text-navy/50 mb-1.5 uppercase tracking-wide">Cover Image <span class="text-navy/30 normal-case">(shown on event cards)</span></label>
                 <div class="flex gap-2">
                   <input id="ev-cover-image" type="text" class="admin-input flex-1" placeholder="https://example.com/event-cover.jpg">
@@ -2249,6 +2257,37 @@
       }).join('\n');
     }
 
+    // Parse the Ticket Tiers JSON textarea. Returns:
+    //   - null if empty (single-price event)
+    //   - parsed array on success
+    //   - false on parse error (and surfaces inline error message)
+    function parseTicketTiersField() {
+      const ta = document.getElementById('ev-ticket-tiers');
+      const errEl = document.getElementById('ev-ticket-tiers-error');
+      if (!ta) return null;
+      const raw = (ta.value || '').trim();
+      if (errEl) errEl.classList.add('hidden');
+      if (!raw) return null;
+      try {
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) throw new Error('Ticket tiers must be a JSON array.');
+        for (const tier of parsed) {
+          if (!tier || typeof tier !== 'object') throw new Error('Each tier must be an object.');
+          if (!tier.id) throw new Error('Each tier needs an "id".');
+          if (typeof tier.price_amd !== 'number') throw new Error('Each tier needs a numeric "price_amd".');
+        }
+        return parsed;
+      } catch (e) {
+        if (errEl) {
+          errEl.textContent = 'Ticket tiers JSON error: ' + e.message;
+          errEl.classList.remove('hidden');
+        } else {
+          showToast('Ticket tiers JSON error: ' + e.message);
+        }
+        return false;
+      }
+    }
+
     // ============================================================
     // ANALYTICS
     // ============================================================
@@ -2697,6 +2736,8 @@
       adding.classList.remove('hidden');
       try {
         const images = parseImageLines(document.getElementById('ev-images').value.trim());
+        const tiersParsed = parseTicketTiersField();
+        if (tiersParsed === false) { adding.classList.add('hidden'); return; }
         await sbFetch('events', {
           method: 'POST',
           body: JSON.stringify({
@@ -2721,9 +2762,11 @@
             video_url: document.getElementById('ev-video-url').value.trim() || null,
             certificate_template: document.getElementById('ev-certificate-template').value.trim() || null,
             organizers: _organizers.length ? _organizers : null,
+            ticket_tiers: tiersParsed,
           }),
         });
-        ['ev-title','ev-title-am','ev-date','ev-end-date','ev-start-time','ev-end-time','ev-location','ev-meeting-url','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url','ev-certificate-template'].forEach(id => document.getElementById(id).value = '');
+        ['ev-title','ev-title-am','ev-date','ev-end-date','ev-start-time','ev-end-time','ev-location','ev-meeting-url','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url','ev-certificate-template','ev-ticket-tiers'].forEach(id => document.getElementById(id).value = '');
+      const _ttErr = document.getElementById('ev-ticket-tiers-error'); if (_ttErr) _ttErr.classList.add('hidden');
         document.getElementById('ev-currency').value = 'AMD';
         document.getElementById('ev-price-display').value = 'hide';
         document.getElementById('ev-cover-preview').classList.add('hidden');
@@ -2784,6 +2827,8 @@
       }
       document.getElementById('ev-video-url').value = ev.video_url || '';
       document.getElementById('ev-certificate-template').value = ev.certificate_template || '';
+      document.getElementById('ev-ticket-tiers').value = ev.ticket_tiers ? JSON.stringify(ev.ticket_tiers, null, 2) : '';
+      document.getElementById('ev-ticket-tiers-error').classList.add('hidden');
       if (ev.certificate_template && !ev.certificate_template.endsWith('.pdf')) { document.getElementById('ev-cert-preview-img').src = ev.certificate_template; document.getElementById('ev-cert-preview').classList.remove('hidden'); } else { document.getElementById('ev-cert-preview').classList.add('hidden'); }
       renderVideoPreview();
       _organizers = Array.isArray(ev.organizers) ? ev.organizers.map(o => ({name: o.name, logo_url: o.logo_url || null})) : [];
@@ -2809,6 +2854,8 @@
       adding.classList.remove('hidden');
       try {
         const updImages = parseImageLines(document.getElementById('ev-images').value.trim());
+        const tiersParsed2 = parseTicketTiersField();
+        if (tiersParsed2 === false) { adding.classList.add('hidden'); return; }
         await sbFetch('events?id=eq.' + _editingEventId, {
           method: 'PATCH',
           body: JSON.stringify({
@@ -2833,6 +2880,7 @@
             video_url: document.getElementById('ev-video-url').value.trim() || null,
             certificate_template: document.getElementById('ev-certificate-template').value.trim() || null,
             organizers: _organizers.length ? _organizers : null,
+            ticket_tiers: tiersParsed2,
           }),
         });
         showToast(tr('event-updated'));
@@ -2847,7 +2895,8 @@
 
     function cancelEditEvent() {
       _editingEventId = null;
-      ['ev-title','ev-title-am','ev-date','ev-end-date','ev-start-time','ev-end-time','ev-location','ev-meeting-url','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url','ev-certificate-template'].forEach(id => document.getElementById(id).value = '');
+      ['ev-title','ev-title-am','ev-date','ev-end-date','ev-start-time','ev-end-time','ev-location','ev-meeting-url','ev-capacity','ev-price','ev-desc','ev-desc-am','ev-summary','ev-summary-am','ev-images','ev-cover-image','ev-video-url','ev-certificate-template','ev-ticket-tiers'].forEach(id => document.getElementById(id).value = '');
+      const _ttErr = document.getElementById('ev-ticket-tiers-error'); if (_ttErr) _ttErr.classList.add('hidden');
       document.getElementById('ev-currency').value = 'AMD';
       document.getElementById('ev-cover-preview').classList.add('hidden');
       document.getElementById('ev-images-preview').innerHTML = '';
@@ -2897,11 +2946,15 @@
               const paymentInfo = r.payment_amount && r.payment_amount > 0
                 ? `<span class="text-[10px] text-navy/40 ml-2">${r.payment_amount.toLocaleString()} ${r.payment_currency || 'AMD'}</span>`
                 : '';
+              const phoneLine = r.phone ? `<p class="text-[11px] text-navy/45">${r.phone}</p>` : '';
+              const tierLine = r.ticket_tier_id ? `<p class="text-[10px] uppercase tracking-wide text-gold/80 font-semibold mt-0.5">${r.ticket_tier_id}</p>` : '';
               return `
               <div class="flex items-center justify-between py-2.5 px-4 rounded-xl bg-warm-gray">
                 <div>
                   <p class="text-sm font-medium text-navy">${r.name}</p>
                   <p class="text-xs text-navy/50">${r.email}</p>
+                  ${phoneLine}
+                  ${tierLine}
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
                   ${statusBadge}${paymentInfo}
@@ -2917,7 +2970,7 @@
     }
 
     function exportCSV(regs) {
-      const rows = [[tr('csv-name'), tr('csv-email'), tr('csv-registered-at'), 'Payment Status', 'Amount', 'Currency', 'Paid At', 'Transaction ID'], ...regs.map(r => [r.name, r.email, r.created_at, r.payment_status || 'free', r.payment_amount || 0, r.payment_currency || '', r.paid_at || '', r.payment_txn_id || ''])];
+      const rows = [[tr('csv-name'), tr('csv-email'), 'Phone', 'Track', tr('csv-registered-at'), 'Payment Status', 'Amount', 'Currency', 'Paid At', 'Transaction ID'], ...regs.map(r => [r.name, r.email, r.phone || '', r.ticket_tier_id || '', r.created_at, r.payment_status || 'free', r.payment_amount || 0, r.payment_currency || '', r.paid_at || '', r.payment_txn_id || ''])];
       const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
       const a = document.createElement('a');
       a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);

@@ -9,10 +9,23 @@ const PAYMENT_MODE = 'test';
 const SUPABASE_FUNCTIONS_URL = SUPABASE_URL + '/functions/v1';
 
 // Test mode: create payment order locally (bypasses Edge Functions)
-async function createPaymentOrder(eventId, name, email, event) {
+// extras = { tier_id?, phone? }
+async function createPaymentOrder(eventId, name, email, event, extras) {
+  extras = extras || {};
   if (PAYMENT_MODE === 'test') {
     // In test mode, create registration directly and redirect to test payment page
     const orderId = 'AP_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    const regBody = {
+      event_id: eventId,
+      name: name,
+      email: email,
+      payment_status: 'pending',
+      payment_amount: event.price,
+      payment_currency: event.currency || 'AMD',
+      payment_order_id: orderId,
+    };
+    if (extras.tier_id) regBody.ticket_tier_id = extras.tier_id;
+    if (extras.phone) regBody.phone = extras.phone;
     const res = await fetch(SUPABASE_URL + '/rest/v1/registrations', {
       method: 'POST',
       headers: {
@@ -21,15 +34,7 @@ async function createPaymentOrder(eventId, name, email, event) {
         'Content-Type': 'application/json',
         'Prefer': 'return=representation',
       },
-      body: JSON.stringify({
-        event_id: eventId,
-        name: name,
-        email: email,
-        payment_status: 'pending',
-        payment_amount: event.price,
-        payment_currency: event.currency || 'AMD',
-        payment_order_id: orderId,
-      }),
+      body: JSON.stringify(regBody),
     });
     if (!res.ok) throw new Error(await res.text());
     const data = await res.json();
@@ -50,10 +55,13 @@ async function createPaymentOrder(eventId, name, email, event) {
     return { payment_url: paymentUrl, order_id: orderId };
   } else {
     // Production: call Edge Function
+    const body = { event_id: eventId, name, email };
+    if (extras.tier_id) body.tier_id = extras.tier_id;
+    if (extras.phone) body.phone = extras.phone;
     const res = await fetch(SUPABASE_FUNCTIONS_URL + '/create-payment-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ event_id: eventId, name, email }),
+      body: JSON.stringify(body),
     });
     if (!res.ok) throw new Error(await res.text());
     return await res.json();

@@ -153,6 +153,23 @@
       backdrop-filter: blur(16px) saturate(180%);
       -webkit-backdrop-filter: blur(16px) saturate(180%);
     }
+    /* Tier picker cards */
+    .tier-card { background: #ffffff; }
+    .tier-card:hover:not(.tier-closed):not(.tier-selected) {
+      border-color: rgba(203,161,75,0.45);
+      box-shadow: 0 1px 2px rgba(13,39,64,0.04), 0 4px 8px rgba(13,39,64,0.06);
+      transform: translateY(-1px);
+    }
+    .tier-card.tier-selected {
+      border-color: #CBA14B;
+      background: #FBF6E8;
+      box-shadow: 0 0 0 3px rgba(203,161,75,0.18);
+    }
+    .tier-card.tier-closed {
+      opacity: 0.55;
+      cursor: not-allowed;
+      background: #F5F5F5;
+    }
   </style>
 </head>
 <body class="font-sans text-navy bg-white antialiased">
@@ -339,6 +356,13 @@
               <!-- Form -->
               <div id="reg-form-wrap">
                 <h3 class="text-sm font-bold text-navy mb-4" data-i18n="register-for-event">Register for this Event</h3>
+
+                <!-- Tier picker (shown only when event has ticket_tiers) -->
+                <div id="tier-picker-wrap" class="hidden mb-5">
+                  <p class="text-xs font-medium text-navy/50 uppercase tracking-wide mb-2.5" data-i18n="select-track">Select Your Track</p>
+                  <div id="tier-picker-list" class="space-y-2.5"></div>
+                </div>
+
                 <form id="reg-form" onsubmit="submitReg(event)" class="space-y-4">
                   <div>
                     <label class="block text-xs font-medium text-navy/50 uppercase tracking-wide mb-1.5" data-i18n="modal-full-name">Full Name *</label>
@@ -347,6 +371,10 @@
                   <div>
                     <label class="block text-xs font-medium text-navy/50 uppercase tracking-wide mb-1.5" data-i18n="modal-email-label">Email Address *</label>
                     <input id="reg-email" type="email" required placeholder="your@email.com" data-i18n-placeholder="modal-email-placeholder" class="admin-input">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-navy/50 uppercase tracking-wide mb-1.5" data-i18n="modal-phone-label">Phone Number</label>
+                    <input id="reg-phone" type="tel" placeholder="+374 ..." data-i18n-placeholder="modal-phone-placeholder" class="admin-input">
                   </div>
                   <p id="reg-error" class="text-red-500 text-xs hidden"></p>
                   <button type="submit" id="reg-btn" class="w-full px-6 py-3 bg-gold text-deep-ink font-bold text-sm rounded-xl hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-elevated" data-i18n="modal-confirm">
@@ -428,6 +456,8 @@
         'modal-name-placeholder': 'Your name',
         'modal-email-label': 'Email Address *',
         'modal-email-placeholder': 'your@email.com',
+        'modal-phone-label': 'Phone Number',
+        'modal-phone-placeholder': '+374 ...',
         'modal-confirm': 'Confirm Registration',
         'youre-registered': "You're registered!",
         'reg-email-notice': "We'll send details to your email before the event.",
@@ -441,6 +471,7 @@
         'cert-claim-title': 'Get Your Certificate', 'cert-claim-desc': 'Enter your details to download your certificate of participation.',
         'cert-first-name': 'First Name *', 'cert-last-name': 'Last Name *',
         'cert-download-btn': 'Download Certificate', 'cert-not-found': 'We could not find your name in the participants list.', 'cert-invalid-email': 'Please enter a valid email address.', 'cert-generating': 'Generating certificate...', 'cert-sent': 'Certificate sent to your email!',
+        'select-track': 'Select Your Track', 'tier-deadline': 'Deadline', 'tier-closed': 'Applications closed', 'tier-select-prompt': 'Select a track to continue',
       },
       am: {
         'all-events': 'Բոլոր միջոցառումները',
@@ -462,6 +493,8 @@
         'modal-name-placeholder': 'Ձեր անունը',
         'modal-email-label': 'Էլ. հասցե *',
         'modal-email-placeholder': 'your@email.com',
+        'modal-phone-label': 'Հեռախոսահամար',
+        'modal-phone-placeholder': '+374 ...',
         'modal-confirm': 'Հաստատել գրանցումը',
         'youre-registered': 'Դուք գրանցված եք։',
         'reg-email-notice': 'Մենք կուղարկենք մանրամասները ձեր էլ. հասցեին:',
@@ -475,6 +508,7 @@
         'cert-claim-title': 'Ստանալ վկայագիր', 'cert-claim-desc': 'Մուտքագրեք ձեր տվյալները՝ մասնակցության վկայագիրը ներբեռնելու համար:',
         'cert-first-name': 'Անուն *', 'cert-last-name': 'Ազգանուն *',
         'cert-download-btn': 'Ներբեռնել վկայագիրը', 'cert-not-found': 'Մենք չկարողացանք գտնել ձեր անունը մասնակիցների ցանկում:', 'cert-invalid-email': 'Խնդրում ենք մուտքագրեք վավեր էլ. հասցե:', 'cert-generating': 'Վկայագիրը ստեղծվում է...', 'cert-sent': 'Վկայագիրը ուղարկվել է ձեր էլ. հասցեին:',
+        'select-track': 'Ընտրեք ձեր ուղղությունը', 'tier-deadline': 'Հայտերի ընդունման վերջնաժամկետ', 'tier-closed': 'Հայտերի ընդունումն ավարտված է', 'tier-select-prompt': 'Ընտրեք ուղղություն շարունակելու համար',
       }
     };
     var currentLang = 'en';
@@ -637,9 +671,16 @@
           document.getElementById('reg-closed-wrap').classList.remove('hidden');
         }
       } else {
+        // Tiered event: render tier picker, button label & price come from selected tier
+        const tiers = Array.isArray(ev.ticket_tiers) ? ev.ticket_tiers : [];
+        if (tiers.length) {
+          renderTierPicker(ev, tiers);
+        }
         // Update registration button for paid events
         const regBtn = document.getElementById('reg-btn');
-        if (ev.price_display === 'show' && ev.price > 0 && typeof formatPrice === 'function') {
+        if (tiers.length) {
+          // tier picker drives the button label
+        } else if (ev.price_display === 'show' && ev.price > 0 && typeof formatPrice === 'function') {
           regBtn.textContent = t['modal-confirm'] + ' — ' + formatPrice(ev.price, ev.currency);
         } else if (ev.price_display === 'contact') {
           // For "contact" mode, replace form with a contact message
@@ -740,10 +781,11 @@
       if (ev.date) cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-date']}</p><p class="text-sm font-semibold text-navy">${formatEventDate(ev, false)}</p></div></div>`);
       if (ev.location) cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-location']}</p><p class="text-sm font-semibold text-navy">${ev.location}</p></div></div>`);
       if (ev.capacity) cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-capacity']}</p><p class="text-sm font-semibold text-navy">${ev._spots_remaining != null ? ev._spots_remaining + ' ' + t['spots-available'] : ev.capacity + ' ' + t['attendees']}</p></div></div>`);
-      // Price display in sidebar
-      if (ev.price_display === 'show' && ev.price > 0) {
+      // Price display in sidebar (skipped when tiered — picker shows per-tier prices)
+      const _hasTiers = Array.isArray(ev.ticket_tiers) && ev.ticket_tiers.length > 0;
+      if (!_hasTiers && ev.price_display === 'show' && ev.price > 0) {
         cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-price']}</p><p class="text-sm font-bold text-gold">${formatPrice(ev.price, ev.currency)}</p></div></div>`);
-      } else if (ev.price_display === 'contact') {
+      } else if (!_hasTiers && ev.price_display === 'contact') {
         cardMeta.push(`<div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg bg-navy/5 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-navy/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div><div><p class="text-[10px] text-navy/40 uppercase tracking-wide">${t['meta-price']}</p><p class="text-xs font-medium text-navy/60">${t['contact-pricing']}</p></div></div>`);
       }
       document.getElementById('reg-card-meta').innerHTML = cardMeta.join('');
@@ -906,10 +948,96 @@
       }
     }
 
+    // Tier picker state
+    let _selectedTier = null;
+
+    function renderTierPicker(ev, tiers) {
+      _selectedTier = null;
+      const t = TRANS[currentLang] || TRANS.en;
+      const isAm = currentLang === 'am';
+      const params = new URLSearchParams(window.location.search);
+      const promo = (params.get('promo') || '').toLowerCase().trim();
+      const today = new Date(); today.setHours(0,0,0,0);
+
+      // Filter visible tiers: hidden ones only show when ?promo=<their promo_code>
+      const visible = tiers.filter(tier => {
+        if (!tier.hidden) return true;
+        return tier.promo_code && promo === String(tier.promo_code).toLowerCase();
+      });
+      if (!visible.length) return;
+
+      const wrap = document.getElementById('tier-picker-wrap');
+      const list = document.getElementById('tier-picker-list');
+      wrap.classList.remove('hidden');
+
+      list.innerHTML = visible.map(tier => {
+        const label = (isAm && tier.label_am) ? tier.label_am : tier.label_en;
+        const dates = (isAm && tier.dates_text_am) ? tier.dates_text_am : tier.dates_text_en;
+        const desc = (isAm && tier.description_am) ? tier.description_am : tier.description_en;
+        const deadlineDate = tier.deadline ? new Date(tier.deadline) : null;
+        const closed = deadlineDate && deadlineDate < today;
+        const deadlineDisplay = deadlineDate ? deadlineDate.toLocaleDateString(isAm ? 'hy-AM' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+        const amdDisplay = (typeof tier.price_amd === 'number') ? tier.price_amd.toLocaleString() + ' AMD' : '';
+        return `
+          <label data-tier-id="${tier.id}" class="tier-card block ${closed ? 'tier-closed' : 'cursor-pointer'} relative rounded-xl border border-navy-tint/40 p-4 transition-all duration-150">
+            <input type="radio" name="reg-tier" value="${tier.id}" class="sr-only" ${closed ? 'disabled' : ''}>
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold text-navy leading-snug">${label}</p>
+                ${dates ? `<p class="text-[11px] text-navy/55 mt-1">${dates}</p>` : ''}
+                ${desc ? `<p class="text-xs text-navy/65 mt-2 leading-relaxed">${desc}</p>` : ''}
+                ${deadlineDisplay ? `<p class="text-[10px] ${closed ? 'text-red-500 font-semibold' : 'text-navy/40'} mt-2 uppercase tracking-wide">${closed ? t['tier-closed'] : (t['tier-deadline'] + ': ' + deadlineDisplay)}</p>` : ''}
+              </div>
+              <div class="text-right flex-shrink-0">
+                <p class="text-base font-bold text-gold leading-none">${tier.price_display || amdDisplay}</p>
+                ${tier.price_display && amdDisplay ? `<p class="text-[10px] text-navy/40 mt-1 whitespace-nowrap">≈ ${amdDisplay}</p>` : ''}
+              </div>
+            </div>
+          </label>
+        `;
+      }).join('');
+
+      // Wire up selection
+      list.querySelectorAll('.tier-card').forEach(card => {
+        if (card.classList.contains('tier-closed')) return;
+        card.addEventListener('click', () => {
+          const id = card.getAttribute('data-tier-id');
+          _selectedTier = visible.find(x => x.id === id) || null;
+          // Visual selection
+          list.querySelectorAll('.tier-card').forEach(c => c.classList.remove('tier-selected'));
+          card.classList.add('tier-selected');
+          const radio = card.querySelector('input[type=radio]');
+          if (radio) radio.checked = true;
+          updateRegBtnForTier();
+        });
+      });
+
+      // Disable submit until a tier is chosen
+      updateRegBtnForTier();
+    }
+
+    function updateRegBtnForTier() {
+      const t = TRANS[currentLang] || TRANS.en;
+      const btn = document.getElementById('reg-btn');
+      if (!btn) return;
+      if (!_selectedTier) {
+        btn.textContent = t['tier-select-prompt'] || 'Select a track to continue';
+        btn.disabled = true;
+        btn.classList.add('opacity-60', 'cursor-not-allowed');
+        return;
+      }
+      const amd = (typeof _selectedTier.price_amd === 'number') ? _selectedTier.price_amd.toLocaleString() + ' AMD' : '';
+      btn.textContent = (t['modal-confirm'] || 'Confirm Registration') + (amd ? ' — ' + amd : '');
+      btn.disabled = false;
+      btn.classList.remove('opacity-60', 'cursor-not-allowed');
+    }
+
     async function submitReg(e) {
       e.preventDefault();
       const name = document.getElementById('reg-name').value.trim();
       const email = document.getElementById('reg-email').value.trim();
+      const phoneEl = document.getElementById('reg-phone');
+      const phone = phoneEl ? phoneEl.value.trim() : '';
       const btn = document.getElementById('reg-btn');
       const errEl = document.getElementById('reg-error');
       const t = TRANS[currentLang] || TRANS.en;
@@ -918,10 +1046,43 @@
       errEl.classList.add('hidden');
 
       const ev = window._currentEvent;
-      // Paid event flow
+      const tiers = Array.isArray(ev && ev.ticket_tiers) ? ev.ticket_tiers : [];
+
+      // Tiered event flow
+      if (tiers.length) {
+        if (!_selectedTier) {
+          errEl.textContent = t['tier-select-prompt'] || 'Please select a track.';
+          errEl.classList.remove('hidden');
+          updateRegBtnForTier();
+          return;
+        }
+        try {
+          const tierEvent = Object.assign({}, ev, {
+            price: _selectedTier.price_amd,
+            currency: 'AMD',
+            title: ((currentLang === 'am' && _selectedTier.label_am) ? _selectedTier.label_am : _selectedTier.label_en),
+          });
+          const result = await createPaymentOrder(eventId, name, email, tierEvent, {
+            tier_id: _selectedTier.id,
+            phone,
+          });
+          if (result.payment_url) {
+            window.location.href = result.payment_url;
+            return;
+          }
+        } catch(err) {
+          errEl.textContent = t['try-again'];
+          errEl.classList.remove('hidden');
+          updateRegBtnForTier();
+          return;
+        }
+        return;
+      }
+
+      // Paid event flow (no tiers)
       if (ev && ev.price > 0 && ev.price_display === 'show') {
         try {
-          const result = await createPaymentOrder(eventId, name, email, ev);
+          const result = await createPaymentOrder(eventId, name, email, ev, { phone });
           if (result.payment_url) {
             window.location.href = result.payment_url;
             return;
@@ -937,6 +1098,8 @@
 
       // Free event flow
       try {
+        const body = { event_id: eventId, name, email };
+        if (phone) body.phone = phone;
         const res = await fetch(SUPABASE_URL + '/rest/v1/registrations', {
           method: 'POST',
           headers: {
@@ -945,7 +1108,7 @@
             'Content-Type': 'application/json',
             'Prefer': 'return=representation',
           },
-          body: JSON.stringify({ event_id: eventId, name, email }),
+          body: JSON.stringify(body),
         });
         if (!res.ok) throw new Error(await res.text());
         document.getElementById('reg-form-wrap').classList.add('hidden');
