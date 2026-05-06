@@ -307,7 +307,7 @@
 
         <!-- RIGHT: Registration card -->
         <div class="lg:col-span-2">
-          <div class="sticky top-28">
+          <div>
             <div id="reg-card" class="bg-white rounded-2xl p-6 shadow-floating border border-navy-tint/30">
               <!-- Event summary -->
               <div class="space-y-3 mb-6 pb-6 border-b border-navy-tint/20" id="reg-card-meta"></div>
@@ -1009,6 +1009,11 @@
           const radio = card.querySelector('input[type=radio]');
           if (radio) radio.checked = true;
           updateRegBtnForTier();
+          // Reveal the next step (form fields + confirm button)
+          setTimeout(() => {
+            const nameInput = document.getElementById('reg-name');
+            if (nameInput) nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 80);
         });
       });
 

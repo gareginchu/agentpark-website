@@ -746,6 +746,17 @@
       const evDesc = (isAm && ev.description_am) ? ev.description_am : ev.description;
       const coverSrc = ev.cover_image || (ev.images && ev.images.length ? (typeof ev.images[0] === 'string' ? ev.images[0] : ev.images[0].url) : null);
 
+      // Tier-aware price label: shows a range when the event has multiple visible tiers,
+      // otherwise falls back to the scalar ev.price.
+      const _visibleTiers = Array.isArray(ev.ticket_tiers) ? ev.ticket_tiers.filter(x => x && typeof x.price_amd === 'number' && x.hidden !== true) : [];
+      const _tierPrices = _visibleTiers.map(x => x.price_amd);
+      const _tierMin = _tierPrices.length ? Math.min.apply(null, _tierPrices) : null;
+      const _tierMax = _tierPrices.length ? Math.max.apply(null, _tierPrices) : null;
+      const _hasTierRange = _tierPrices.length > 1 && _tierMin !== _tierMax;
+      const _priceLabel = _hasTierRange
+        ? (_tierMin.toLocaleString() + ' – ' + _tierMax.toLocaleString() + ' AMD')
+        : (ev.price > 0 ? formatPrice(ev.price, ev.currency) : '');
+
       // Calculate days until event
       let daysUntil = '';
       if (!isPast && ev.date) {
@@ -778,17 +789,17 @@
                 ${ev.location ? `<span>\u{1F4CD} ${ev.location}</span>` : ''}
                 ${ev.capacity ? `<span class="inline-flex items-center gap-1 text-gold font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span><span data-spots-event="${ev.id}">${ev._spots_remaining != null ? ev._spots_remaining : ev.capacity}</span> ${t['ev-spots-left'] || 'spots remaining'}</span>` : ''}
               </div>
-              ${ev.price_display === 'show' && ev.price > 0 ? `<div class="mb-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gold/10 border border-gold/20"><svg class="w-3.5 h-3.5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="text-sm font-bold text-gold">${formatPrice(ev.price, ev.currency)}</span></div>` : ''}
+              ${(ev.price_display === 'show' || _hasTierRange) && _priceLabel ? `<div class="mb-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gold/10 border border-gold/20"><svg class="w-3.5 h-3.5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="text-sm font-bold text-gold">${_priceLabel}</span></div>` : ''}
               ${ev.price_display === 'contact' ? `<div class="mb-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-navy/5 border border-navy/10"><svg class="w-3.5 h-3.5 text-navy/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><span class="text-xs font-medium text-navy/50">${t['ev-contact-pricing']}</span></div>` : ''}
               ${ev.video_url ? `<a href="${ev.video_url}" target="_blank" rel="noopener" class="mb-4 inline-flex items-center gap-2 px-3 py-2 bg-red-50 rounded-lg hover:bg-red-100 transition-colors duration-150 group w-fit">
                 <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                 <span class="text-xs font-medium text-red-600 group-hover:text-red-700">${t['ev-watch-video'] || 'Watch Video'}</span>
               </a>` : ''}
               <div class="flex gap-3">
-                <button onclick="openRegModal('${ev.id}', '${evTitle.replace(/'/g,"\\\\'")}', '${ev.date||''}', '${ev.location||''}', ${ev.price||0}, '${ev.currency||'AMD'}', '${ev.price_display||'hide'}')"
-                  class="px-8 py-3.5 bg-gold text-deep-ink text-sm font-bold rounded-xl hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-elevated">
-                  ${t['ev-register']} \u2192
-                </button>
+                ${_visibleTiers.length > 0
+                  ? `<a href="/event.html?id=${ev.id}" class="px-8 py-3.5 bg-gold text-deep-ink text-sm font-bold rounded-xl hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-elevated">${t['ev-register']} \u2192</a>`
+                  : `<button onclick="openRegModal('${ev.id}', '${evTitle.replace(/'/g,"\\\\'")}', '${ev.date||''}', '${ev.location||''}', ${ev.price||0}, '${ev.currency||'AMD'}', '${ev.price_display||'hide'}')" class="px-8 py-3.5 bg-gold text-deep-ink text-sm font-bold rounded-xl hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-elevated">${t['ev-register']} \u2192</button>`
+                }
                 <a href="/event.html?id=${ev.id}" class="px-5 py-3.5 text-sm font-medium text-navy/60 hover:text-navy transition-colors duration-150 brand-focus">
                   ${t['ev-view-details']}
                 </a>
