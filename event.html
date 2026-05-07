@@ -275,20 +275,19 @@
 
         <!-- LEFT: Description -->
         <div class="lg:col-span-3">
-          <h2 class="text-lg font-bold text-navy heading-tight mb-4" data-i18n="about-event">About this Event</h2>
-          <div id="event-description" class="text-navy/70 body-relaxed space-y-4 text-[15px]"></div>
-
-          <!-- Event Images Gallery (populated for past events with images) -->
-          <!-- Event Video -->
-          <div id="event-video" class="hidden mt-10 pt-8 border-t border-navy-tint/30">
+          <!-- Media (video + gallery) sit above the description so visual context comes first -->
+          <div id="event-video" class="hidden mb-10">
             <h3 class="text-lg font-bold text-navy heading-tight mb-4" data-i18n="event-video">Event Video</h3>
             <div id="event-video-player" class="rounded-xl overflow-hidden"></div>
           </div>
 
-          <div id="event-gallery" class="hidden mt-10 pt-8 border-t border-navy-tint/30">
+          <div id="event-gallery" class="hidden mb-10">
             <h3 class="text-lg font-bold text-navy heading-tight mb-4" data-i18n="event-gallery">Event Gallery</h3>
             <div id="event-gallery-grid" class="grid grid-cols-2 gap-3 rounded-xl overflow-hidden"></div>
           </div>
+
+          <h2 class="text-lg font-bold text-navy heading-tight mb-4" data-i18n="about-event">About this Event</h2>
+          <div id="event-description" class="text-navy/70 body-relaxed space-y-4 text-[15px]"></div>
 
           <!-- Past Event Summary (populated if summary exists) -->
           <div id="event-summary-section" class="hidden mt-10 pt-8 border-t border-navy-tint/30">
