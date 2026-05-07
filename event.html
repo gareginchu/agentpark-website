@@ -376,6 +376,11 @@
                     <label class="block text-xs font-medium text-navy/50 uppercase tracking-wide mb-1.5" data-i18n="modal-phone-label">Phone Number</label>
                     <input id="reg-phone" type="tel" placeholder="+374 ..." data-i18n-placeholder="modal-phone-placeholder" class="admin-input">
                   </div>
+                  <label class="flex items-start gap-2.5 text-[12px] leading-relaxed text-navy/65 select-none cursor-pointer">
+                    <input id="reg-accept" type="checkbox" required class="mt-0.5 w-4 h-4 rounded border-navy-tint/60 text-gold focus:ring-2 focus:ring-gold/40 cursor-pointer flex-shrink-0">
+                    <span data-i18n="reg-accept-html">By proceeding I confirm I have read and accept the <a href="/terms-and-conditions" target="_blank" class="text-gold hover:underline">Terms &amp; Conditions</a>, <a href="/refund-policy" target="_blank" class="text-gold hover:underline">Refund Policy</a>, <a href="/delivery-terms" target="_blank" class="text-gold hover:underline">Delivery Terms</a>, and <a href="/privacy-policy" target="_blank" class="text-gold hover:underline">Privacy Policy</a>.</span>
+                  </label>
+                  <p class="text-[11px] text-navy/45 leading-relaxed" data-i18n="reg-receipt-note">A copy of the payment confirmation will be emailed to you.</p>
                   <p id="reg-error" class="text-red-500 text-xs hidden"></p>
                   <button type="submit" id="reg-btn" class="w-full px-6 py-3 bg-gold text-deep-ink font-bold text-sm rounded-xl hover:brightness-110 active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus shadow-elevated" data-i18n="modal-confirm">
                     Confirm Registration
@@ -390,6 +395,7 @@
                 </div>
                 <p class="text-sm font-bold text-navy mb-1" data-i18n="youre-registered">You're registered!</p>
                 <p class="text-xs text-navy/50" data-i18n="reg-email-notice">We'll send details to your email before the event.</p>
+                <p class="text-[11px] text-navy/40 mt-2" data-i18n="reg-email-receipt-success">A payment confirmation has been emailed to you.</p>
               </div>
             </div>
 
@@ -458,6 +464,9 @@
         'modal-email-placeholder': 'your@email.com',
         'modal-phone-label': 'Phone Number',
         'modal-phone-placeholder': '+374 ...',
+        'reg-accept-html': 'By proceeding I confirm I have read and accept the <a href="/terms-and-conditions" target="_blank" class="text-gold hover:underline">Terms &amp; Conditions</a>, <a href="/refund-policy" target="_blank" class="text-gold hover:underline">Refund Policy</a>, <a href="/delivery-terms" target="_blank" class="text-gold hover:underline">Delivery Terms</a>, and <a href="/privacy-policy" target="_blank" class="text-gold hover:underline">Privacy Policy</a>.',
+        'reg-receipt-note': 'A copy of the payment confirmation will be emailed to you.',
+        'reg-email-receipt-success': 'A payment confirmation has been emailed to you.',
         'modal-confirm': 'Confirm Registration',
         'youre-registered': "You're registered!",
         'reg-email-notice': "We'll send details to your email before the event.",
@@ -495,6 +504,9 @@
         'modal-email-placeholder': 'your@email.com',
         'modal-phone-label': 'Հեռախոսահամար',
         'modal-phone-placeholder': '+374 ...',
+        'reg-accept-html': 'Շարունակելով՝ հաստատում եմ, որ կարդացել և ընդունում եմ <a href="/terms-and-conditions" target="_blank" class="text-gold hover:underline">Ընդհանուր դրույթներ և պայմանները</a>, <a href="/refund-policy" target="_blank" class="text-gold hover:underline">Գումարի վերադարձի քաղաքականությունը</a>, <a href="/delivery-terms" target="_blank" class="text-gold hover:underline">Առաքման պայմանները</a> և <a href="/privacy-policy" target="_blank" class="text-gold hover:underline">Գաղտնիության քաղաքականությունը</a>։',
+        'reg-receipt-note': 'Վճարման հաստատման պատճենը կուղարկվի ձեր էլ. փոստին։',
+        'reg-email-receipt-success': 'Վճարման հաստատումն ուղարկվել է ձեր էլ. փոստին։',
         'modal-confirm': 'Հաստատել գրանցումը',
         'youre-registered': 'Դուք գրանցված եք։',
         'reg-email-notice': 'Մենք կուղարկենք մանրամասները ձեր էլ. հասցեին:',

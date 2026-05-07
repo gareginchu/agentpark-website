@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delivery Terms — AgentPark</title>
+  <meta name="description" content="Delivery Terms for AgentPark.am — AgentPark LLC, Yerevan, Armenia.">
+  <link rel="canonical" href="https://agentpark.am/delivery-terms">
+  <link rel="icon" type="image/png" sizes="32x32" href="Brand_assets/favicon-32x32.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: '#0D2740', 'navy-light': '#1A3A5C',
+            gold: '#CBA14B', 'gold-tint': '#F5EDD8',
+            'navy-tint': '#D6DEE5', 'deep-ink': '#0D1027',
+            'warm-gray': '#F5F5F5',
+          },
+          fontFamily: {
+            sans: ['Inter','Helvetica Neue','Arial','system-ui','sans-serif'],
+            display: ['Playfair Display','Georgia','serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    .heading-tight { letter-spacing: -0.03em; }
+    .body-relaxed { line-height: 1.75; }
+    .brand-focus:focus-visible { outline: 2px solid #CBA14B; outline-offset: 2px; }
+    .nav-blur { backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); }
+    .legal-prose p { color: rgba(13,39,64,0.78); line-height: 1.8; font-size: 15px; margin-bottom: 1.1rem; }
+    .legal-prose a { color: #CBA14B; }
+    .legal-prose a:hover { text-decoration: underline; }
+    .lang-toggle-btn { transition: color 0.15s, background 0.15s; }
+    .lang-toggle-btn.active-lang { background: #0D2740; color: #fff; border-color: #0D2740; }
+  </style>
+</head>
+<body class="font-sans text-navy bg-white antialiased">
+
+  <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-white/80 border-b border-navy-tint/50">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20 lg:h-28">
+        <a href="/" class="brand-focus flex items-center gap-3">
+          <img src="Brand_assets/AgentPark_logo.png" alt="AgentPark" class="h-16 lg:h-24 w-auto">
+        </a>
+        <div class="flex items-center gap-4">
+          <a href="/" class="inline-flex items-center gap-2 text-sm font-medium text-navy/70 hover:text-navy transition-colors duration-150 brand-focus">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <span data-i18n="back-to-home">Home</span>
+          </a>
+          <div class="flex items-center gap-1">
+            <button onclick="setLang('en')" data-lang="en" class="lang-toggle-btn active-lang px-3 py-1.5 text-xs font-semibold rounded border border-navy-tint/50 text-navy/70 brand-focus">EN</button>
+            <button onclick="setLang('am')" data-lang="am" class="lang-toggle-btn px-3 py-1.5 text-xs font-semibold rounded border border-navy-tint/50 text-navy/70 brand-focus">ՀՅ</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="pt-32 pb-12">
+    <div class="max-w-3xl mx-auto px-6 lg:px-8">
+      <p class="text-xs font-medium text-navy/40 uppercase tracking-widest mb-3" data-i18n="legal-section">Legal</p>
+      <h1 id="page-title" class="font-display text-3xl sm:text-4xl font-bold text-navy heading-tight mb-2"></h1>
+      <p class="text-sm text-navy/50 mb-10" data-i18n="last-updated">Last updated: 7 May 2026</p>
+      <article id="legal-body" class="legal-prose"></article>
+    </div>
+  </main>
+
+  <footer class="bg-deep-ink py-12 mt-16">
+    <div class="max-w-5xl mx-auto px-6 lg:px-8 text-center">
+      <div class="flex flex-wrap justify-center gap-x-6 gap-y-3 mb-5 text-sm">
+        <a href="/terms-and-conditions" class="text-navy-tint/65 hover:text-gold transition-opacity duration-200" data-i18n="footer-terms">Terms & Conditions</a>
+        <a href="/refund-policy" class="text-navy-tint/65 hover:text-gold transition-opacity duration-200" data-i18n="footer-refund">Refund Policy</a>
+        <a href="/delivery-terms" class="text-navy-tint/65 hover:text-gold transition-opacity duration-200" data-i18n="footer-delivery">Delivery Terms</a>
+        <a href="/privacy-policy" class="text-navy-tint/65 hover:text-gold transition-opacity duration-200" data-i18n="footer-privacy">Privacy Policy</a>
+        <a href="mailto:info@agentpark.am" class="text-navy-tint/65 hover:text-gold transition-opacity duration-200">info@agentpark.am</a>
+      </div>
+      <p class="text-xs text-navy-tint/40" data-i18n="footer-copy">© 2026 AgentPark LLC, Yerevan, Armenia. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    var TRANS = {
+      en: {
+        'back-to-home': 'Home',
+        'legal-section': 'Legal',
+        'last-updated': 'Last updated: 7 May 2026',
+        'page-title': "Delivery Terms",
+        'body-html': "<p>Most services offered on AgentPark.am may be intangible or digital in nature. In such cases, “delivery” means providing access to the service, confirming registration, sending digital materials, sharing an online meeting link, or commencing the relevant service.</p>\n          <p>Digital materials, access details, confirmation emails, or event participation information are generally sent to the email address provided by the user after successful completion of the order or payment. The user is therefore responsible for providing a valid and working email address.</p>\n          <p>If a service is delivered online, AgentPark provides the relevant access or participation information within a reasonable time before the service starts. If a service is delivered at a physical venue, the location, date, and schedule are stated on the relevant page or offer.</p>\n          <p>If any physical materials or goods are provided, the applicable delivery terms, timelines, charges, and geographic limitations are stated separately on the relevant page or during checkout.</p>\n          <p>AgentPark shall not be responsible for delayed or failed delivery where the cause is inaccurate user data, email filtering, force majeure, or disruption of third-party services.</p>\n          <p>For delivery questions, email <a href=\"mailto:info@agentpark.am\">info@agentpark.am</a>.</p>",
+        'footer-terms': 'Terms & Conditions',
+        'footer-refund': 'Refund Policy',
+        'footer-delivery': 'Delivery Terms',
+        'footer-privacy': 'Privacy Policy',
+        'footer-copy': '© 2026 AgentPark LLC, Yerevan, Armenia. All rights reserved.',
+      },
+      am: {
+        'back-to-home': 'Գլխավոր',
+        'legal-section': 'Իրավական',
+        'last-updated': 'Թարմացվել է՝ 7 մայիսի 2026',
+        'page-title': "Առաքման պայմաններ",
+        'body-html': "<p>AgentPark.am կայքում առաջարկվող ծառայությունների մեծ մասը կարող է ունենալ ոչ նյութական կամ թվային բնույթ։ Այդ դեպքում «առաքում» հասկացությունը վերաբերում է ծառայության հասանելիության տրամադրմանը, գրանցման հաստատմանը, էլեկտրոնային նյութերի ուղարկմանը, առցանց հանդիպման հղման տրամադրմանը կամ համապատասխան ծառայության մեկնարկին։</p>\n          <p>Թվային նյութերը, մուտքի տվյալները, հաստատման նամակները կամ միջոցառման մասնակցության տեղեկատվությունը սովորաբար ուղարկվում են օգտատիրոջ կողմից նշված էլեկտրոնային փոստին պատվերի կամ վճարման հաջող ավարտից հետո։ Ուստի օգտատերը պարտավորվում է տրամադրել վավեր և գործող էլեկտրոնային փոստի հասցե։</p>\n          <p>Եթե ծառայությունը մատուցվում է օնլայն ձևաչափով, AgentPark-ը ծառայության մեկնարկից առաջ տրամադրում է համապատասխան մուտքի կամ մասնակցության տեղեկատվությունը ողջամիտ ժամկետում։ Եթե ծառայությունն իրականացվում է ֆիզիկական վայրում, կայքում կամ առաջարկում նշվում են անցկացման վայրը, օրը և ժամերը։</p>\n          <p>Եթե տրամադրվում է որևէ ֆիզիկական նյութ կամ ապրանք, դրա առաքման պայմանները, ժամկետները, արժեքը և աշխարհագրական սահմանափակումները պետք է առանձին նշվեն համապատասխան էջում կամ պատվերի ընթացքում։</p>\n          <p>AgentPark-ը պատասխանատվություն չի կրում առաքման ուշացման կամ անհնարինության համար, եթե պատճառը օգտատիրոջ կողմից տրամադրված սխալ տվյալներն են, էլեկտրոնային նամակների ֆիլտրումը, ֆորսմաժորային իրավիճակները կամ երրորդ կողմի ծառայությունների խափանումները։</p>\n          <p>Առաքման հետ կապված հարցերի համար գրեք՝ <a href=\"mailto:info@agentpark.am\">info@agentpark.am</a>։</p>",
+        'footer-terms': 'Ընդհանուր դրույթներ և պայմաններ',
+        'footer-refund': 'Գումարի վերադարձի քաղաքականություն',
+        'footer-delivery': 'Առաքման պայմաններ',
+        'footer-privacy': 'Գաղտնիության քաղաքականություն',
+        'footer-copy': '© 2026 AgentPark ՍՊԸ, Երևան, Հայաստան։ Բոլոր իրավունքները պաշտպանված են։',
+      },
+    };
+
+    function setLang(lang) {
+      if (!TRANS[lang]) lang = 'en';
+      document.documentElement.lang = lang === 'am' ? 'hy' : 'en';
+      localStorage.setItem('agentpark-lang', lang);
+      const t = TRANS[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) el.innerHTML = t[key];
+      });
+      document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+        btn.classList.toggle('active-lang', btn.dataset.lang === lang);
+      });
+      document.getElementById('page-title').textContent = t['page-title'];
+      document.getElementById('legal-body').innerHTML = t['body-html'];
+      document.title = t['page-title'] + ' — AgentPark';
+    }
+
+    (function() {
+      var saved = localStorage.getItem('agentpark-lang') || 'en';
+      setLang(saved);
+    })();
+  </script>
+</body>
+</html>
