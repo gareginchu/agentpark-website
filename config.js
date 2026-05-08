@@ -5,7 +5,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 // Payment Configuration
 // 'test' uses /payment-test.html for local clicking-through;
 // 'live' calls the create-payment-order Edge Function which talks to ACBA.
-const PAYMENT_MODE = 'live';
+const PAYMENT_MODE = 'test';
 // Edge Function URL (update when deployed to Supabase)
 const SUPABASE_FUNCTIONS_URL = SUPABASE_URL + '/functions/v1';
 
