@@ -1,1 +1,8 @@
+# Cloudflare Pages redirects.
+# Format:  source  destination  status
+# Query strings are forwarded automatically.
 
+# ACBA payment callback: forward customers from the agentpark.am-branded URL
+# to the Supabase Edge Function that verifies the payment with ACBA and
+# 302s them back to /event.html with ?payment=success or ?payment=failed.
+/payments/callback  https://uvmfjdaqpsdbvokaynpi.supabase.co/functions/v1/payment-callback  302
