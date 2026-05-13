@@ -161,7 +161,10 @@ serve(async (req: Request): Promise<Response> => {
     orderNumber,
     amount: String(amountLuma),
     currency: currencyIso,
-    returnUrl: `${siteUrl}/payments/callback?orderId={orderId}`,
+    // ACBA does not support {orderId} placeholder substitution and rejects
+    // URLs containing literal '{' / '}' as invalid. Send a clean URL — the
+    // gateway appends ?orderId=... itself when redirecting the customer back.
+    returnUrl: `${siteUrl}/payments/callback`,
     description: `${eventTitle} (${tierLabel})`,
     language: uiLang,
     // Helpful metadata; surfaces on the merchant dashboard
