@@ -92,7 +92,26 @@ serve(async (req) => {
     const location = event?.location || "TBD";
     const meetingUrl = event?.meeting_url || "";
     const isPaid = reg.payment_status === "paid" && reg.payment_amount > 0;
-    const amountDisplay = isPaid ? `${reg.payment_amount.toLocaleString()} ${reg.payment_currency}` : "";
+    // Format amount + currency for human display:
+    //   - ACBA stores amount in minor units (luma; 1 AMD = 100 luma) → divide by 100.
+    //   - payment_currency is ISO 4217 numeric (e.g. "051" = AMD) → map to 3-letter code.
+    function formatPaymentAmount(amountMinor: number, currencyNumeric: string): string {
+      const major = amountMinor / 100;
+      const formatted = major.toLocaleString("en-US", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      });
+      const currencyMap: Record<string, string> = {
+        "051": "AMD",
+        "840": "USD",
+        "978": "EUR",
+        "826": "GBP",
+        "643": "RUB",
+      };
+      const code = currencyMap[currencyNumeric] || currencyNumeric;
+      return `${formatted} ${code}`;
+    }
+    const amountDisplay = isPaid ? formatPaymentAmount(reg.payment_amount, reg.payment_currency || "051") : "";
 
     const isAm = lang === "am";
 
