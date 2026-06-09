@@ -790,10 +790,21 @@
       </span>`);
       metaEl.innerHTML = metas.join('');
 
-      // Description
+      // Description — escape HTML for safety, then linkify any http(s) URLs so
+      // visitors can click through (e.g. the Gamma program-details link).
       const descEl = document.getElementById('event-description');
+      const _escapeHtml = (s) => s
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+      const _linkify = (escaped) => escaped.replace(
+        /\b(https?:\/\/[^\s<]+[^\s<.,;:!?)\]])/g,
+        '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-gold hover:underline break-words">$1</a>'
+      );
       if (evDesc) {
-        descEl.innerHTML = evDesc.split('\n').filter(l => l.trim()).map(p => `<p>${p}</p>`).join('');
+        descEl.innerHTML = evDesc.split('\n').filter(l => l.trim()).map(p => `<p>${_linkify(_escapeHtml(p))}</p>`).join('');
       } else {
         descEl.innerHTML = `<p class="text-navy/40 italic">${(TRANS[currentLang]||TRANS.en)['no-description']}</p>`;
       }
