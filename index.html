@@ -202,7 +202,7 @@
             <div class="w-px h-4 bg-navy-tint/50"></div>
             <button onclick="setLang('am')" data-lang="am" class="lang-toggle-btn px-3 py-1.5 text-navy/70 hover:text-navy brand-focus">ՀՅ</button>
           </div>
-          <a href="#upcoming-section" class="inline-flex items-center justify-center px-5 py-2.5 bg-navy text-white text-sm font-semibold rounded-lg hover:bg-navy-light active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus">
+          <a href="#upcoming-section" onclick="scrollToEvents(event)" class="inline-flex items-center justify-center px-5 py-2.5 bg-navy text-white text-sm font-semibold rounded-lg hover:bg-navy-light active:scale-[0.97] transition-transform duration-200 spring-ease brand-focus">
             <span data-i18n="nav-cta">Join Our Events</span>
           </a>
         </div>
@@ -225,7 +225,7 @@
             <button onclick="setLang('en')" data-lang="en" class="lang-toggle-btn active-lang px-4 py-2 text-sm font-semibold rounded border border-navy-tint/50 text-navy/70 brand-focus">EN</button>
             <button onclick="setLang('am')" data-lang="am" class="lang-toggle-btn px-4 py-2 text-sm font-semibold rounded border border-navy-tint/50 text-navy/70 brand-focus">ՀՅ</button>
           </div>
-          <a href="#upcoming-section" class="inline-flex items-center justify-center px-5 py-2.5 bg-navy text-white text-sm font-semibold rounded-lg brand-focus w-full mt-2"><span data-i18n="nav-cta">Join Our Events</span></a>
+          <a href="#upcoming-section" onclick="scrollToEvents(event)" class="inline-flex items-center justify-center px-5 py-2.5 bg-navy text-white text-sm font-semibold rounded-lg brand-focus w-full mt-2"><span data-i18n="nav-cta">Join Our Events</span></a>
         </div>
       </div>
     </div>
@@ -884,6 +884,34 @@
         const t = TRANS[currentLang] || TRANS.en;
         if (loadingEl) { loadingEl.textContent = t['ev-no-events']; loadingEl.classList.remove('hidden'); }
       }
+    }
+
+    // Smart scroll for the "Join Our Events" CTA: prefer upcoming events
+    // if any exist; otherwise fall back to past events (expanding the
+    // collapsed grid so the visitor actually sees them); else the heading.
+    function scrollToEvents(ev) {
+      if (ev) ev.preventDefault();
+      const upcoming = document.getElementById('upcoming-section');
+      const past = document.getElementById('past-section');
+      const fallback = document.getElementById('events');
+      let target = null;
+      if (upcoming && !upcoming.classList.contains('hidden')) {
+        target = upcoming;
+      } else if (past && !past.classList.contains('hidden')) {
+        // Auto-expand the past-events grid if it's still collapsed so the
+        // landing position has actual cards visible.
+        const grid = document.getElementById('past-events-grid');
+        if (grid && grid.classList.contains('hidden') && typeof togglePastEvents === 'function') {
+          togglePastEvents();
+        }
+        target = past;
+      } else {
+        target = fallback;
+      }
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Also close the mobile menu if it's open, so the scroll isn't hidden behind it.
+      const mm = document.getElementById('mobile-menu');
+      if (mm && !mm.classList.contains('hidden')) mm.classList.add('hidden');
     }
 
     function togglePastEvents() {
