@@ -23,11 +23,16 @@ interface CreateOrderRequest {
   email: string;
   phone?: string;
   lang?: "en" | "am";          // UI language; defaults to "en"
+  // For tiers with custom_amount=true (e.g. Scholarship Holders):
+  custom_amount_amd?: number;       // self-chosen amount, in whole AMD
+  scholarship_name?: string;        // free-text scholarship label
+  scholarship_confirmed?: boolean;  // organizing team has verified status
 }
 
 interface TicketTier {
   id: string;
-  price_amd: number;       // canonical price, in whole AMD
+  price_amd?: number;       // canonical price, in whole AMD (absent when custom_amount=true)
+  custom_amount?: boolean;  // when true, amount comes from the request, not the tier
   label_en?: string;
   label_am?: string;
   deadline?: string;
@@ -77,7 +82,8 @@ serve(async (req: Request): Promise<Response> => {
     return json({ error: "invalid_json" }, 400);
   }
 
-  const { event_id, ticket_tier_id, name, email, phone, lang } = body;
+  const { event_id, ticket_tier_id, name, email, phone, lang,
+          custom_amount_amd, scholarship_name, scholarship_confirmed } = body;
   const uiLang: "en" | "am" = lang === "am" ? "am" : "en";
 
   if (!isUuid(event_id))           return json({ error: "invalid_event_id" }, 400);
@@ -85,6 +91,12 @@ serve(async (req: Request): Promise<Response> => {
   if (typeof name !== "string" || name.trim().length < 2 || name.length > 120) return json({ error: "invalid_name" }, 400);
   if (!isEmail(email))             return json({ error: "invalid_email" }, 400);
   if (phone !== undefined && (typeof phone !== "string" || phone.length > 32)) return json({ error: "invalid_phone" }, 400);
+  if (scholarship_name !== undefined && (typeof scholarship_name !== "string" || scholarship_name.length > 200)) {
+    return json({ error: "invalid_scholarship_name" }, 400);
+  }
+  if (scholarship_confirmed !== undefined && typeof scholarship_confirmed !== "boolean") {
+    return json({ error: "invalid_scholarship_confirmed" }, 400);
+  }
 
   // 2. Look up canonical price from DB (never trust the client)
   const supabase = createClient(
@@ -104,8 +116,33 @@ serve(async (req: Request): Promise<Response> => {
 
   const tiers = (event.ticket_tiers as TicketTier[] | null) ?? [];
   const tier = tiers.find((t) => t.id === ticket_tier_id);
-  if (!tier || typeof tier.price_amd !== "number" || tier.price_amd <= 0) {
+  if (!tier) {
     return json({ error: "ticket_tier_not_found" }, 404);
+  }
+
+  // Resolve amount in whole AMD.
+  //   - Standard tier: amount comes from tier.price_amd.
+  //   - custom_amount tier (Scholarship Holders): amount comes from the
+  //     request's custom_amount_amd, with bounds, and scholarship_name is
+  //     required.
+  let amountAmd: number;
+  if (tier.custom_amount === true) {
+    if (typeof custom_amount_amd !== "number" || !Number.isFinite(custom_amount_amd)) {
+      return json({ error: "invalid_custom_amount" }, 400);
+    }
+    if (custom_amount_amd < 1000 || custom_amount_amd > 1_000_000) {
+      // Floor 1,000 AMD (~€2.30). Ceiling 1,000,000 AMD (~€2,300).
+      return json({ error: "custom_amount_out_of_range" }, 400);
+    }
+    if (typeof scholarship_name !== "string" || scholarship_name.trim().length < 2) {
+      return json({ error: "scholarship_name_required" }, 400);
+    }
+    amountAmd = Math.round(custom_amount_amd);
+  } else {
+    if (typeof tier.price_amd !== "number" || tier.price_amd <= 0) {
+      return json({ error: "ticket_tier_invalid_price" }, 404);
+    }
+    amountAmd = tier.price_amd;
   }
 
   // Optional: enforce tier deadline
@@ -114,21 +151,27 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   // 3. Insert pending registration row
-  const amountLuma = tier.price_amd * 100;            // AMD luma (minor unit)
+  const amountLuma = amountAmd * 100;                 // AMD luma (minor unit)
   const currencyIso = "051";                          // AMD ISO 4217 numeric
+
+  const regRow: Record<string, unknown> = {
+    event_id,
+    ticket_tier_id,
+    name: name.trim(),
+    email: email.trim().toLowerCase(),
+    phone: phone?.trim() ?? null,
+    payment_status: "pending",
+    payment_amount: amountLuma,
+    payment_currency: currencyIso,
+  };
+  if (tier.custom_amount === true) {
+    regRow.scholarship_name = scholarship_name?.trim() ?? null;
+    regRow.scholarship_confirmed = scholarship_confirmed ?? null;
+  }
 
   const { data: registration, error: regErr } = await supabase
     .from("registrations")
-    .insert({
-      event_id,
-      ticket_tier_id,
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      phone: phone?.trim() ?? null,
-      payment_status: "pending",
-      payment_amount: amountLuma,
-      payment_currency: currencyIso,
-    })
+    .insert(regRow)
     .select("id")
     .single();
 

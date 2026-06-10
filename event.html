@@ -23,7 +23,7 @@
 
   <link rel="icon" type="image/png" sizes="32x32" href="Brand_assets/favicon-32x32.png">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="config.js?v=6"></script>
+  <script src="config.js?v=7"></script>
 <script>
 // Analytics tracking
 (function() {
@@ -375,6 +375,27 @@
                     <label class="block text-xs font-medium text-navy/50 uppercase tracking-wide mb-1.5" data-i18n="modal-phone-label">Phone Number</label>
                     <input id="reg-phone" type="tel" placeholder="+374 ..." data-i18n-placeholder="modal-phone-placeholder" class="admin-input">
                   </div>
+                  <!-- Scholarship fields — shown only when a custom_amount tier is selected -->
+                  <div id="reg-scholarship-fields" class="hidden rounded-xl border border-gold/30 bg-gold/5 p-4 space-y-4">
+                    <div>
+                      <label class="block text-xs font-medium text-navy/70 uppercase tracking-wide mb-1.5" data-i18n="reg-scholarship-amount-label">Amount you wish to pay (AMD) *</label>
+                      <input id="reg-scholarship-amount" type="number" min="1000" max="1000000" step="100" placeholder="e.g. 5000" class="admin-input">
+                      <p class="text-[10px] text-navy/45 mt-1" data-i18n="reg-scholarship-amount-hint">Minimum 1,000 AMD. Enter the contribution you can make.</p>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-navy/70 uppercase tracking-wide mb-1.5" data-i18n="reg-scholarship-name-label">Which scholarship do you hold? *</label>
+                      <input id="reg-scholarship-name" type="text" maxlength="200" placeholder="e.g. HackNation Global AI Hackathon — Yerevan Hub winner" class="admin-input">
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-navy/70 uppercase tracking-wide mb-1.5" data-i18n="reg-scholarship-confirmed-label">Has your scholarship been confirmed by the organizing team? *</label>
+                      <select id="reg-scholarship-confirmed" class="admin-input">
+                        <option value="" data-i18n="reg-scholarship-confirmed-placeholder">— Please choose —</option>
+                        <option value="yes" data-i18n="reg-scholarship-confirmed-yes">Yes, confirmed</option>
+                        <option value="no" data-i18n="reg-scholarship-confirmed-no">No, not yet</option>
+                      </select>
+                      <p class="text-[10px] text-navy/45 mt-1" data-i18n="reg-scholarship-confirmed-hint">If your scholarship has not yet been confirmed, your registration will be reviewed before being accepted.</p>
+                    </div>
+                  </div>
                   <label class="flex items-start gap-2.5 text-[12px] leading-relaxed text-navy/65 select-none cursor-pointer">
                     <input id="reg-accept" type="checkbox" required class="mt-0.5 w-4 h-4 rounded border-navy-tint/60 text-gold focus:ring-2 focus:ring-gold/40 cursor-pointer flex-shrink-0">
                     <span data-i18n="reg-accept-html">By proceeding I confirm I have read and accept the <a href="/terms-and-conditions" target="_blank" class="text-gold hover:underline">Terms &amp; Conditions</a>, <a href="/refund-policy" target="_blank" class="text-gold hover:underline">Refund Policy</a>, <a href="/delivery-terms" target="_blank" class="text-gold hover:underline">Delivery Terms</a>, and <a href="/privacy-policy" target="_blank" class="text-gold hover:underline">Privacy Policy</a>.</span>
@@ -490,6 +511,19 @@
         'cert-first-name': 'First Name *', 'cert-last-name': 'Last Name *',
         'cert-download-btn': 'Download Certificate', 'cert-not-found': 'We could not find your name in the participants list.', 'cert-invalid-email': 'Please enter a valid email address.', 'cert-generating': 'Generating certificate...', 'cert-sent': 'Certificate sent to your email!',
         'select-track': 'Select Your Track', 'tier-deadline': 'Deadline', 'tier-closed': 'Applications closed', 'tier-select-prompt': 'Select a track to continue',
+        'tier-custom-amount': 'Choose your amount',
+        'reg-scholarship-amount-label': 'Amount you wish to pay (AMD) *',
+        'reg-scholarship-amount-hint': 'Minimum 1,000 AMD. Enter the contribution you can make.',
+        'reg-scholarship-name-label': 'Which scholarship do you hold? *',
+        'reg-scholarship-confirmed-label': 'Has your scholarship been confirmed by the organizing team? *',
+        'reg-scholarship-confirmed-placeholder': '— Please choose —',
+        'reg-scholarship-confirmed-yes': 'Yes, confirmed',
+        'reg-scholarship-confirmed-no': 'No, not yet',
+        'reg-scholarship-confirmed-hint': 'If your scholarship has not yet been confirmed, your registration will be reviewed before being accepted.',
+        'reg-enter-amount-prompt': 'Enter your amount to continue',
+        'reg-scholarship-amount-invalid': 'Please enter an amount between 1,000 and 1,000,000 AMD.',
+        'reg-scholarship-name-required': 'Please tell us which scholarship you hold.',
+        'reg-scholarship-confirmed-required': 'Please answer whether your scholarship has been confirmed.',
       },
       am: {
         'all-events': 'Բոլոր միջոցառումները',
@@ -531,6 +565,19 @@
         'cert-first-name': 'Անուն *', 'cert-last-name': 'Ազգանուն *',
         'cert-download-btn': 'Ներբեռնել վկայագիրը', 'cert-not-found': 'Մենք չկարողացանք գտնել ձեր անունը մասնակիցների ցանկում:', 'cert-invalid-email': 'Խնդրում ենք մուտքագրեք վավեր էլ. հասցե:', 'cert-generating': 'Վկայագիրը ստեղծվում է...', 'cert-sent': 'Վկայագիրը ուղարկվել է ձեր էլ. հասցեին:',
         'select-track': 'Ընտրեք ձեր ուղղությունը', 'tier-deadline': 'Հայտերի ընդունման վերջնաժամկետ', 'tier-closed': 'Հայտերի ընդունումն ավարտված է', 'tier-select-prompt': 'Ընտրեք ուղղություն շարունակելու համար',
+        'tier-custom-amount': 'Ընտրեք ձեր գումարը',
+        'reg-scholarship-amount-label': 'Որքա՞ն եք ցանկանում վճարել (AMD) *',
+        'reg-scholarship-amount-hint': 'Նվազագույնը՝ 1,000 AMD։ Մուտքագրեք այն գումարը, որը կարող եք ներդնել։',
+        'reg-scholarship-name-label': 'Ո՞ր կրթաթոշակառու եք *',
+        'reg-scholarship-confirmed-label': 'Ձեր կրթաթոշակը հաստատվա՞ծ է կազմակերպչական թիմի կողմից *',
+        'reg-scholarship-confirmed-placeholder': '— Խնդրում ենք ընտրել —',
+        'reg-scholarship-confirmed-yes': 'Այո, հաստատված է',
+        'reg-scholarship-confirmed-no': 'Ոչ, դեռ ոչ',
+        'reg-scholarship-confirmed-hint': 'Եթե ձեր կրթաթոշակը դեռ հաստատված չէ, ձեր գրանցումը կդիտարկվի մինչ ընդունումը։',
+        'reg-enter-amount-prompt': 'Մուտքագրեք ձեր գումարը շարունակելու համար',
+        'reg-scholarship-amount-invalid': 'Խնդրում ենք մուտքագրել գումար 1,000-ից 1,000,000 AMD միջակայքում։',
+        'reg-scholarship-name-required': 'Խնդրում ենք նշել՝ ո՞ր կրթաթոշակառու եք։',
+        'reg-scholarship-confirmed-required': 'Խնդրում ենք պատասխանել՝ ձեր կրթաթոշակը հաստատվա՞ծ է։',
       }
     };
     var currentLang = 'en';
@@ -1011,6 +1058,12 @@
         const closed = deadlineDate && deadlineDate < today;
         const deadlineDisplay = deadlineDate ? deadlineDate.toLocaleDateString(isAm ? 'hy-AM' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
         const amdDisplay = (typeof tier.price_amd === 'number') ? tier.price_amd.toLocaleString() + ' AMD' : '';
+        // Custom-amount tiers (Scholarship Holders): no fixed price column —
+        // a "choose your amount" label appears instead.
+        const priceColumn = tier.custom_amount
+          ? `<p class="text-xs font-semibold text-gold leading-tight text-right">${t['tier-custom-amount'] || 'Choose your amount'}</p>`
+          : `<p class="text-base font-bold text-gold leading-none">${tier.price_display || amdDisplay}</p>
+             ${tier.price_display && amdDisplay ? `<p class="text-[10px] text-navy/40 mt-1 whitespace-nowrap">≈ ${amdDisplay}</p>` : ''}`;
         return `
           <label data-tier-id="${tier.id}" class="tier-card block ${closed ? 'tier-closed' : 'cursor-pointer'} relative rounded-xl border border-navy-tint/40 p-4 transition-all duration-150">
             <input type="radio" name="reg-tier" value="${tier.id}" class="sr-only" ${closed ? 'disabled' : ''}>
@@ -1022,8 +1075,7 @@
                 ${deadlineDisplay ? `<p class="text-[10px] ${closed ? 'text-red-500 font-semibold' : 'text-navy/40'} mt-2 uppercase tracking-wide">${closed ? t['tier-closed'] : (t['tier-deadline'] + ': ' + deadlineDisplay)}</p>` : ''}
               </div>
               <div class="text-right flex-shrink-0">
-                <p class="text-base font-bold text-gold leading-none">${tier.price_display || amdDisplay}</p>
-                ${tier.price_display && amdDisplay ? `<p class="text-[10px] text-navy/40 mt-1 whitespace-nowrap">≈ ${amdDisplay}</p>` : ''}
+                ${priceColumn}
               </div>
             </div>
           </label>
@@ -1041,6 +1093,16 @@
           card.classList.add('tier-selected');
           const radio = card.querySelector('input[type=radio]');
           if (radio) radio.checked = true;
+          // Show or hide the scholarship-specific fields panel based on
+          // whether the picked tier uses a custom amount.
+          const schol = document.getElementById('reg-scholarship-fields');
+          if (schol) {
+            if (_selectedTier && _selectedTier.custom_amount) {
+              schol.classList.remove('hidden');
+            } else {
+              schol.classList.add('hidden');
+            }
+          }
           updateRegBtnForTier();
           // Reveal the next step — scroll until the Confirm button is in view
           // (block:'end' anchors the button near the viewport bottom so the form
@@ -1066,11 +1128,36 @@
         btn.classList.add('opacity-60', 'cursor-not-allowed');
         return;
       }
+      // Custom-amount tier: read the user-entered amount; show prompt or
+      // amount-in-button depending on whether a valid value is present.
+      if (_selectedTier.custom_amount) {
+        const amtEl = document.getElementById('reg-scholarship-amount');
+        const raw = amtEl ? parseInt(amtEl.value, 10) : NaN;
+        const valid = Number.isFinite(raw) && raw >= 1000 && raw <= 1000000;
+        if (!valid) {
+          btn.textContent = t['reg-enter-amount-prompt'] || 'Enter your amount to continue';
+          btn.disabled = true;
+          btn.classList.add('opacity-60', 'cursor-not-allowed');
+          return;
+        }
+        const amd = raw.toLocaleString() + ' AMD';
+        btn.textContent = (t['modal-confirm'] || 'Confirm Registration') + ' — ' + amd;
+        btn.disabled = false;
+        btn.classList.remove('opacity-60', 'cursor-not-allowed');
+        return;
+      }
       const amd = (typeof _selectedTier.price_amd === 'number') ? _selectedTier.price_amd.toLocaleString() + ' AMD' : '';
       btn.textContent = (t['modal-confirm'] || 'Confirm Registration') + (amd ? ' — ' + amd : '');
       btn.disabled = false;
       btn.classList.remove('opacity-60', 'cursor-not-allowed');
     }
+
+    // Refresh the Confirm button as the user types the scholarship amount.
+    document.addEventListener('input', (ev) => {
+      if (ev.target && ev.target.id === 'reg-scholarship-amount') {
+        updateRegBtnForTier();
+      }
+    });
 
     async function submitReg(e) {
       e.preventDefault();
@@ -1096,16 +1183,56 @@
           updateRegBtnForTier();
           return;
         }
+        // Collect + validate scholarship-specific fields when the chosen
+        // tier uses a custom amount.
+        let customAmount = null;
+        let scholarshipName = null;
+        let scholarshipConfirmed = null;
+        if (_selectedTier.custom_amount) {
+          const amtEl = document.getElementById('reg-scholarship-amount');
+          const nameEl = document.getElementById('reg-scholarship-name');
+          const confEl = document.getElementById('reg-scholarship-confirmed');
+          const raw = amtEl ? parseInt(amtEl.value, 10) : NaN;
+          if (!Number.isFinite(raw) || raw < 1000 || raw > 1000000) {
+            errEl.textContent = t['reg-scholarship-amount-invalid'] || 'Please enter a valid amount.';
+            errEl.classList.remove('hidden');
+            updateRegBtnForTier();
+            return;
+          }
+          const sName = nameEl ? nameEl.value.trim() : '';
+          if (sName.length < 2) {
+            errEl.textContent = t['reg-scholarship-name-required'] || 'Please tell us which scholarship you hold.';
+            errEl.classList.remove('hidden');
+            updateRegBtnForTier();
+            return;
+          }
+          const conf = confEl ? confEl.value : '';
+          if (conf !== 'yes' && conf !== 'no') {
+            errEl.textContent = t['reg-scholarship-confirmed-required'] || 'Please answer whether your scholarship has been confirmed.';
+            errEl.classList.remove('hidden');
+            updateRegBtnForTier();
+            return;
+          }
+          customAmount = raw;
+          scholarshipName = sName;
+          scholarshipConfirmed = (conf === 'yes');
+        }
         try {
           const tierEvent = Object.assign({}, ev, {
-            price: _selectedTier.price_amd,
+            price: _selectedTier.custom_amount ? customAmount : _selectedTier.price_amd,
             currency: 'AMD',
             title: ((currentLang === 'am' && _selectedTier.label_am) ? _selectedTier.label_am : _selectedTier.label_en),
           });
-          const result = await createPaymentOrder(eventId, name, email, tierEvent, {
+          const extras = {
             tier_id: _selectedTier.id,
             phone,
-          });
+          };
+          if (_selectedTier.custom_amount) {
+            extras.custom_amount_amd = customAmount;
+            extras.scholarship_name = scholarshipName;
+            extras.scholarship_confirmed = scholarshipConfirmed;
+          }
+          const result = await createPaymentOrder(eventId, name, email, tierEvent, extras);
           if (result.payment_url) {
             window.location.href = result.payment_url;
             return;

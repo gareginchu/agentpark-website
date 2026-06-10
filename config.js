@@ -10,7 +10,11 @@ const PAYMENT_MODE = 'live';
 const SUPABASE_FUNCTIONS_URL = SUPABASE_URL + '/functions/v1';
 
 // Test mode: create payment order locally (bypasses Edge Functions)
-// extras = { tier_id?, phone? }
+// extras = {
+//   tier_id?, phone?,
+//   // Scholarship Holders (custom_amount) tier only:
+//   custom_amount_amd?, scholarship_name?, scholarship_confirmed?,
+// }
 async function createPaymentOrder(eventId, name, email, event, extras) {
   extras = extras || {};
   if (PAYMENT_MODE === 'test') {
@@ -66,6 +70,10 @@ async function createPaymentOrder(eventId, name, email, event, extras) {
     };
     if (extras.tier_id) body.ticket_tier_id = extras.tier_id;
     if (extras.phone) body.phone = extras.phone;
+    // Scholarship Holders / custom-amount tier extras
+    if (typeof extras.custom_amount_amd === 'number') body.custom_amount_amd = extras.custom_amount_amd;
+    if (extras.scholarship_name) body.scholarship_name = extras.scholarship_name;
+    if (typeof extras.scholarship_confirmed === 'boolean') body.scholarship_confirmed = extras.scholarship_confirmed;
     const res = await fetch(SUPABASE_FUNCTIONS_URL + '/create-payment-order', {
       method: 'POST',
       headers: {
