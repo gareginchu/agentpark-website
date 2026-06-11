@@ -883,8 +883,17 @@
           if (org.logo_url) {
             // Logo already includes the company name as artwork — keep alt
             // for screen readers and SEO, but skip the redundant <span> label.
-            return `<div class="flex items-center justify-center bg-warm-gray rounded-lg px-4 py-3">
-              <img src="${org.logo_url}" alt="${org.name}" title="${org.name}" class="h-16 max-w-[220px] w-auto object-contain">
+            // AgentPark is the primary organizer of every event on this site,
+            // so it gets a noticeably larger card to read as primary.
+            const isPrimary = org.name && org.name.toLowerCase().includes('agentpark');
+            const imgClass = isPrimary
+              ? 'h-28 max-w-[320px] w-auto object-contain'
+              : 'h-16 max-w-[220px] w-auto object-contain';
+            const cardClass = isPrimary
+              ? 'flex items-center justify-center bg-warm-gray rounded-lg px-6 py-5'
+              : 'flex items-center justify-center bg-warm-gray rounded-lg px-4 py-3';
+            return `<div class="${cardClass}">
+              <img src="${org.logo_url}" alt="${org.name}" title="${org.name}" class="${imgClass}">
             </div>`;
           }
           // No logo on file → show the name as a text pill so the visitor
