@@ -24,6 +24,12 @@
   <link rel="icon" type="image/png" sizes="32x32" href="Brand_assets/favicon-32x32.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="config.js?v=7"></script>
+  <!-- Privacy-friendly analytics by Plausible -->
+  <script async src="https://plausible.io/js/pa-DAauNjJxgQznGkw_oKTLA.js"></script>
+  <script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+  </script>
 <script>
 // Analytics tracking
 (function() {
@@ -903,12 +909,14 @@
       if (paymentStatus === 'success') {
         document.getElementById('reg-form-wrap').classList.add('hidden');
         document.getElementById('reg-success').classList.remove('hidden');
+        try { window.plausible && window.plausible('Payment Success', { props: { event: ev.title || eventId } }); } catch(_) {}
       } else if (paymentStatus === 'failed') {
         const errEl = document.getElementById('reg-error');
         if (errEl) {
           errEl.textContent = t['try-again'] || 'Payment failed. Please try again.';
           errEl.classList.remove('hidden');
         }
+        try { window.plausible && window.plausible('Payment Failed', { props: { event: ev.title || eventId, reason: params.get('reason') || 'unknown' } }); } catch(_) {}
       }
 
       document.getElementById('loading').classList.add('hidden');
@@ -1019,6 +1027,10 @@
         btn.textContent = t['cert-sent'] || 'Certificate sent to your email!';
         btn.disabled = false;
         setTimeout(() => { btn.textContent = t['cert-download-btn'] || 'Download Certificate'; }, 4000);
+        try {
+          const _ev = window._currentEvent;
+          window.plausible && window.plausible('Certificate Downloaded', { props: { event: (_ev && _ev.title) || eventId } });
+        } catch(_) {}
       } catch(err) {
         console.error('Certificate error:', err);
         errEl.textContent = t['try-again'] || 'Something went wrong. Please try again.';
@@ -1088,6 +1100,9 @@
         card.addEventListener('click', () => {
           const id = card.getAttribute('data-tier-id');
           _selectedTier = visible.find(x => x.id === id) || null;
+          try {
+            window.plausible && window.plausible('Registration Started', { props: { event: (ev && ev.title) || eventId, tier: id } });
+          } catch(_) {}
           // Visual selection
           list.querySelectorAll('.tier-card').forEach(c => c.classList.remove('tier-selected'));
           card.classList.add('tier-selected');
