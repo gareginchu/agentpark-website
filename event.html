@@ -281,7 +281,11 @@
 
         <!-- LEFT: Description -->
         <div class="lg:col-span-3">
-          <!-- Media (video + gallery) sit above the description so visual context comes first -->
+          <!-- Media (cover image + video + gallery) sit above the description so visual context comes first -->
+          <div id="event-cover" class="hidden mb-10">
+            <img id="event-cover-img" src="" alt="" class="w-full rounded-xl">
+          </div>
+
           <div id="event-video" class="hidden mb-10">
             <h3 class="text-lg font-bold text-navy heading-tight mb-4" data-i18n="event-video">Event Video</h3>
             <div id="event-video-player" class="rounded-xl overflow-hidden"></div>
@@ -771,6 +775,15 @@
               </a>
             </div>`;
         }
+      }
+
+      // Cover image (rendered above video for visual context)
+      if (ev.cover_image) {
+        const coverSection = document.getElementById('event-cover');
+        const coverImg = document.getElementById('event-cover-img');
+        coverImg.src = ev.cover_image;
+        coverImg.alt = evTitle;
+        coverSection.classList.remove('hidden');
       }
 
       // Event video
