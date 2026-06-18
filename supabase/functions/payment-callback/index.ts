@@ -32,6 +32,30 @@ interface AcbaStatusResponse {
   authRefNum?: string;           // auth reference, useful as txn id
   paymentAmountInfo?: { paymentState?: string };
   attributes?: Array<{ name: string; value: string }>;
+  // SmartVista card / issuer-bank metadata. Field placement varies between
+  // gateway versions, so we look in several places at extraction time.
+  Pan?: string;                  // top-level masked PAN, e.g. "411111**1111"
+  cardAuthInfo?: {
+    pan?: string;
+    maskedPan?: string;
+    expiration?: string;
+    cardholderName?: string;
+    approvalCode?: string;
+  };
+  bindingInfo?: { clientId?: string; bindingId?: string };
+  bankInfo?: {
+    bankName?: string;
+    bankCountryCode?: string;    // ISO 3166-1 alpha-2, e.g. "AM"
+    bankCountryName?: string;    // e.g. "ARMENIA"
+  };
+}
+
+interface CardInfo {
+  card_pan_masked: string | null;
+  card_brand: string | null;
+  card_country: string | null;
+  card_country_name: string | null;
+  card_bank_name: string | null;
 }
 
 // ---------- helpers ----------
@@ -79,6 +103,51 @@ function pickTxnId(s: AcbaStatusResponse): string | null {
   if (s.authRefNum) return s.authRefNum;
   const attr = s.attributes?.find((a) => a.name?.toLowerCase() === "rrn");
   return attr?.value ?? null;
+}
+
+// Derive card scheme from the first digits of a masked PAN.
+// Local Armenian "ArCa" cards use BIN 9... — they're the reason we can't just
+// use a generic visa/mastercard table.
+function brandFromPan(pan: string | null | undefined): string | null {
+  if (!pan) return null;
+  const first = pan[0];
+  const first2 = pan.slice(0, 2);
+  if (first === "4") return "visa";
+  if (first === "5" || ["22", "23", "24", "25", "26", "27"].includes(first2)) return "mastercard";
+  if (["34", "37"].includes(first2)) return "amex";
+  if (first === "9") return "arca";
+  if (first === "6") return "discover";
+  return "unknown";
+}
+
+// Pull card / issuer metadata out of an ACBA status response, looking in every
+// plausible location since SmartVista is inconsistent across versions.
+function extractCardInfo(s: AcbaStatusResponse): CardInfo {
+  const pan =
+    s.cardAuthInfo?.maskedPan ??
+    s.cardAuthInfo?.pan ??
+    s.Pan ??
+    s.attributes?.find((a) => a.name?.toLowerCase() === "pan")?.value ??
+    null;
+  const country =
+    s.bankInfo?.bankCountryCode ??
+    s.attributes?.find((a) => a.name?.toLowerCase() === "bankcountrycode")?.value ??
+    null;
+  const countryName =
+    s.bankInfo?.bankCountryName ??
+    s.attributes?.find((a) => a.name?.toLowerCase() === "bankcountryname")?.value ??
+    null;
+  const bankName =
+    s.bankInfo?.bankName ??
+    s.attributes?.find((a) => a.name?.toLowerCase() === "bankname")?.value ??
+    null;
+  return {
+    card_pan_masked: pan,
+    card_brand: brandFromPan(pan),
+    card_country: country ? country.toUpperCase() : null,
+    card_country_name: countryName,
+    card_bank_name: bankName,
+  };
 }
 
 // ---------- main ----------
@@ -164,12 +233,14 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     // Idempotent update: only flip from `pending` to `paid`.
+    const cardInfo = extractCardInfo(status);
     const { data: updated, error: updErr } = await supabase
       .from("registrations")
       .update({
         payment_status: "paid",
         paid_at: new Date().toISOString(),
         payment_txn_id: pickTxnId(status),
+        ...cardInfo,
       })
       .eq("id", registration.id)
       .eq("payment_status", "pending")
