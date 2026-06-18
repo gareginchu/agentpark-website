@@ -862,26 +862,11 @@
           <!-- Traffic chart (visual bar chart) -->
           <div class="bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
             <div class="flex items-center justify-between mb-6">
-              <h3 class="text-sm font-semibold text-navy" data-i18n="daily-traffic">Daily Traffic — March 2026</h3>
+              <h3 id="traffic-chart-heading" class="text-sm font-semibold text-navy" data-i18n="daily-traffic">Daily Traffic</h3>
               <span class="text-xs text-navy/40 bg-warm-gray px-3 py-1 rounded-full" data-i18n="last-14-days">Last 14 days</span>
             </div>
             <div id="traffic-chart-bars" class="flex items-end gap-2 h-32">
-              <!-- Bars populated dynamically -->
-              <div class="text-center py-10 text-navy/40 text-xs w-full">Loading chart...</div>
-<span class="text-[9px] text-navy/30">19</span></div>
-              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 20"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:60%"></div><span class="text-[9px] text-navy/30">20</span></div>
-              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 21"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:35%"></div><span class="text-[9px] text-navy/30">21</span></div>
-              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 22"><div class="w-full bg-gold/60 rounded-t-sm hover:bg-gold transition-colors duration-150 cursor-default" style="height:80%"></div><span class="text-[9px] text-navy/30">22</span></div>
-              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 23"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:55%"></div><span class="text-[9px] text-navy/30">23</span></div>
-              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 24"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:50%"></div><span class="text-[9px] text-navy/30">24</span></div>
-              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 25"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:70%"></div><span class="text-[9px] text-navy/30">25</span></div>
-              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 26"><div class="w-full bg-gold/60 rounded-t-sm hover:bg-gold transition-colors duration-150 cursor-default" style="height:100%"></div><span class="text-[9px] text-navy/30">26</span></div>
-              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 27"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:65%"></div><span class="text-[9px] text-navy/30">27</span></div>
-              <div class="flex flex-col items-center gap-1 flex-1" title="Feb 28"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:58%"></div><span class="text-[9px] text-navy/30">28</span></div>
-              <div class="flex flex-col items-center gap-1 flex-1" title="Mar 1"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:42%"></div><span class="text-[9px] text-navy/30">Mar 1</span></div>
-              <div class="flex flex-col items-center gap-1 flex-1" title="Mar 2"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:75%"></div><span class="text-[9px] text-navy/30">2</span></div>
-              <div class="flex flex-col items-center gap-1 flex-1" title="Mar 3"><div class="w-full bg-navy/8 rounded-t-sm hover:bg-gold/40 transition-colors duration-150 cursor-default" style="height:68%"></div><span class="text-[9px] text-navy/30">3</span></div>
-              <div class="flex flex-col items-center gap-1 flex-1" title="Mar 4"><div class="w-full bg-gold rounded-t-sm hover:brightness-110 transition-colors duration-150 cursor-default" style="height:82%"></div><span class="text-[9px] text-navy/30 font-semibold">4</span></div>
+              <div class="text-center py-10 text-navy/40 text-xs w-full">Loading chart…</div>
             </div>
           </div>
 
@@ -1308,7 +1293,23 @@
       // called for it on initial load, so the widgets stayed at "—". Kick the
       // fetch now so they populate immediately.
       loadDashboardStats();
+      // Same fix for the analytics tab — preload so switching tabs is instant.
+      loadAnalyticsData();
       populateLastUpdated();
+      updateTrafficChartHeading();
+    }
+
+    // The chart heading used to be hardcoded "Daily Traffic — March 2026".
+    // Make it follow whatever month the rolling 14-day window mostly falls in
+    // (the right-side "Last 14 days" badge already gives the precise range).
+    function updateTrafficChartHeading() {
+      const el = document.getElementById('traffic-chart-heading');
+      if (!el) return;
+      const lang = localStorage.getItem('agentpark-lang') || 'en';
+      const locale = lang === 'am' ? 'hy-AM' : 'en-US';
+      const monthYear = new Date().toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+      const prefix = lang === 'am' ? 'Օրական երթևեկություն' : 'Daily Traffic';
+      el.textContent = `${prefix} — ${monthYear}`;
     }
 
     // Derive "Last Updated" from the HTML file's Last-Modified header
@@ -3259,7 +3260,7 @@
         'analytics-visitors': 'Visitors', 'analytics-unique-sessions': 'unique sessions',
         'analytics-bounce-rate': 'Bounce Rate', 'analytics-bounce-change': '↓ 4% vs last month',
         'analytics-avg-duration': 'Avg. Duration', 'analytics-duration-change': '↑ 12s vs last month',
-        'daily-traffic': 'Daily Traffic — March 2026', 'last-14-days': 'Last 14 days',
+        'daily-traffic': 'Daily Traffic', 'last-14-days': 'Last 14 days',
         'top-pages': 'Top Pages', 'top-countries': 'Top Countries',
         // Settings
         'brand-colors': 'Brand Colors', 'label-primary-navy': 'Primary (Navy)', 'label-accent-gold': 'Accent (Gold)',
@@ -3429,7 +3430,7 @@
         'analytics-visitors': 'Այցելուներ', 'analytics-unique-sessions': 'եզակի նիստեր',
         'analytics-bounce-rate': 'Հենարկման տոկոս', 'analytics-bounce-change': '↓ 4% նախորդ ամսվա',
         'analytics-avg-duration': 'միջ. տևողություն', 'analytics-duration-change': '↑ 12վ նախորդ ամսվա',
-        'daily-traffic': 'Օրական երթևեկություն — մարտ 2026', 'last-14-days': 'Վերջին 14 օր',
+        'daily-traffic': 'Օրական երթևեկություն', 'last-14-days': 'Վերջին 14 օր',
         'top-pages': 'Լավագույն էջեր', 'top-countries': 'Լավագույն երկրներ',
         // Settings
         'brand-colors': 'Բրենդի գույներ', 'label-primary-navy': 'Առաջնային (Navy)', 'label-accent-gold': 'Շեշտադրում (օսկե)',
