@@ -453,20 +453,20 @@
               <div class="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center">
                 <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
               </div>
-              <span id="dash-uv-change" class="text-xs font-medium text-navy/40 bg-navy/5 px-2 py-0.5 rounded-full">—</span>
+              <span id="dash-pc-change" class="text-xs font-medium text-navy/40 bg-navy/5 px-2 py-0.5 rounded-full">—</span>
             </div>
-            <p id="dash-unique-visitors" class="text-2xl font-bold text-navy heading-tight">—</p>
-            <p class="text-xs text-navy/50 mt-1" data-i18n="stat-unique-visitors">Unique Visitors</p>
+            <p id="dash-paying-customers" class="text-2xl font-bold text-navy heading-tight">—</p>
+            <p class="text-xs text-navy/50 mt-1" data-i18n="stat-paying-customers">Paying Customers</p>
           </div>
           <div class="stat-card bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
             <div class="flex items-start justify-between mb-4">
               <div class="w-10 h-10 rounded-xl bg-navy/8 flex items-center justify-center">
-                <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               </div>
-              <span id="dash-cs-change" class="text-xs font-medium text-navy/40 bg-navy/5 px-2 py-0.5 rounded-full">—</span>
+              <span id="dash-rev-change" class="text-xs font-medium text-navy/40 bg-navy/5 px-2 py-0.5 rounded-full">AMD</span>
             </div>
-            <p id="dash-contact-submissions" class="text-2xl font-bold text-navy heading-tight">—</p>
-            <p class="text-xs text-navy/50 mt-1" data-i18n="stat-contact-submissions">Contact Submissions</p>
+            <p id="dash-total-revenue" class="text-2xl font-bold text-navy heading-tight">—</p>
+            <p class="text-xs text-navy/50 mt-1" data-i18n="stat-total-revenue">Total Revenue</p>
           </div>
           <div class="stat-card bg-white rounded-2xl p-6 shadow-elevated border border-navy-tint/30">
             <div class="flex items-start justify-between mb-4">
@@ -539,7 +539,7 @@
                 </div>
                 <div class="flex items-center justify-between">
                   <span class="text-xs text-white/60" data-i18n="status-last-updated">Last Updated</span>
-                  <span class="text-xs text-white/60">Mar 4, 2026</span>
+                  <span id="status-last-updated-value" class="text-xs text-white/60">—</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span class="text-xs text-white/60" data-i18n="status-version">Version</span>
@@ -1304,6 +1304,24 @@
       initRichEditors();
       loadSaved();
       initAutoExpand();
+      // Dashboard is the default visible section but showSection() was never
+      // called for it on initial load, so the widgets stayed at "—". Kick the
+      // fetch now so they populate immediately.
+      loadDashboardStats();
+      populateLastUpdated();
+    }
+
+    // Derive "Last Updated" from the HTML file's Last-Modified header
+    // (Cloudflare Pages serves the git commit date), falling back to today.
+    function populateLastUpdated() {
+      const el = document.getElementById('status-last-updated-value');
+      if (!el) return;
+      const lang = localStorage.getItem('agentpark-lang') || 'en';
+      const locale = lang === 'am' ? 'hy-AM' : 'en-US';
+      const opts = { year: 'numeric', month: 'short', day: 'numeric' };
+      let d = new Date(document.lastModified);
+      if (isNaN(d.getTime()) || d.getFullYear() < 2020) d = new Date();
+      el.textContent = d.toLocaleDateString(locale, opts);
     }
 
     // Check for existing session on page load
@@ -2303,16 +2321,13 @@
         const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
         const sixtyDaysAgo = new Date(Date.now() - 60 * 86400000).toISOString();
 
-        // Fetch all page views for current and previous 30-day periods
-        const [pvCurrent, pvPrevious, contacts] = await Promise.all([
+        const [pvCurrent, pvPrevious, paidRegs] = await Promise.all([
           sbFetch('page_views?select=visitor_id,duration_seconds&created_at=gte.' + thirtyDaysAgo),
           sbFetch('page_views?select=id&created_at=gte.' + sixtyDaysAgo + '&created_at=lt.' + thirtyDaysAgo),
-          sbFetch('contact_messages?select=id')
+          sbFetch('registrations?select=payment_amount,paid_at&payment_status=eq.paid'),
         ]);
 
-        const uniqueVisitors = new Set(pvCurrent.map(v => v.visitor_id)).size;
-
-        // Avg duration
+        // Avg duration for site traffic widget
         const withDuration = pvCurrent.filter(v => v.duration_seconds != null);
         let avgDuration = 0;
         if (withDuration.length) {
@@ -2324,12 +2339,8 @@
         };
         var fmt = function(n) { return n.toLocaleString(); };
 
+        // Page views (30d) + change badge vs previous 30d
         document.getElementById('dash-page-views').textContent = fmt(pvCurrent.length);
-        document.getElementById('dash-unique-visitors').textContent = fmt(uniqueVisitors);
-        document.getElementById('dash-contact-submissions').textContent = fmt(contacts.length);
-        document.getElementById('dash-avg-duration').textContent = fmtDur(avgDuration);
-
-        // Percentage change for page views
         var pvEl = document.getElementById('dash-pv-change');
         if (pvPrevious.length > 0) {
           var pct = Math.round(((pvCurrent.length - pvPrevious.length) / pvPrevious.length) * 100);
@@ -2341,9 +2352,26 @@
           pvEl.textContent = pvCurrent.length > 0 ? 'new' : '—';
         }
 
-        // Hide change badges for other stats (they need historical data to compare)
-        document.getElementById('dash-uv-change').textContent = uniqueVisitors > 0 ? 'live' : '—';
-        document.getElementById('dash-cs-change').textContent = contacts.length > 0 ? 'total' : '—';
+        // Paying customers + total revenue (across all events, all-time)
+        var totalRevenueLuma = paidRegs.reduce(function(s, r) { return s + (r.payment_amount || 0); }, 0);
+        var totalRevenueAmd = Math.round(totalRevenueLuma / 100);
+        document.getElementById('dash-paying-customers').textContent = fmt(paidRegs.length);
+        document.getElementById('dash-total-revenue').textContent = fmt(totalRevenueAmd);
+
+        // Change badge on paying customers — % paid in last 30 days
+        var recentPaid = paidRegs.filter(function(r) {
+          return r.paid_at && r.paid_at >= thirtyDaysAgo;
+        }).length;
+        var pcEl = document.getElementById('dash-pc-change');
+        if (recentPaid > 0) {
+          pcEl.textContent = '+' + recentPaid + ' / 30d';
+          pcEl.className = 'text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full';
+        } else {
+          pcEl.textContent = '—';
+        }
+
+        // Avg duration widget (kept as a site-health metric)
+        document.getElementById('dash-avg-duration').textContent = fmtDur(avgDuration);
 
       } catch (err) {
         console.error('Dashboard stats error:', err);
@@ -3163,8 +3191,8 @@
         'title-events': 'Events Manager', 'sub-events': 'Add, edit and view registrations',
         'title-settings': 'Settings', 'sub-settings': 'Brand, contact & site options',
         // Dashboard stat cards
-        'stat-page-views': 'Page Views (30d)', 'stat-unique-visitors': 'Unique Visitors',
-        'stat-contact-submissions': 'Contact Submissions', 'stat-avg-duration': 'Avg. Session Duration',
+        'stat-page-views': 'Page Views (30d)', 'stat-paying-customers': 'Paying Customers',
+        'stat-total-revenue': 'Total Revenue (AMD)', 'stat-avg-duration': 'Avg. Session Duration',
         'stat-avg-label': 'avg',
         // Dashboard quick actions
         'quick-actions': 'Quick Actions',
@@ -3334,8 +3362,8 @@
         'title-events': 'Միջոցառումների կառավարիչ', 'sub-events': 'Ավելացնել, խմբագրել և դիտել գրանցումները',
         'title-settings': 'Կարգավորումներ', 'sub-settings': 'Բրենդ, կապ և կայքի ընտրանքներ',
         // Dashboard stat cards
-        'stat-page-views': 'էջի դիտումներ (30օր)', 'stat-unique-visitors': 'Եզակի այցելուներ',
-        'stat-contact-submissions': 'Կապի հայտեր', 'stat-avg-duration': 'միջ. նիստի տևողություն',
+        'stat-page-views': 'Էջի դիտումներ (30օր)', 'stat-paying-customers': 'Վճարող հաճախորդներ',
+        'stat-total-revenue': 'Ընդհանուր եկամուտ (AMD)', 'stat-avg-duration': 'Միջ. նիստի տևողություն',
         'stat-avg-label': 'միջ.',
         // Dashboard quick actions
         'quick-actions': 'Արագ գործողություններ',
