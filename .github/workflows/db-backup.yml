@@ -30,4 +30,4 @@ jobs:
         with:
           name: supabase-db-backup-${{ github.run_id }}
           path: backup/*.dump
-          retention-days: 30
+          retention-days: 90
