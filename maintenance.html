@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Annual Maintenance — Prof. Vahakn Dadrian Digital Archive · AgentPark</title>
+  <link rel="icon" type="image/x-icon" href="Brand_assets/AgentPark_logo.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              950: '#040810',
+              900: '#070E1B',
+              800: '#0C1826',
+              700: '#132030',
+              600: '#1B2D43',
+            },
+            gold: {
+              DEFAULT: '#C9A14A',
+              light:   '#DEBF72',
+              muted:   '#8B7034',
+            }
+          },
+          fontFamily: {
+            display: ['Cormorant Garamond', 'Georgia', 'serif'],
+            body:    ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .font-display, h1, h2, h3 { font-family: 'Cormorant Garamond', Georgia, serif; }
+
+    /* Grain overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .plan-card {
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  border-color 0.18s ease,
+                  box-shadow 0.22s ease;
+    }
+    .plan-card:hover { transform: translateY(-2px); }
+
+    .input-field {
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      background: rgba(255,255,255,0.04);
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: #C9A14A;
+      box-shadow: 0 0 0 3px rgba(201, 161, 74, 0.12);
+    }
+
+    .btn-pay {
+      background: #C9A14A;
+      color: #040810;
+      transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1),
+                  background-color 0.15s ease,
+                  box-shadow 0.2s ease,
+                  opacity 0.15s ease;
+    }
+    .btn-pay:hover:not(:disabled) {
+      background: #DEBF72;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 28px rgba(201,161,74,0.28), 0 2px 8px rgba(0,0,0,0.35);
+    }
+    .btn-pay:active:not(:disabled) {
+      transform: translateY(0);
+      background: #B8913E;
+    }
+    .btn-pay:focus-visible {
+      outline: 2px solid #C9A14A;
+      outline-offset: 3px;
+    }
+    .btn-pay:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .back-link {
+      transition: color 0.15s ease, opacity 0.15s ease;
+    }
+    .back-link:hover { opacity: 1; }
+    .back-link:focus-visible { outline: 2px solid #C9A14A; outline-offset: 3px; border-radius: 4px; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { animation: spin 0.75s linear infinite; }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0);   }
+    }
+    .fade-slide { animation: fadeSlide 0.35s ease forwards; }
+
+    .card-surface {
+      background: rgba(10, 18, 32, 0.75);
+      box-shadow: 0 4px 40px rgba(0,0,0,0.35), 0 1px 4px rgba(0,0,0,0.25);
+      backdrop-filter: blur(12px);
+    }
+
+    a.text-link {
+      color: rgba(201,161,74,0.8);
+      transition: color 0.15s ease;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    a.text-link:hover { color: #DEBF72; }
+    a.text-link:focus-visible { outline: 2px solid #C9A14A; outline-offset: 2px; border-radius: 3px; }
+  </style>
+</head>
+
+<body class="bg-navy-950 text-slate-100 min-h-screen overflow-x-hidden">
+
+  <!-- Ambient gradients -->
+  <div class="fixed inset-0 pointer-events-none" aria-hidden="true" style="z-index:0">
+    <div style="position:absolute;top:-15%;left:50%;transform:translateX(-50%);width:900px;height:900px;background:radial-gradient(circle at 50% 40%, rgba(201,161,74,0.07) 0%, transparent 65%);"></div>
+    <div style="position:absolute;bottom:-20%;right:-10%;width:700px;height:700px;background:radial-gradient(circle, rgba(18,40,80,0.45) 0%, transparent 65%);"></div>
+    <div style="position:absolute;top:40%;left:-15%;width:500px;height:500px;background:radial-gradient(circle, rgba(12,24,50,0.3) 0%, transparent 65%);"></div>
+  </div>
+
+  <div class="relative" style="z-index:1">
+
+    <!-- ─── Header ──────────────────────────────────────────────────── -->
+    <header style="border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div class="max-w-2xl mx-auto px-6 py-5 flex items-center justify-between">
+        <a href="https://agentpark.am" target="_blank" rel="noopener"
+           class="back-link opacity-80 flex items-center gap-2.5 focus-visible:outline-none"
+           style="outline:none">
+          <img src="Brand_assets/AgentPark_logo.png" alt="AgentPark" class="h-7 w-auto">
+        </a>
+        <span class="text-xs font-body text-white/30 tracking-widest uppercase">Client Portal</span>
+      </div>
+    </header>
+
+    <!-- ─── Alert banners ───────────────────────────────────────────── -->
+    <div id="banner-success" class="hidden max-w-2xl mx-auto px-6 pt-6">
+      <div class="fade-slide rounded-xl px-5 py-4 flex items-start gap-3.5"
+           style="background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.25)">
+        <svg class="mt-0.5 shrink-0 w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+          <p class="text-sm font-medium text-emerald-300 font-body">Payment received — thank you</p>
+          <p class="mt-1 text-sm text-white/45 font-body leading-relaxed">
+            Your subscription is now active. A confirmation will be sent to your email.
+            Questions? <a href="mailto:gareginc@agentpark.am" class="text-link">gareginc@agentpark.am</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div id="banner-failed" class="hidden max-w-2xl mx-auto px-6 pt-6">
+      <div class="fade-slide rounded-xl px-5 py-4 flex items-start gap-3.5"
+           style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.25)">
+        <svg class="mt-0.5 shrink-0 w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+          <p class="text-sm font-medium text-red-300 font-body">Payment was not completed</p>
+          <p class="mt-1 text-sm text-white/45 font-body leading-relaxed">
+            Your card was not charged. Please try again below, or contact
+            <a href="mailto:gareginc@agentpark.am" class="text-link">gareginc@agentpark.am</a> for assistance.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Main ────────────────────────────────────────────────────── -->
+    <main class="max-w-2xl mx-auto px-6 pt-10 pb-24">
+
+      <!-- Title block -->
+      <div class="mb-10">
+        <p class="text-xs uppercase tracking-widest text-gold/65 font-body font-medium mb-3">AgentPark · Annual Agreement</p>
+        <h1 class="font-display font-medium text-white/95 leading-tight"
+            style="font-size:clamp(2rem,5vw,2.9rem);letter-spacing:-0.03em">
+          Website Maintenance<br>
+          <span style="color:#C9A14A">Subscription</span>
+        </h1>
+        <p class="mt-3.5 text-white/45 font-body text-[0.95rem] leading-relaxed">
+          Prof. Vahakn Dadrian Digital Archive &mdash;
+          <a href="https://dadrian-archive.org" target="_blank" rel="noopener"
+             class="text-white/55 hover:text-white/75 underline underline-offset-2"
+             style="transition:color 0.15s ease">dadrian-archive.org</a>
+        </p>
+      </div>
+
+      <!-- ─── What's included ─────────────────────────────────────── -->
+      <section class="mb-8 rounded-2xl overflow-hidden card-surface"
+               style="border:1px solid rgba(255,255,255,0.07)">
+        <div class="px-6 pt-5 pb-4" style="border-bottom:1px solid rgba(255,255,255,0.06)">
+          <h2 class="font-display font-medium text-white/88 text-xl" style="letter-spacing:-0.02em">What's included</h2>
+        </div>
+
+        <div class="grid md:grid-cols-2" style="divide-x:1px solid rgba(255,255,255,0.06)">
+
+          <!-- Infrastructure -->
+          <div class="px-6 py-5" style="border-right:1px solid rgba(255,255,255,0.06)">
+            <p class="text-[10px] uppercase tracking-widest text-gold/55 font-body font-semibold mb-4">Infrastructure</p>
+            <ul class="space-y-2.5">
+              <li class="flex items-start gap-3 text-sm text-white/65 font-body leading-snug">
+                <svg class="mt-0.5 shrink-0 w-3.5 h-3.5" style="color:#C9A14A;opacity:0.7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                Hetzner CCX33 "dadrian-prod" production server
+              </li>
+              <li class="flex items-start gap-3 text-sm text-white/65 font-body leading-snug">
+                <svg class="mt-0.5 shrink-0 w-3.5 h-3.5" style="color:#C9A14A;opacity:0.7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                Automated backups + monthly restore verification
+              </li>
+              <li class="flex items-start gap-3 text-sm text-white/65 font-body leading-snug">
+                <svg class="mt-0.5 shrink-0 w-3.5 h-3.5" style="color:#C9A14A;opacity:0.7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                Cloudflare R2 — 660 GB PDF archive storage
+              </li>
+              <li class="flex items-start gap-3 text-sm text-white/65 font-body leading-snug">
+                <svg class="mt-0.5 shrink-0 w-3.5 h-3.5" style="color:#C9A14A;opacity:0.7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                Cloudflare Tunnel + DNS + CDN
+              </li>
+              <li class="flex items-start gap-3 text-sm text-white/65 font-body leading-snug">
+                <svg class="mt-0.5 shrink-0 w-3.5 h-3.5" style="color:#C9A14A;opacity:0.7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                Domain registration &amp; Resend transactional email
+              </li>
+            </ul>
+            <p class="mt-4 text-[11px] text-white/28 font-body leading-relaxed">All vendor accounts held and administered by AgentPark — nothing for the Museum to manage.</p>
+          </div>
+
+          <!-- Services -->
+          <div class="px-6 py-5">
+            <p class="text-[10px] uppercase tracking-widest text-gold/55 font-body font-semibold mb-4">Ongoing Services</p>
+            <ul class="space-y-2.5">
+              <li class="flex items-start gap-3 text-sm text-white/65 font-body leading-snug">
+                <svg class="mt-0.5 shrink-0 w-3.5 h-3.5" style="color:#C9A14A;opacity:0.7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                Monthly OS, package &amp; container updates
+              </li>
+              <li class="flex items-start gap-3 text-sm text-white/65 font-body leading-snug">
+                <svg class="mt-0.5 shrink-0 w-3.5 h-3.5" style="color:#C9A14A;opacity:0.7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                Elasticsearch tuning &amp; TLS auto-renewal
+              </li>
+              <li class="flex items-start gap-3 text-sm text-white/65 font-body leading-snug">
+                <svg class="mt-0.5 shrink-0 w-3.5 h-3.5" style="color:#C9A14A;opacity:0.7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                24/7 uptime monitoring &mdash; 4-hour critical response
+              </li>
+              <li class="flex items-start gap-3 text-sm text-white/65 font-body leading-snug">
+                <svg class="mt-0.5 shrink-0 w-3.5 h-3.5" style="color:#C9A14A;opacity:0.7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                Up to 4 hrs/month of minor updates &amp; bug fixes
+              </li>
+              <li class="flex items-start gap-3 text-sm text-white/65 font-body leading-snug">
+                <svg class="mt-0.5 shrink-0 w-3.5 h-3.5" style="color:#C9A14A;opacity:0.7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                Email support &amp; quarterly written status reports
+              </li>
+            </ul>
+            <p class="mt-4 text-[11px] text-white/28 font-body leading-relaxed">Additional hours beyond 4/month billed at USD 60/hr on prior-approval basis.</p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ─── Pricing ─────────────────────────────────────────────── -->
+      <section class="mb-8">
+        <h2 class="font-display font-medium text-white/88 text-xl mb-5" style="letter-spacing:-0.02em">Choose your billing cycle</h2>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+
+          <!-- Monthly -->
+          <button type="button" id="plan-monthly"
+            class="plan-card text-left rounded-2xl p-5 cursor-pointer focus-visible:outline-none"
+            style="background:rgba(10,18,32,0.75);border:1.5px solid #C9A14A;
+                   box-shadow:0 0 0 1px #C9A14A,0 8px 32px rgba(201,161,74,0.12),0 2px 8px rgba(0,0,0,0.35)"
+            onclick="selectPlan('monthly')"
+            aria-pressed="true">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-[10px] uppercase tracking-widest text-gold/65 font-body font-semibold mb-2">Monthly</p>
+                <div class="flex items-baseline gap-1">
+                  <span class="font-display text-[2.4rem] font-semibold text-white leading-none" style="letter-spacing:-0.04em">$350</span>
+                  <span class="text-sm text-white/35 font-body ml-1">/ mo</span>
+                </div>
+              </div>
+              <div id="ring-monthly" class="mt-1 w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                   style="border:2px solid #C9A14A">
+                <div id="dot-monthly" class="w-2.5 h-2.5 rounded-full" style="background:#C9A14A"></div>
+              </div>
+            </div>
+            <p class="mt-3 text-sm text-white/45 font-body leading-relaxed">One invoice per month. Cancel with 60 days' notice.</p>
+            <p class="mt-1.5 text-[11px] text-white/25 font-body">$4,200 / year total</p>
+          </button>
+
+          <!-- Annual -->
+          <button type="button" id="plan-annual"
+            class="plan-card text-left rounded-2xl p-5 cursor-pointer focus-visible:outline-none"
+            style="background:rgba(10,18,32,0.75);border:1.5px solid rgba(255,255,255,0.1)"
+            onclick="selectPlan('annual')"
+            aria-pressed="false">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <p class="text-[10px] uppercase tracking-widest text-gold/65 font-body font-semibold">Annual prepay</p>
+                  <span class="text-[10px] font-semibold font-body px-1.5 py-0.5 rounded-full"
+                        style="background:rgba(201,161,74,0.14);color:#C9A14A">Save $300</span>
+                </div>
+                <div class="flex items-baseline gap-1">
+                  <span class="font-display text-[2.4rem] font-semibold text-white leading-none" style="letter-spacing:-0.04em">$3,900</span>
+                  <span class="text-sm text-white/35 font-body ml-1">/ yr</span>
+                </div>
+              </div>
+              <div id="ring-annual" class="mt-1 w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                   style="border:2px solid rgba(255,255,255,0.3)">
+                <div id="dot-annual" class="w-2.5 h-2.5 rounded-full" style="background:transparent"></div>
+              </div>
+            </div>
+            <p class="mt-3 text-sm text-white/45 font-body leading-relaxed">One invoice for the full year. 7.1% discount applied.</p>
+            <p class="mt-1.5 text-[11px] text-white/25 font-body">Equivalent to $325 / month</p>
+          </button>
+
+        </div>
+      </section>
+
+      <!-- ─── Checkout form ───────────────────────────────────────── -->
+      <section class="rounded-2xl overflow-hidden card-surface"
+               style="border:1px solid rgba(255,255,255,0.07)">
+        <div class="px-6 pt-5 pb-4" style="border-bottom:1px solid rgba(255,255,255,0.06)">
+          <h2 class="font-display font-medium text-white/88 text-xl" style="letter-spacing:-0.02em">Contact &amp; payment</h2>
+        </div>
+
+        <form id="checkout-form" class="px-6 py-6 space-y-5" novalidate onsubmit="handleSubmit(event)">
+
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label for="field-name"
+                class="block text-[10px] uppercase tracking-widest text-white/38 font-body font-semibold mb-2">
+                Full name
+              </label>
+              <input id="field-name" type="text" required minlength="2" maxlength="120"
+                autocomplete="name"
+                placeholder="Maggie Mangassarian-Goschin"
+                class="input-field w-full rounded-xl text-sm text-white placeholder-white/18 font-body px-4 py-3"
+                style="border:1px solid rgba(255,255,255,0.1)">
+            </div>
+            <div>
+              <label for="field-email"
+                class="block text-[10px] uppercase tracking-widest text-white/38 font-body font-semibold mb-2">
+                Email address
+              </label>
+              <input id="field-email" type="email" required maxlength="254"
+                autocomplete="email"
+                placeholder="eskijian@ararat-eskijian-museum.com"
+                class="input-field w-full rounded-xl text-sm text-white placeholder-white/18 font-body px-4 py-3"
+                style="border:1px solid rgba(255,255,255,0.1)">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] uppercase tracking-widest text-white/38 font-body font-semibold mb-2">
+              Organisation
+            </label>
+            <input type="text" readonly
+              value="Ararat-Eskijian Museum and Research Center"
+              class="w-full rounded-xl text-sm font-body px-4 py-3 cursor-default select-none"
+              style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.32)">
+          </div>
+
+          <!-- Error message -->
+          <div id="error-msg" class="hidden rounded-xl px-4 py-3 text-sm text-red-300 font-body fade-slide"
+               style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.25)"></div>
+
+          <!-- Summary + CTA -->
+          <div class="pt-1">
+            <div class="flex items-center justify-between pb-5 mb-5"
+                 style="border-bottom:1px solid rgba(255,255,255,0.06)">
+              <div>
+                <p class="text-[10px] uppercase tracking-widest text-white/35 font-body font-semibold">Due today</p>
+                <p id="summary-amount" class="font-display text-3xl text-white font-medium mt-1" style="letter-spacing:-0.03em">$350</p>
+                <p id="summary-label" class="text-[11px] text-white/28 font-body mt-0.5">Monthly billing · USD</p>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center justify-end gap-2 mb-2">
+                  <img src="Brand_assets/payment-cards/visa.png"       alt="Visa"       class="h-5 object-contain" style="opacity:0.55">
+                  <img src="Brand_assets/payment-cards/mastercard.svg" alt="Mastercard" class="h-5 object-contain" style="opacity:0.55">
+                  <img src="Brand_assets/payment-cards/amex.svg"       alt="Amex"       class="h-5 object-contain" style="opacity:0.55">
+                </div>
+                <p class="text-[10px] text-white/22 font-body">Secured by ACBA Bank</p>
+              </div>
+            </div>
+
+            <button type="submit" id="btn-pay"
+              class="btn-pay w-full rounded-xl py-3.5 px-6 font-body font-semibold text-sm flex items-center justify-center gap-2.5">
+              <span id="btn-text">Pay $350 →</span>
+              <svg id="btn-spinner" class="spinner hidden w-4 h-4" style="color:#040810" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke-linecap="round"/>
+              </svg>
+            </button>
+
+            <p class="mt-4 text-center text-[11px] text-white/22 font-body leading-relaxed">
+              By clicking Pay you agree to the
+              <button type="button" onclick="return false"
+                class="underline underline-offset-2 text-white/32 hover:text-white/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gold rounded"
+                style="transition:color 0.15s ease">
+                Annual Maintenance Agreement
+              </button>.
+              Payment processed via ACBA Bank. Amount charged in AMD at the CBA reference rate.
+            </p>
+          </div>
+
+        </form>
+      </section>
+
+      <!-- ─── Footer ──────────────────────────────────────────────── -->
+      <footer class="mt-14 pt-7 flex flex-col sm:flex-row items-center justify-between gap-4"
+              style="border-top:1px solid rgba(255,255,255,0.05)">
+        <div class="flex items-center gap-3">
+          <img src="Brand_assets/AgentPark_logo.png" alt="AgentPark" class="h-6 w-auto" style="opacity:0.4">
+          <span class="text-xs text-white/22 font-body">AgentPark LLC &copy; 2026</span>
+        </div>
+        <a href="mailto:gareginc@agentpark.am"
+           class="text-xs text-white/28 font-body hover:text-white/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gold rounded"
+           style="transition:color 0.15s ease">
+          gareginc@agentpark.am
+        </a>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- ─── JavaScript ─────────────────────────────────────────────── -->
+  <script>
+    const SUPABASE_FUNCTIONS_URL = 'https://uvmfjdaqpsdbvokaynpi.supabase.co/functions/v1';
+
+    let selectedPlan = 'monthly';
+
+    /* ── Init: show payment result banners ─────────────────────── */
+    (function init() {
+      const p = new URLSearchParams(window.location.search).get('payment');
+      if (p === 'success') {
+        document.getElementById('banner-success').classList.remove('hidden');
+        requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+      } else if (p === 'failed') {
+        document.getElementById('banner-failed').classList.remove('hidden');
+        requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+      }
+    })();
+
+    /* ── Plan selection ─────────────────────────────────────────── */
+    const PLANS = {
+      monthly: { amount: '$350',   label: 'Monthly billing · USD',           btn: 'Pay $350 →' },
+      annual:  { amount: '$3,900', label: 'Annual prepay · USD · Save $300',  btn: 'Pay $3,900 →' },
+    };
+
+    function selectPlan(plan) {
+      selectedPlan = plan;
+
+      ['monthly', 'annual'].forEach(key => {
+        const card    = document.getElementById('plan-' + key);
+        const ring    = document.getElementById('ring-' + key);
+        const dot     = document.getElementById('dot-' + key);
+        const active  = key === plan;
+
+        card.style.borderColor  = active ? '#C9A14A' : 'rgba(255,255,255,0.1)';
+        card.style.boxShadow    = active
+          ? '0 0 0 1px #C9A14A, 0 8px 32px rgba(201,161,74,0.12), 0 2px 8px rgba(0,0,0,0.35)'
+          : '';
+        card.setAttribute('aria-pressed', String(active));
+
+        ring.style.borderColor  = active ? '#C9A14A' : 'rgba(255,255,255,0.3)';
+        dot.style.background    = active ? '#C9A14A' : 'transparent';
+      });
+
+      document.getElementById('summary-amount').textContent = PLANS[plan].amount;
+      document.getElementById('summary-label').textContent  = PLANS[plan].label;
+      document.getElementById('btn-text').textContent       = PLANS[plan].btn;
+
+      /* clear any lingering error when user switches plan */
+      document.getElementById('error-msg').classList.add('hidden');
+    }
+
+    /* ── Form submit ────────────────────────────────────────────── */
+    async function handleSubmit(e) {
+      e.preventDefault();
+
+      const name   = document.getElementById('field-name').value.trim();
+      const email  = document.getElementById('field-email').value.trim();
+      const errEl  = document.getElementById('error-msg');
+      const btn    = document.getElementById('btn-pay');
+      const btnTxt = document.getElementById('btn-text');
+      const spinner= document.getElementById('btn-spinner');
+
+      errEl.classList.add('hidden');
+
+      if (name.length < 2) { return showError('Please enter your full name.'); }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return showError('Please enter a valid email address.');
+      }
+
+      btn.disabled = true;
+      btnTxt.classList.add('hidden');
+      spinner.classList.remove('hidden');
+
+      try {
+        const resp = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-maintenance-order`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, plan: selectedPlan }),
+        });
+
+        const data = await resp.json().catch(() => ({}));
+
+        if (!resp.ok || data.error) {
+          throw new Error(data.error || 'An unexpected error occurred. Please try again.');
+        }
+
+        if (!data.form_url) {
+          throw new Error('Payment gateway did not return a redirect URL. Please try again.');
+        }
+
+        window.location.href = data.form_url;
+
+      } catch (err) {
+        showError(err.message || 'Something went wrong. Please try again or contact gareginc@agentpark.am.');
+        btn.disabled = false;
+        btnTxt.classList.remove('hidden');
+        spinner.classList.add('hidden');
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('error-msg');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+  </script>
+
+</body>
+</html>

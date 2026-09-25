@@ -150,6 +150,13 @@ function extractCardInfo(s: AcbaStatusResponse): CardInfo {
   };
 }
 
+// Redirect helpers for maintenance subscription payments.
+function maintenanceRedirect(siteUrl: string, payment: "success" | "failed", reason?: string): Response {
+  const qs = new URLSearchParams({ payment });
+  if (reason) qs.set("reason", reason);
+  return redirect(`${siteUrl}/maintenance.html?${qs.toString()}`);
+}
+
 // ---------- main ----------
 
 serve(async (req: Request): Promise<Response> => {
@@ -169,19 +176,111 @@ serve(async (req: Request): Promise<Response> => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
-  // 1. Find the registration by EPG orderId
-  const { data: registration, error: lookupErr } = await supabase
+  // 1a. Find the registration by EPG orderId (event registrations)
+  const { data: registration, error: regLookupErr } = await supabase
     .from("registrations")
     .select("id, event_id, payment_status, payment_amount, payment_currency, payment_order_id")
     .eq("payment_order_id", orderId)
     .single();
 
-  if (lookupErr || !registration) {
-    console.warn("callback: unknown orderId", orderId, lookupErr);
+  // 1b. If not found in registrations, try maintenance_subscriptions
+  if (regLookupErr || !registration) {
+    const { data: subscription, error: subLookupErr } = await supabase
+      .from("maintenance_subscriptions")
+      .select("id, payment_status, payment_amount_luma, payment_currency, payment_order_id")
+      .eq("payment_order_id", orderId)
+      .single();
+
+    if (subLookupErr || !subscription) {
+      console.warn("callback: unknown orderId in both tables", orderId);
+      return isWebhook
+        ? new Response("unknown order", { status: 404 })
+        : fallbackRedirect(siteUrl, "unknown_order");
+    }
+
+    // ── Maintenance subscription branch ──────────────────────────────
+
+    if (subscription.payment_status === "paid") {
+      return isWebhook
+        ? new Response("already paid", { status: 200 })
+        : maintenanceRedirect(siteUrl, "success");
+    }
+    if (subscription.payment_status === "failed" || subscription.payment_status === "declined") {
+      return isWebhook
+        ? new Response("already failed", { status: 200 })
+        : maintenanceRedirect(siteUrl, "failed");
+    }
+
+    let mStatus: AcbaStatusResponse;
+    try {
+      mStatus = await verifyOrder(orderId);
+    } catch (e) {
+      console.error("verifyOrder network error (maintenance)", e);
+      return isWebhook
+        ? new Response("verify failed", { status: 502 })
+        : maintenanceRedirect(siteUrl, "failed", "verify_failed");
+    }
+
+    if (mStatus.errorCode && mStatus.errorCode !== "0") {
+      console.warn("verifyOrder gateway error (maintenance)", mStatus);
+      await supabase.from("maintenance_subscriptions")
+        .update({ payment_status: "failed" })
+        .eq("id", subscription.id)
+        .eq("payment_status", "pending");
+      return isWebhook
+        ? new Response("gateway error", { status: 200 })
+        : maintenanceRedirect(siteUrl, "failed");
+    }
+
+    if (mStatus.orderStatus === 2) {
+      if (typeof mStatus.amount === "number" && mStatus.amount !== subscription.payment_amount_luma) {
+        console.error("amount mismatch (maintenance)", { expected: subscription.payment_amount_luma, got: mStatus.amount });
+        await supabase.from("maintenance_subscriptions")
+          .update({ payment_status: "amount_mismatch" })
+          .eq("id", subscription.id)
+          .eq("payment_status", "pending");
+        return isWebhook
+          ? new Response("amount mismatch", { status: 200 })
+          : maintenanceRedirect(siteUrl, "failed", "amount_mismatch");
+      }
+
+      const cardInfo = extractCardInfo(mStatus);
+      const { error: mUpdErr } = await supabase
+        .from("maintenance_subscriptions")
+        .update({
+          payment_status: "paid",
+          paid_at:         new Date().toISOString(),
+          payment_txn_id:  pickTxnId(mStatus),
+          ...cardInfo,
+        })
+        .eq("id", subscription.id)
+        .eq("payment_status", "pending");
+
+      if (mUpdErr) {
+        console.error("maintenance paid update failed", mUpdErr);
+      }
+
+      return isWebhook
+        ? new Response("ok", { status: 200 })
+        : maintenanceRedirect(siteUrl, "success");
+    }
+
+    if (mStatus.orderStatus === 6) {
+      await supabase.from("maintenance_subscriptions")
+        .update({ payment_status: "declined" })
+        .eq("id", subscription.id)
+        .eq("payment_status", "pending");
+      return isWebhook
+        ? new Response("declined", { status: 200 })
+        : maintenanceRedirect(siteUrl, "failed", "declined");
+    }
+
     return isWebhook
-      ? new Response("unknown order", { status: 404 })
-      : fallbackRedirect(siteUrl, "unknown_order");
+      ? new Response("pending", { status: 200 })
+      : maintenanceRedirect(siteUrl, "failed", "pending_at_gateway");
   }
+
+  // ── Event registration branch (original logic) ───────────────────
 
   // 2. Idempotency: if already finalised, skip the work and just redirect
   if (registration.payment_status === "paid") {
