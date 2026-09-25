@@ -13,6 +13,7 @@
 // Optional env vars (override defaults if AMD rate drifts):
 //   MAINTENANCE_MONTHLY_AMD   AMD amount for monthly plan  (default: 13_580_000 luma = 135,800 AMD ≈ $350)
 //   MAINTENANCE_ANNUAL_AMD    AMD amount for annual plan   (default: 151_320_000 luma = 1,513,200 AMD ≈ $3,900)
+//   MAINTENANCE_CATCHUP_AMD   AMD amount for catch-up plan (default: 67_900_000 luma = 679,000 AMD ≈ $1,750)
 
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
@@ -22,7 +23,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 interface CreateMaintenanceOrderRequest {
   name: string;
   email: string;
-  plan: "monthly" | "annual";
+  plan: "monthly" | "annual" | "catchup";
 }
 
 interface AcbaRegisterResponse {
@@ -55,7 +56,12 @@ function isEmail(s: unknown): s is string {
 
 // Amounts in AMD luma (AMD × 100). Defaults assume ~388 AMD/USD.
 // Override via env vars if the rate drifts significantly.
-const PLAN_AMOUNTS: Record<"monthly" | "annual", { amountLuma: number; amountUsd: number; label: string }> = {
+const PLAN_AMOUNTS: Record<"monthly" | "annual" | "catchup", { amountLuma: number; amountUsd: number; label: string }> = {
+  catchup: {
+    amountLuma: Number(Deno.env.get("MAINTENANCE_CATCHUP_AMD") ?? "67900000"),
+    amountUsd: 1750,
+    label: "Website Maintenance — Back Payment May–Sep 2026 (5 months)",
+  },
   monthly: {
     amountLuma: Number(Deno.env.get("MAINTENANCE_MONTHLY_AMD") ?? "13580000"),
     amountUsd: 350,
@@ -94,7 +100,7 @@ serve(async (req: Request): Promise<Response> => {
   if (!isEmail(email)) {
     return json({ error: "invalid_email" }, 400);
   }
-  if (plan !== "monthly" && plan !== "annual") {
+  if (plan !== "monthly" && plan !== "annual" && plan !== "catchup") {
     return json({ error: "invalid_plan" }, 400);
   }
 

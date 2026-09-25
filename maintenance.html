@@ -269,17 +269,43 @@
 
       <!-- ─── Pricing ─────────────────────────────────────────────── -->
       <section class="mb-8">
-        <h2 class="font-display font-medium text-white/88 text-xl mb-5" style="letter-spacing:-0.02em">Choose your billing cycle</h2>
+        <h2 class="font-display font-medium text-white/88 text-xl mb-5" style="letter-spacing:-0.02em">Choose your payment</h2>
 
-        <div class="grid sm:grid-cols-2 gap-4">
+        <div class="grid sm:grid-cols-3 gap-4">
+
+          <!-- Catch-up (default selected) -->
+          <button type="button" id="plan-catchup"
+            class="plan-card text-left rounded-2xl p-5 cursor-pointer focus-visible:outline-none"
+            style="background:rgba(10,18,32,0.75);border:1.5px solid #C9A14A;
+                   box-shadow:0 0 0 1px #C9A14A,0 8px 32px rgba(201,161,74,0.12),0 2px 8px rgba(0,0,0,0.35)"
+            onclick="selectPlan('catchup')"
+            aria-pressed="true">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <p class="text-[10px] uppercase tracking-widest text-gold/65 font-body font-semibold">Back payment</p>
+                  <span class="text-[10px] font-semibold font-body px-1.5 py-0.5 rounded-full"
+                        style="background:rgba(201,161,74,0.14);color:#C9A14A">Due now</span>
+                </div>
+                <div class="flex items-baseline gap-1">
+                  <span class="font-display text-[2.4rem] font-semibold text-white leading-none" style="letter-spacing:-0.04em">$1,750</span>
+                </div>
+              </div>
+              <div id="ring-catchup" class="mt-1 w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                   style="border:2px solid #C9A14A">
+                <div id="dot-catchup" class="w-2.5 h-2.5 rounded-full" style="background:#C9A14A"></div>
+              </div>
+            </div>
+            <p class="mt-3 text-sm text-white/45 font-body leading-relaxed">Covers May – Sep 2026 (5 months × $350).</p>
+            <p class="mt-1.5 text-[11px] text-white/25 font-body">One-time · services already rendered</p>
+          </button>
 
           <!-- Monthly -->
           <button type="button" id="plan-monthly"
             class="plan-card text-left rounded-2xl p-5 cursor-pointer focus-visible:outline-none"
-            style="background:rgba(10,18,32,0.75);border:1.5px solid #C9A14A;
-                   box-shadow:0 0 0 1px #C9A14A,0 8px 32px rgba(201,161,74,0.12),0 2px 8px rgba(0,0,0,0.35)"
+            style="background:rgba(10,18,32,0.75);border:1.5px solid rgba(255,255,255,0.1)"
             onclick="selectPlan('monthly')"
-            aria-pressed="true">
+            aria-pressed="false">
             <div class="flex items-start justify-between">
               <div>
                 <p class="text-[10px] uppercase tracking-widest text-gold/65 font-body font-semibold mb-2">Monthly</p>
@@ -289,8 +315,8 @@
                 </div>
               </div>
               <div id="ring-monthly" class="mt-1 w-5 h-5 rounded-full flex items-center justify-center shrink-0"
-                   style="border:2px solid #C9A14A">
-                <div id="dot-monthly" class="w-2.5 h-2.5 rounded-full" style="background:#C9A14A"></div>
+                   style="border:2px solid rgba(255,255,255,0.3)">
+                <div id="dot-monthly" class="w-2.5 h-2.5 rounded-full" style="background:transparent"></div>
               </div>
             </div>
             <p class="mt-3 text-sm text-white/45 font-body leading-relaxed">One invoice per month. Cancel with 60 days' notice.</p>
@@ -381,8 +407,8 @@
                  style="border-bottom:1px solid rgba(255,255,255,0.06)">
               <div>
                 <p class="text-[10px] uppercase tracking-widest text-white/35 font-body font-semibold">Due today</p>
-                <p id="summary-amount" class="font-display text-3xl text-white font-medium mt-1" style="letter-spacing:-0.03em">$350</p>
-                <p id="summary-label" class="text-[11px] text-white/28 font-body mt-0.5">Monthly billing · USD</p>
+                <p id="summary-amount" class="font-display text-3xl text-white font-medium mt-1" style="letter-spacing:-0.03em">$1,750</p>
+                <p id="summary-label" class="text-[11px] text-white/28 font-body mt-0.5">Back payment · May–Sep 2026 · USD</p>
               </div>
               <div class="text-right">
                 <div class="flex items-center justify-end gap-2 mb-2">
@@ -396,7 +422,7 @@
 
             <button type="submit" id="btn-pay"
               class="btn-pay w-full rounded-xl py-3.5 px-6 font-body font-semibold text-sm flex items-center justify-center gap-2.5">
-              <span id="btn-text">Pay $350 →</span>
+              <span id="btn-text">Pay $1,750 →</span>
               <svg id="btn-spinner" class="spinner hidden w-4 h-4" style="color:#040810" viewBox="0 0 24 24" fill="none"
                    stroke="currentColor" stroke-width="2.5" aria-hidden="true">
                 <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke-linecap="round"/>
@@ -438,7 +464,7 @@
   <script>
     const SUPABASE_FUNCTIONS_URL = 'https://uvmfjdaqpsdbvokaynpi.supabase.co/functions/v1';
 
-    let selectedPlan = 'monthly';
+    let selectedPlan = 'catchup';
 
     /* ── Init: show payment result banners ─────────────────────── */
     (function init() {
@@ -454,14 +480,15 @@
 
     /* ── Plan selection ─────────────────────────────────────────── */
     const PLANS = {
-      monthly: { amount: '$350',   label: 'Monthly billing · USD',           btn: 'Pay $350 →' },
-      annual:  { amount: '$3,900', label: 'Annual prepay · USD · Save $300',  btn: 'Pay $3,900 →' },
+      catchup: { amount: '$1,750', label: 'Back payment · May–Sep 2026 · USD', btn: 'Pay $1,750 →' },
+      monthly: { amount: '$350',   label: 'Monthly billing · USD',              btn: 'Pay $350 →' },
+      annual:  { amount: '$3,900', label: 'Annual prepay · USD · Save $300',    btn: 'Pay $3,900 →' },
     };
 
     function selectPlan(plan) {
       selectedPlan = plan;
 
-      ['monthly', 'annual'].forEach(key => {
+      ['catchup', 'monthly', 'annual'].forEach(key => {
         const card    = document.getElementById('plan-' + key);
         const ring    = document.getElementById('ring-' + key);
         const dot     = document.getElementById('dot-' + key);
