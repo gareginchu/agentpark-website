@@ -496,10 +496,12 @@
       const spinner= document.getElementById('btn-spinner');
 
       errEl.classList.add('hidden');
+      clearFieldError('field-name');
+      clearFieldError('field-email');
 
-      if (name.length < 2) { return showError('Please enter your full name.'); }
+      if (name.length < 2) { focusField('field-name'); return showError('Please enter your full name.'); }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        return showError('Please enter a valid email address.');
+        focusField('field-email'); return showError('Please enter a valid email address.');
       }
 
       btn.disabled = true;
@@ -537,6 +539,20 @@
       const el = document.getElementById('error-msg');
       el.textContent = msg;
       el.classList.remove('hidden');
+    }
+
+    function focusField(id) {
+      const el = document.getElementById(id);
+      el.style.borderColor = 'rgba(239,68,68,0.7)';
+      el.style.boxShadow   = '0 0 0 3px rgba(239,68,68,0.15)';
+      el.focus();
+      el.addEventListener('input', () => clearFieldError(id), { once: true });
+    }
+
+    function clearFieldError(id) {
+      const el = document.getElementById(id);
+      el.style.borderColor = '';
+      el.style.boxShadow   = '';
     }
   </script>
 
